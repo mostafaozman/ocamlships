@@ -1,12 +1,12 @@
 .PHONY: test check
 
 zip: 
-	rm -f adventure.zip
-	zip -r adventure.zip . -x@exclude.lst
+	rm -f battleship.zip
+	zip -r battleship.zip . -x@exclude.lst
 
 clean:
 	dune clean
-	rm -f adventure.zip
+	rm -f battleship.zip
 
 build:
 	dune build
