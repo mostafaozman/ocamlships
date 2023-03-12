@@ -1,1 +1,1 @@
-"hello"
+(* Implement functions from battleship.mli *)

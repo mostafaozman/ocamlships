@@ -15,12 +15,11 @@ let example_test_function (name : string) (input : char) (expected_output : int)
  ********************************************************************)
 
 (* example test suites *)
-let adventure_tests = [ example_test_function "name" 'A' 0 ]
-let command_tests = []
-let state_tests = []
+let suite1_tests = [ example_test_function "name" 'A' 0 ]
+let suite2_tests = []
 
 let suite =
   "test suite for final project"
-  >::: List.flatten [ adventure_tests; command_tests; state_tests ]
+  >::: List.flatten [ suite1_tests; suite2_tests ]
 
 let _ = run_test_tt_main suite
