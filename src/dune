@@ -1,4 +1,3 @@
 (library
  (name battleship)
- ; (libraries [add libraries used here])
- )
+ (libraries graphics))
