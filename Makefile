@@ -1,12 +1,12 @@
-.PHONY: test check
+.PHONY: test
 
 zip: 
-	rm -f battleship.zip
-	zip -r battleship.zip . -x@exclude.lst
+	rm -f ships.zip
+	zip -r ships.zip . -x@exclude.lst
 
 clean:
 	dune clean
-	rm -f battleship.zip
+	rm -f ships.zip
 
 build:
 	dune build
