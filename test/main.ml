@@ -1,5 +1,5 @@
 open OUnit2
-open Battleship
+open Ships
 
 (********************************************************************
    Here are some helper functions for your testing of set-like lists.
