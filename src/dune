@@ -1,3 +1,4 @@
 (library
- (name battleship)
+ (name ships)
+ (public_name Ships)
  (libraries graphics))
