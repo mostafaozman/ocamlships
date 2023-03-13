@@ -1,0 +1,27 @@
+There is a OPAM package that the user needs to install to play this game.
+
+To install it open your terminal and run:
+
+opam install graphics
+
+
+It will ask you a series of prompts, you want to say yes to all of the prompts
+(you can simply type 'y' as a response)
+
+It might take a moment, but eventually It will finish and you will need to run:
+
+eval $(opam env)
+
+to reconfigure your new opam package to its enviroment. Another alternative is 
+restarting your device but you do not have to do this.
+
+Once you have finished this check if it works by running the following lines in utop:
+
+#require "graphics";;
+
+open Graphics;;
+
+open_graph " 480x270";;
+
+The result should result in a dialogue box popping up with the specified 
+dimensions in open_graph.
