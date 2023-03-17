@@ -1,2 +1,5 @@
 (* Implement functions from gui.mli *)
-let start_game () = raise (Failure "Unimplemented")
+open Graphics
+
+let start_game () = open_graph " 800x800"
+let quit () = close_graph
