@@ -17,6 +17,9 @@ test:
 utop:
 	OCAMLRUNPARAM=b dune utop src
 
+play:
+	OCAMLRUNPARAM=b dune exec bin/main.exe
+
 doc:
 	dune build @doc
 	
