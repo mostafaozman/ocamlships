@@ -1,23 +1,18 @@
 (* Implement functions from battleship.mli *)
-let cBOARD_SIZE = 10
-let cCARRIER = 5
-let cDESTROYER = 4
-let cSUBMARINE = 3
-let cPATROL = 2
-let cSHIP_SIZES = [ cCARRIER; cDESTROYER; cSUBMARINE; cPATROL ]
+open Consts
 
 exception InvalidPosition
 
 type ship = {
   length : int;
-  mutable hits : int;
+  hits : int;
 }
 
 type cell =
   | Empty of (int * int)
   | Ship of {
       position : int * int;
-      ship : ship ref;
+      mutable ship : ship;
     }
   | Hit of (int * int)
   | Miss of (int * int)
@@ -124,7 +119,7 @@ let place_ship player ship row col dir =
              (fun x ->
                let pos_x = extract_pos x in
                if List.mem pos_x ship_spots then
-                 Ship { position = (fst pos_x, snd pos_x); ship = ref ship }
+                 Ship { position = (fst pos_x, snd pos_x); ship }
                else x)
              y)
          player.board
