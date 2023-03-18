@@ -68,10 +68,10 @@ let extract_pos (cell : cell) =
   | Empty t | Hit t | Miss t -> t
   | Ship t -> t.position
 
-(** [pos_of_ship board ship row col dir] is all the coordinates on board which
-    [ship] will occupy when placed on position ([row],[col]) facing direction
-    [dir]. Raises InvalidPosition if any coordinates are out of bounds *)
-let pos_of_ship ship row col dir =
+(** [pos_of_ship board ship x y dir] is all the coordinates on board which
+    [ship] will occupy when placed on position ([x],[y]) facing direction [dir].
+    Raises InvalidPosition if any coordinates are out of bounds *)
+let pos_of_ship ship x y dir =
   let rec check_bounds acc lst =
     match lst with
     | [] -> acc
@@ -82,14 +82,12 @@ let pos_of_ship ship row col dir =
   in
   (match ship.length with
   | 5 ->
-      if dir = 0 then List.init 5 (fun x -> (row + (-2 + x), col))
-      else List.init 5 (fun y -> (row, col + (-2 + y)))
+      if dir = 0 then List.init 5 (fun i -> (x + (-2 + i), y))
+      else List.init 5 (fun y -> (x, y + (-2 + y)))
   | 3 | 4 ->
-      if dir = 0 then List.init ship.length (fun x -> (row + (-1 + x), col))
-      else List.init ship.length (fun x -> (row, col + (-1 + x)))
-  | 2 ->
-      if dir = 0 then [ (row, col); (row + 1, col) ]
-      else [ (row, col); (row, col + 1) ]
+      if dir = 0 then List.init ship.length (fun i -> (x + (-1 + i), y))
+      else List.init ship.length (fun i -> (x, y + (-1 + i)))
+  | 2 -> if dir = 0 then [ (x, y); (x + 1, y) ] else [ (x, y); (x, y + 1) ]
   | _ -> [])
   |> check_bounds []
 
@@ -107,7 +105,7 @@ let rec check_position (board : board) (ship_spots : (int * int) list) =
       then check_position t ship_spots
       else false
 
-let place_ship player ship row col dir =
+let place_ship player ship x y dir =
   let updated_board board ship ship_spots =
     if check_position board ship_spots then
       List.map
@@ -122,9 +120,9 @@ let place_ship player ship row col dir =
         board
     else board
   in
-  let ship_spots = pos_of_ship ship row col dir in
+  let ship_spots = pos_of_ship ship x y dir in
   { player with board = updated_board player.board (ref ship) ship_spots }
 
-let fire board row col = raise (Failure "init_board Unimplemented")
+let fire board x y = raise (Failure "init_board Unimplemented")
 let get_ships player = player.ships
 let is_game_over player = raise (Failure "init_board Unimplemented")

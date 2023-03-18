@@ -1,6 +1,6 @@
-There is a OPAM package that the user needs to install to play this game.
+There is an OPAM package that the user needs to install to play this game.
 
-To install it open your terminal and run:
+To install it open your command line and run:
 
 opam install graphics
 
@@ -15,7 +15,8 @@ eval $(opam env)
 to reconfigure your new opam package to its enviroment. Another alternative is 
 restarting your device but you do not have to do this.
 
-Once you have finished this check if it works by running the following lines in utop:
+Once you have finished this, check if it works by running the following lines in
+utop:
 
 #require "graphics";;
 
