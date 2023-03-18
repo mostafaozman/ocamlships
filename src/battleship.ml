@@ -5,14 +5,14 @@ exception InvalidPosition
 
 type ship = {
   length : int;
-  hits : int;
+  mutable hits : int;
 }
 
 type cell =
   | Empty of (int * int)
   | Ship of {
       position : int * int;
-      mutable ship : ship;
+      ship : ship ref;
     }
   | Hit of (int * int)
   | Miss of (int * int)
@@ -108,23 +108,22 @@ let rec check_position (board : board) (ship_spots : (int * int) list) =
       else false
 
 let place_ship player ship row col dir =
+  let updated_board board ship ship_spots =
+    if check_position board ship_spots then
+      List.map
+        (fun y ->
+          List.map
+            (fun x ->
+              let pos_x = extract_pos x in
+              if List.mem pos_x ship_spots then
+                Ship { position = (fst pos_x, snd pos_x); ship }
+              else x)
+            y)
+        board
+    else board
+  in
   let ship_spots = pos_of_ship ship row col dir in
-  {
-    player with
-    board =
-      (if check_position player.board ship_spots then
-       List.map
-         (fun y ->
-           List.map
-             (fun x ->
-               let pos_x = extract_pos x in
-               if List.mem pos_x ship_spots then
-                 Ship { position = (fst pos_x, snd pos_x); ship }
-               else x)
-             y)
-         player.board
-      else player.board);
-  }
+  { player with board = updated_board player.board (ref ship) ship_spots }
 
 let fire board row col = raise (Failure "init_board Unimplemented")
 let get_ships player = player.ships
