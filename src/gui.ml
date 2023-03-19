@@ -1,42 +1,35 @@
 (* Implement functions from gui.mli *)
-open GMain
 open Graphics
 
 let go_green = 0x1B512D
 let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
 
-(* let _ = GMain.init ()
+let write size mv_x mv_y color string =
+  set_text_size size;
+  moveto mv_x mv_y;
+  set_color white;
+  draw_string string
 
-   let main () = let window = GWindow.window ~border_width:800
-   ~title:"LablGL/Gtk" () in window#connect#destroy ~callback:Main.quit; ()
+let draw_btn color x y width height =
+  set_color color;
+  fill_rect x y width height
 
-   let button = GButton.button ~label:"Hello World" ~packing:window#add ()
-   window#show (); GMain.main ()
-
-   (* let add_buttons ?pixfile canvas = let group = canvas#get_root_item in let
-   start = GooCanvas.rect ~props: [X 10; Y 10; ] *) *)
-let start_game () =
-  let state = true in
-  let _ = open_graph " 800x800" in
-
-  let draw_btn color x y width height =
-    set_color color;
-    fill_rect x y width height
-  in
-
+let home () =
   draw_btn go_green 150 300 500 100;
-  moveto 150 300;
-  draw_string "Start Game";
+  write 20 450 350 white "Start Game";
 
   draw_btn quit_red 150 100 375 100;
-  moveto 150 100;
-  draw_string "Quit";
+  write 20 450 150 white "Quit";
 
   draw_btn black 170 620 600 280;
-  moveto 150 600;
+  write 50 150 700 white "Battle Ships"
 
-  draw_string "Battle Ship";
+let start_game () =
+  let _ = open_graph " 800x800" in
+  let state = true in
+
+  home ();
 
   while state do
     ()
