@@ -59,8 +59,8 @@ let rec is_adjacent (lst : cell list list) (x : int * int) (a : int * int) :
     || snd a >= cBOARD_SIZE
   then raise InvalidPosition
   else
-    let dx = abs (snd a - fst a) in
-    let dy = abs (snd x - fst x) in
+    let dx = abs (fst x - fst a) in
+    let dy = abs (snd x - snd a) in
     dx <= 1 && dy <= 1
 
 let extract_pos (cell : cell) =
