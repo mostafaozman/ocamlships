@@ -42,6 +42,7 @@ let create_ship x =
   | 6 | 7 | 8 | 9 -> init_ship cPATROL
   | _ -> raise (invalid_arg "Too many ships")
 
+let get_ship_length s = s.length
 let init_player () = { board = init_board (); ships = List.init 10 create_ship }
 
 (** [is_adjacent lst x a] is whether the element at position [x] in the matrix

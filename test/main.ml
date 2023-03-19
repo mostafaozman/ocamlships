@@ -1,8 +1,8 @@
 open OUnit2
-open Ships
+open Ships.Battleship
 
 (********************************************************************
-   Here are some helper functions for your testing of set-like lists.
+   Helper functions.
  ********************************************************************)
 
 let example_test_function (name : string) (input : char) (expected_output : int)
@@ -15,7 +15,12 @@ let example_test_function (name : string) (input : char) (expected_output : int)
  ********************************************************************)
 
 (* example test suites *)
-let suite1_tests = [ example_test_function "name" 'A' 0 ]
+let suite1_tests =
+  [
+    ( "Initialize ship test" >:: fun _ ->
+      assert_equal 4 (init_ship 4 |> get_ship_length) );
+  ]
+
 let suite2_tests = []
 
 let suite =

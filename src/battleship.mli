@@ -21,6 +21,9 @@ val init_board : unit -> board
 val init_ship : int -> ship
 (** [init_ship i] initializes a new ship of length [i] *)
 
+val get_ship_length : ship -> int
+(** [get_ship_length s] is the length of the ship [s] *)
+
 val init_player : unit -> player
 (** [init_player ()] initializes a player with an empty board *)
 
