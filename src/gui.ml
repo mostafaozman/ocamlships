@@ -1,6 +1,7 @@
 (* Implement functions from gui.mli *)
 open Graphics
 open Battleship
+open Consts
 
 type state =
   | START
@@ -32,18 +33,16 @@ let home () =
   draw_btn black 0 620 800 280;
   write 280 680 white "Battle Ships"
 
-let off = 4
-
 let play_board () =
   draw_btn black 70 120 634 634;
-  for y = 0 to 13 do
-    for x = 0 to 13 do
-      draw_btn ocean_blue (70 + off + (45 * x)) (120 + off + (45 * y)) 41 41
+  for y = 0 to cNUM_BOX do
+    for x = 0 to cNUM_BOX do
+      draw_btn ocean_blue
+        (cLL_X + cBOX_OFF + (cBOX_SIZE * x))
+        (cLL_Y + cBOX_OFF + (cBOX_SIZE * y))
+        41 41
     done
   done
-(* draw_btn white (70 + off) (120 + off) 41 41; draw_btn white (70 + off + 45)
-   (120 + off) 41 41; draw_btn white (70 + off) (120 + off + 45) 41 41 *)
-(* let b = init_board () in let rec make_grid b *)
 
 let quit () = exit 0
 
