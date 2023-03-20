@@ -16,14 +16,14 @@ let draw_btn color x y width height =
   fill_rect x y width height
 
 let home () =
-  draw_btn go_green 150 300 500 100;
-  write 20 450 350 white "Start Game";
+  draw_btn go_green 200 300 400 125;
 
-  draw_btn quit_red 150 100 375 100;
-  write 20 450 150 white "Quit";
+  write 20 375 350 white "Start Game";
+  draw_btn quit_red 200 100 400 125;
 
-  draw_btn black 170 620 600 280;
-  write 50 150 700 white "Battle Ships"
+  write 20 390 150 white "Quit";
+  draw_btn black 0 620 800 280;
+  write 50 370 700 white "Battle Ships"
 
 let start_game () =
   let _ = open_graph " 800x800" in
