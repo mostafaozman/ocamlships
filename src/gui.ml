@@ -17,13 +17,16 @@ let draw_btn color x y width height =
 
 let home () =
   draw_btn go_green 200 300 400 125;
-
   write 20 375 350 white "Start Game";
-  draw_btn quit_red 200 100 400 125;
 
+  draw_btn quit_red 200 100 400 125;
   write 20 390 150 white "Quit";
+
   draw_btn black 0 620 800 280;
   write 50 370 700 white "Battle Ships"
+
+let quit () = close_graph ()
+let go_start () = clear_graph ()
 
 let start_game () =
   let _ = open_graph " 800x800" in
@@ -32,7 +35,15 @@ let start_game () =
   home ();
 
   while state do
-    ()
+    let st = wait_next_event [ Button_down; Key_pressed ] in
+    synchronize ();
+    if st.key == 'q' then quit ();
+    if
+      (st.mouse_x >= 200 && st.mouse_x <= 600)
+      && st.mouse_y >= 300 && st.mouse_y <= 425
+    then go_start ()
+    else if
+      (st.mouse_x >= 200 && st.mouse_x <= 600)
+      && st.mouse_y >= 100 && st.mouse_y <= 225
+    then quit ()
   done
-
-let quit () = close_graph ()
