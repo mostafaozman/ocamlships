@@ -38,10 +38,11 @@ let start_game () =
     let st = wait_next_event [ Button_down; Key_pressed ] in
     synchronize ();
     if st.key == 'q' then quit ();
+    (* If comdition for start box *)
     if
       (st.mouse_x >= 200 && st.mouse_x <= 600)
       && st.mouse_y >= 300 && st.mouse_y <= 425
-    then go_start ()
+    then go_start () (* If comdition for quit box *)
     else if
       (st.mouse_x >= 200 && st.mouse_x <= 600)
       && st.mouse_y >= 100 && st.mouse_y <= 225
