@@ -2,6 +2,11 @@
 open Graphics
 open Battleship
 
+type state =
+  | START
+  | MyBOARD
+
+let state = ref START
 let go_green = 0x1B512D
 let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
@@ -43,26 +48,29 @@ let play_board () =
 let quit () = exit 0
 
 let go_start () =
+  state := MyBOARD;
   clear_graph ();
   play_board ()
 
 let start_game () =
   let _ = open_graph " 800x800" in
-  let state = true in
 
   home ();
-
-  while state do
+  while !state = START do
     let st = wait_next_event [ Button_down; Key_pressed ] in
     synchronize ();
     if st.key == 'q' then quit ();
-    (* If comdition for start box *)
+    (* If condition for start box *)
     if
       (st.mouse_x >= 200 && st.mouse_x <= 600)
       && st.mouse_y >= 300 && st.mouse_y <= 425
-    then go_start () (* If comdition for quit box *)
+    then go_start () (* If condition for quit box *)
     else if
       (st.mouse_x >= 200 && st.mouse_x <= 600)
       && st.mouse_y >= 100 && st.mouse_y <= 225
     then quit ()
+  done;
+
+  while !state = MyBOARD do
+    ()
   done
