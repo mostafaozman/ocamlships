@@ -25,7 +25,7 @@ let home () =
   draw_btn black 0 620 800 280;
   write 50 370 700 white "Battle Ships"
 
-let quit () = close_graph ()
+let quit () = exit 0
 let go_start () = clear_graph ()
 
 let start_game () =
