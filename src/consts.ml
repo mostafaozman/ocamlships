@@ -1,4 +1,4 @@
-let cBOARD_SIZE = 10
+let cBOARD_SIZE = 14
 let cCARRIER = 5
 let cDESTROYER = 4
 let cSUBMARINE = 3

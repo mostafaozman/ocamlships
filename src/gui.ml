@@ -1,9 +1,11 @@
 (* Implement functions from gui.mli *)
 open Graphics
+open Battleship
 
 let go_green = 0x1B512D
 let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
+let ocean_blue = 0x7BB5FF
 
 let write mv_x mv_y color string =
   set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
@@ -25,8 +27,24 @@ let home () =
   draw_btn black 0 620 800 280;
   write 280 680 white "Battle Ships"
 
+let off = 4
+
+let play_board () =
+  draw_btn black 70 120 634 634;
+  for y = 0 to 13 do
+    for x = 0 to 13 do
+      draw_btn ocean_blue (70 + off + (45 * x)) (120 + off + (45 * y)) 41 41
+    done
+  done
+(* draw_btn white (70 + off) (120 + off) 41 41; draw_btn white (70 + off + 45)
+   (120 + off) 41 41; draw_btn white (70 + off) (120 + off + 45) 41 41 *)
+(* let b = init_board () in let rec make_grid b *)
+
 let quit () = exit 0
-let go_start () = clear_graph ()
+
+let go_start () =
+  clear_graph ();
+  play_board ()
 
 let start_game () =
   let _ = open_graph " 800x800" in
