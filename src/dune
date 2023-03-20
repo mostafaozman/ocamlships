@@ -1,4 +1,4 @@
 (library
  (name ships)
  (public_name Ships)
- (libraries graphics lablgtk3))
+ (libraries graphics))
