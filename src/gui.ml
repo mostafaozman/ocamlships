@@ -14,10 +14,16 @@ let logo_wht = 0xF7F7F2
 let ocean_blue = 0x7BB5FF
 
 let write mv_x mv_y color string =
-  set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  moveto mv_x mv_y;
-  set_color white;
-  draw_string string
+  match Sys.os_type with
+  | "MacOS" ->
+      set_font "-*-fixed-medium-r-s*--12-87-*-*-*-*-iso10???-1";
+      moveto mv_x mv_y;
+      set_color white;
+      draw_string string
+  | _ ->
+      moveto mv_x mv_y;
+      set_color white;
+      draw_string string
 
 let draw_btn color x y width height =
   set_color color;
