@@ -47,11 +47,11 @@ val get_player : game -> int -> player
 val get_player_board : player -> board
 (** [get_player_board p] is the board associated with player [p]*)
 
-val is_placeable : board -> ship -> int -> int -> int -> bool
+(* val is_placeable : board -> ship -> int -> int -> int -> bool
 (** [is_placeable board ship x y dir] is whether [ship] can be placed at
     position ([x],[y] on the [board]. It is true if it can be placed, false
     otherwise. The ship can be placed if and only if the coordinates it will
-    occupy are empty)*)
+    occupy are empty)*) *)
 
 val get_coordinate : board -> int * int -> cell
 (** [get_coordinate x] is the cell at coordinate [x]*)

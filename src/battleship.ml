@@ -102,8 +102,8 @@ let pos_of_ship ship x y dir =
   | _ -> [])
   |> check_bounds []
 
-(** [check_position b s] is whether all in [s] are empty.*)
-let rec check_position (board : board) (ship_spots : (int * int) list) =
+(** [is_valid_position b s] is whether all in [s] are empty.*)
+let rec is_valid_position (board : board) (ship_spots : (int * int) list) =
   match board with
   | [] -> true
   | h :: t ->
@@ -114,25 +114,25 @@ let rec check_position (board : board) (ship_spots : (int * int) list) =
             if List.mem pos_x ship_spots then x = Empty (fst pos_x, snd pos_x)
             else true)
           h
-      then check_position t ship_spots
+      then is_valid_position t ship_spots
       else false
 
-let is_placeable board ship x y dir =
-  check_position board (pos_of_ship ship x y dir)
+let place_ship_helper board ship ship_spots =
+  List.map
+    (fun y ->
+      List.map
+        (fun x ->
+          let pos_x = extract_pos x in
+          if List.mem pos_x ship_spots then
+            Ship { position = (fst pos_x, snd pos_x); ship }
+          else x)
+        y)
+    board
 
 let place_ship player ship x y dir =
   let updated_board board ship ship_spots =
-    if check_position board ship_spots then
-      List.map
-        (fun y ->
-          List.map
-            (fun x ->
-              let pos_x = extract_pos x in
-              if List.mem pos_x ship_spots then
-                Ship { position = (fst pos_x, snd pos_x); ship }
-              else x)
-            y)
-        board
+    if is_valid_position board ship_spots then
+      place_ship_helper board ship ship_spots
     else board
   in
   let ship_spots = pos_of_ship ship x y dir in
