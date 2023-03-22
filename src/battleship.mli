@@ -47,23 +47,23 @@ val get_player : game -> int -> player
 val get_player_board : player -> board
 (** [get_player_board p] is the board associated with player [p]*)
 
-val is_placeable : board -> ship -> int -> int -> int -> bool
-(** [is_placeable board ship x y dir] is whether [ship] can be placed at
-    position ([x],[y] on the [board]. It is true if it can be placed, false
-    otherwise. The ship can be placed if and only if the coordinates it will
-    occupy are empty)*)
+(* val is_placeable : board -> ship -> int -> int -> int -> bool (**
+   [is_placeable board ship x y dir] is whether [ship] can be placed at position
+   ([x],[y] on the [board]. It is true if it can be placed, false otherwise. The
+   ship can be placed if and only if the coordinates it will occupy are
+   empty)*) *)
 
 val get_coordinate : board -> int * int -> cell
-(** [get_coordinate x] is the cell at coordinate [x]*)
+(** [get_coordinate x] is the cell at board coordinate [x]. *)
 
 val place_ship : player -> ship -> int -> int -> int -> player
 (** [place_ship board ship x y dir] is the board after a ship has been placed in
-    position ([x],[y]) facing direction [dir]. [dir] is 0 if the ship is
+    board position ([x],[y]) facing direction [dir]. [dir] is 0 if the ship is
     horizontal, 1 if vertical. Requires: [dir] is 0 or 1.*)
 
 val fire : board -> int -> int -> board
-(** [fire board x y] is the updated [board] after a shot is fired at position
-    ([x],[y]) on the board *)
+(** [fire board x y] is the updated [board] after a shot is fired at board
+    position ([x],[y]) on the board *)
 
 val get_ships : player -> ship list
 (** [get_ships player] is the list of all ships belonging to the [player]*)
