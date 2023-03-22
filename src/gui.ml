@@ -13,6 +13,8 @@ let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
 let ocean_blue = 0x7BB5FF
 
+(** [write x y c s sz] draws the text of [s] with font size [sz] at position
+    ([x],[y]) on the screen*)
 let write mv_x mv_y color string size =
   set_font
     ("-*-fixed-medium-r-semicondensed--" ^ string_of_int size
@@ -21,10 +23,13 @@ let write mv_x mv_y color string size =
   set_color white;
   draw_string string
 
+(** [draw_btn c x y w h] draws a rectangle at position ([x],[y]) with width [w]
+    and height [h] in color [c]*)
 let draw_btn color x y width height =
   set_color color;
   fill_rect x y width height
 
+(** [home ()] draws the start screen of the game*)
 let home () =
   draw_btn go_green 200 300 400 125;
   write 300 340 white "Start Game" 50;
@@ -49,12 +54,16 @@ let play_board () =
 
 let quit () = exit 0
 
+(** [draw_cell c x y] draws a cell of color [c] at position ([x],[y]) on the
+    grid*)
 let draw_cell color x y =
   draw_btn color
     (background_llx + box_off + (box_size * x))
     (background_tly - box_size - (box_size * y))
     41 41
 
+(** [draw_player_board p] draws the board associated with player [p]. Color of
+    cells depends on the cells state*)
 let draw_player_board p =
   draw_btn black background_llx background_lly background_length
     background_length;
@@ -69,11 +78,13 @@ let draw_player_board p =
     done
   done
 
+(** [go_start g] changes state to PLACING and draws the board of player 1 in [g]*)
 let go_start g =
   state := PLACING;
   clear_graph ();
   draw_player_board (get_player g 1)
 
+(** [start_loop g] is the start screen of game [g]*)
 let start_loop g =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
@@ -92,7 +103,7 @@ let start_loop g =
     && st.mouse_y >= 100 && st.mouse_y <= 225
   then quit ()
 
-let start_game () =
+let main () =
   let _ = open_graph " 800x800" in
   home ();
 

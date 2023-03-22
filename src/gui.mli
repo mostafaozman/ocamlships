@@ -1,2 +1,2 @@
-val start_game : unit -> unit
-(** [start_game ()] starts the Battleship GUI and game *)
+val main : unit -> unit
+(** [main ()] starts the Battleship GUI and game *)
