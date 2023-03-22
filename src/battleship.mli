@@ -28,6 +28,9 @@ exception InvalidPosition of string
 val init_board : unit -> board
 (** [init_board ()] initializes a new, empty game board. *)
 
+val string_of_coord : int * int -> string
+(** [string_of_coord x] is the string representation of x. *)
+
 val init_ship : int -> ship
 (** [init_ship i] initializes a new ship of length [i] *)
 

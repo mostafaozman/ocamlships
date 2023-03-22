@@ -12,14 +12,18 @@ let go_green = 0x1B512D
 let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
 let ocean_blue = 0x7BB5FF
+let game = ref (init_game "Player" "AI")
 
 let convert x y =
-  if x < 74 || x > 700 || y < 124 || y > 700 then
-    raise (InvalidPosition "Try again")
+  if
+    x < background_llx
+    || x > background_length + background_llx - box_off
+    || y < background_lly || y > background_tly
+  then None
   else
-    let r = (y - background_lly - box_off) / box_size in
+    let r = (background_tly - y - box_off) / box_size in
     let c = (x - background_llx - box_off) / box_size in
-    (c, r)
+    Some (c, r)
 
 (** [write x y c s sz] draws the text of [s] with font size [sz] at pixel
     position ([x],[y]). *)
@@ -75,7 +79,7 @@ let draw_cell color x y =
     board belongs to the current player [self] is true and cells with ships will
     be drawn the same as empty cells. if [self] is false, then draw ship cells
     differently than empty cells. *)
-let draw_player_board p self =
+let draw_player_board self p =
   draw_btn black background_llx background_lly background_length
     background_length;
   moveto background_llx background_tly;
@@ -95,7 +99,7 @@ let draw_player_board p self =
 let go_start g =
   state := PLACING;
   clear_graph ();
-  draw_player_board (get_player g 1) true
+  draw_player_board true (get_player g 1)
 
 (** [start_loop g] is the start screen of game [g]. *)
 let start_loop g =
@@ -107,7 +111,7 @@ let start_loop g =
     (st.mouse_x >= 200 && st.mouse_x <= 600)
     && st.mouse_y >= 300 && st.mouse_y <= 425
   then (
-    go_start g;
+    go_start !g;
     draw_btn quit_red 100 20 150 50;
     write 125 35 white "Length 5 ship" 15)
   else if
@@ -116,16 +120,32 @@ let start_loop g =
     && st.mouse_y >= 100 && st.mouse_y <= 225
   then quit ()
 
+let rec place_loop g =
+  let st = wait_next_event [ Button_down; Key_pressed ] in
+  synchronize ();
+  let tup = convert st.mouse_x st.mouse_y in
+  match tup with
+  | None -> place_loop g
+  | Some tup ->
+      place_ship (get_player g 1) (init_ship 5) (fst tup) (snd tup) 0
+      |> draw_player_board true
+
+let placing_loop g =
+  let st = wait_next_event [ Button_down; Key_pressed ] in
+  synchronize ();
+  if
+    (st.mouse_x >= 100 && st.mouse_x <= 250)
+    && st.mouse_y >= 20 && st.mouse_y <= 70
+  then place_loop !g
+
 let main () =
   let _ = open_graph " 800x800" in
   home ();
 
   while !state = START do
-    start_loop (init_game "Player" "AI")
+    start_loop game
   done;
 
   while !state = PLACING do
-    ()
-    (* if (st.mouse_x >= 100 && st.mouse_x <= 250) && (st.mouse_y >= 20 &&
-       st.mouse_y <= 70) then *)
+    placing_loop game
   done

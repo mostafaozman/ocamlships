@@ -53,7 +53,6 @@ let get_player_board p = p.board
 let init_game name1 name2 =
   { players = (init_player name1, init_player name2); current_player = 0 }
 
-(** [string_of_coord x] is the string representation of x. *)
 let string_of_coord x =
   "(" ^ string_of_int (fst x) ^ "," ^ string_of_int (snd x) ^ ")"
 
@@ -87,7 +86,7 @@ let pos_of_ship ship x y dir =
     match lst with
     | [] -> acc
     | h :: t ->
-        if fst h < 0 || fst h > board_size || snd h < 0 || snd h > board_size
+        if fst h < 0 || fst h >= board_size || snd h < 0 || snd h >= board_size
         then raise (InvalidPosition (string_of_coord h))
         else check_bounds (h :: acc) t
   in
@@ -136,6 +135,9 @@ let place_ship player ship x y dir =
     else board
   in
   let ship_spots = pos_of_ship ship x y dir in
+  print_newline ();
+  print_endline
+    (String.concat ";" (List.map (fun x -> string_of_coord x) ship_spots));
   { player with board = updated_board player.board (ref ship) ship_spots }
 
 let fire board x y = raise (Failure "init_board Unimplemented")
