@@ -13,17 +13,13 @@ let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
 let ocean_blue = 0x7BB5FF
 
-let write mv_x mv_y color string =
-  match Sys.os_type with
-  | "MacOS" ->
-      set_font "-*-fixed-medium-r-s*--12-87-*-*-*-*-iso10???-1";
-      moveto mv_x mv_y;
-      set_color white;
-      draw_string string
-  | _ ->
-      moveto mv_x mv_y;
-      set_color white;
-      draw_string string
+let write mv_x mv_y color string size =
+  set_font
+    ("-*-fixed-medium-r-semicondensed--" ^ string_of_int size
+   ^ "-*-*-*-*-*-iso8859-1");
+  moveto mv_x mv_y;
+  set_color white;
+  draw_string string
 
 let draw_btn color x y width height =
   set_color color;
@@ -31,24 +27,27 @@ let draw_btn color x y width height =
 
 let home () =
   draw_btn go_green 200 300 400 125;
-  write 300 340 white "Start Game";
+  write 300 340 white "Start Game" 50;
 
   draw_btn quit_red 200 100 400 125;
-  write 355 140 white "Quit";
+  write 355 140 white "Quit" 50;
 
   draw_btn black 0 620 800 280;
-  write 280 680 white "Battle Ships"
+  write 280 680 white "Battle Ships" 50
 
 let play_board () =
-  draw_btn black 70 120 634 634;
-  for y = 0 to cNUM_BOX do
-    for x = 0 to cNUM_BOX do
+  draw_btn black background_llx background_lly background_length
+    background_length;
+  for y = 0 to num_box do
+    for x = 0 to num_box do
       draw_btn ocean_blue
-        (cLL_X + cBOX_OFF + (cBOX_SIZE * x))
-        (cLL_Y + cBOX_OFF + (cBOX_SIZE * y))
+        (background_llx + box_off + (box_size * x))
+        (background_lly + box_off + (box_size * y))
         41 41
     done
-  done
+  done;
+  draw_btn quit_red 100 20 150 50;
+  write 125 35 white "Length 5 ship" 15
 
 let quit () = exit 0
 
@@ -79,5 +78,8 @@ let start_game () =
   done;
 
   while !state = PLACING do
-    ()
+    let st = wait_next_event [ Button_down ] in
+    synchronize ()
+    (* if (st.mouse_x >= 100 && st.mouse_x <= 250) && (st.mouse_y >= 20 &&
+       st.mouse_y <= 70) then *)
   done

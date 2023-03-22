@@ -30,16 +30,16 @@ type game = {
 }
 
 let init_board () =
-  List.init cBOARD_SIZE (fun y -> List.init cBOARD_SIZE (fun x -> Empty (x, y)))
+  List.init board_size (fun y -> List.init board_size (fun x -> Empty (x, y)))
 
 let init_ship len = { length = len; hits = 0 }
 
 let create_ship x =
   match x with
-  | 0 -> init_ship cCARRIER
-  | 1 | 2 -> init_ship cDESTROYER
-  | 3 | 4 | 5 -> init_ship cSUBMARINE
-  | 6 | 7 | 8 | 9 -> init_ship cPATROL
+  | 0 -> init_ship carrier
+  | 1 | 2 -> init_ship destroyer
+  | 3 | 4 | 5 -> init_ship submarine
+  | 6 | 7 | 8 | 9 -> init_ship patrol
   | _ -> raise (invalid_arg "Too many ships")
 
 let get_ship_length s = s.length
@@ -51,13 +51,13 @@ let rec is_adjacent (lst : cell list list) (x : int * int) (a : int * int) :
     bool =
   if
     fst x < 0
-    || fst x >= cBOARD_SIZE
+    || fst x >= board_size
     || snd x < 0
-    || snd x >= cBOARD_SIZE
+    || snd x >= board_size
     || fst a < 0
-    || fst a >= cBOARD_SIZE
+    || fst a >= board_size
     || snd a < 0
-    || snd a >= cBOARD_SIZE
+    || snd a >= board_size
   then raise InvalidPosition
   else
     let dx = abs (fst x - fst a) in
@@ -77,7 +77,7 @@ let pos_of_ship ship x y dir =
     match lst with
     | [] -> acc
     | h :: t ->
-        if fst h < 0 || fst h > cBOARD_SIZE || snd h < 0 || snd h > cBOARD_SIZE
+        if fst h < 0 || fst h > board_size || snd h < 0 || snd h > board_size
         then raise InvalidPosition
         else check_bounds (h :: acc) t
   in

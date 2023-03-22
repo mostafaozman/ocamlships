@@ -1,11 +1,12 @@
-let cBOARD_SIZE = 14
-let cCARRIER = 5
-let cDESTROYER = 4
-let cSUBMARINE = 3
-let cPATROL = 2
-let cSHIP_SIZES = [ cCARRIER; cDESTROYER; cSUBMARINE; cPATROL ]
-let cBOX_SIZE = 45
-let cNUM_BOX = 13
-let cBOX_OFF = 4
-let cLL_X = 70
-let cLL_Y = 120
+let board_size = 14
+let carrier = 5
+let destroyer = 4
+let submarine = 3
+let patrol = 2
+let box_size = 45
+let num_box = 13
+let box_off = 4
+let background_llx = 70
+let background_lly = 120
+
+let background_length = 634
