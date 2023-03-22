@@ -19,7 +19,7 @@ let convert x y =
   else
     let r = (y - background_lly - box_off) / box_size in
     let c = (x - background_llx - box_off) / box_size in
-    (r, c)
+    (c, r)
 
 (** [write x y c s sz] draws the text of [s] with font size [sz] at pixel
     position ([x],[y]). *)
@@ -48,6 +48,7 @@ let home () =
   draw_btn black 0 620 800 280;
   write 280 680 white "Battle Ships" 50
 
+(** [play_board ()] draws the placing ship screen of the game. *)
 let play_board () =
   draw_btn black background_llx background_lly background_length
     background_length;
