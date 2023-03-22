@@ -12,7 +12,6 @@ let go_green = 0x1B512D
 let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
 let ocean_blue = 0x7BB5FF
-let game = init_game "Joel" "AI"
 
 let write mv_x mv_y color string size =
   set_font
@@ -46,9 +45,7 @@ let play_board () =
         (background_lly + box_off + (box_size * y))
         41 41
     done
-  done;
-  draw_btn quit_red 100 20 150 50;
-  write 125 35 white "Length 5 ship" 15
+  done
 
 let quit () = exit 0
 
@@ -72,12 +69,12 @@ let draw_player_board p =
     done
   done
 
-let go_start () =
+let go_start g =
   state := PLACING;
   clear_graph ();
-  draw_player_board (place_ship (get_player game 1) (init_ship 5) 3 3 0)
+  draw_player_board (get_player g 1)
 
-let start_loop () =
+let start_loop g =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   if st.key == 'q' then quit ();
@@ -85,8 +82,12 @@ let start_loop () =
   if
     (st.mouse_x >= 200 && st.mouse_x <= 600)
     && st.mouse_y >= 300 && st.mouse_y <= 425
-  then go_start () (* If condition for quit box *)
+  then (
+    go_start g;
+    draw_btn quit_red 100 20 150 50;
+    write 125 35 white "Length 5 ship" 15)
   else if
+    (* If condition for quit box *)
     (st.mouse_x >= 200 && st.mouse_x <= 600)
     && st.mouse_y >= 100 && st.mouse_y <= 225
   then quit ()
@@ -96,7 +97,7 @@ let start_game () =
   home ();
 
   while !state = START do
-    start_loop ()
+    start_loop (init_game "Player" "AI")
   done;
 
   while !state = PLACING do
