@@ -12,7 +12,7 @@ type cell =
   | Miss of (int * int)
 
 type board = cell list list
-(** Type representing the game board, it is a 10x10 grid *)
+(** Type representing the game board, it is a 14x14 grid *)
 
 type player
 (** Type representing a player. Each player has a board and ships. *)

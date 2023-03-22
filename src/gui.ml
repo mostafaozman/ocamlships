@@ -13,6 +13,14 @@ let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
 let ocean_blue = 0x7BB5FF
 
+let convert x y =
+  if x < 74 || x > 700 || y < 124 || y > 700 then
+    raise (InvalidPosition "Try again")
+  else
+    let r = (y - background_lly - box_off) / box_size in
+    let c = (x - background_llx - box_off) / box_size in
+    (r, c)
+
 let write mv_x mv_y color string size =
   set_font
     ("-*-fixed-medium-r-semicondensed--" ^ string_of_int size
