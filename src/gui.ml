@@ -52,21 +52,6 @@ let home () =
   draw_btn black 0 620 800 280;
   write 280 680 white "Battle Ships" 50
 
-(** [play_board ()] draws the placing ship screen of the game. *)
-let play_board () =
-  draw_btn black background_llx background_lly background_length
-    background_length;
-  for y = 0 to num_box do
-    for x = 0 to num_box do
-      draw_btn ocean_blue
-        (background_llx + box_off + (box_size * x))
-        (background_lly + box_off + (box_size * y))
-        41 41
-    done
-  done
-
-let quit () = exit 0
-
 (** [draw_cell c x y] draws a cell of color [c] at pixel position ([x],[y]) on
     the grid. *)
 let draw_cell color x y =
@@ -74,6 +59,18 @@ let draw_cell color x y =
     (background_llx + box_off + (box_size * x))
     (background_tly - box_size - (box_size * y))
     41 41
+
+(** [play_board ()] draws the placing ship screen of the game. *)
+let play_board () =
+  draw_btn black background_llx background_lly background_length
+    background_length;
+  for y = 0 to num_box do
+    for x = 0 to num_box do
+      draw_cell ocean_blue x y
+    done
+  done
+
+let quit () = exit 0
 
 (** [draw_player_board p] draws the board associated with player [p]. If the
     board belongs to the current player [self] is true and cells with ships will
