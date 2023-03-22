@@ -1,7 +1,7 @@
 (* Implement functions from battleship.mli *)
 open Consts
 
-exception InvalidPosition
+exception InvalidPosition of string
 
 type ship = {
   length : int;
@@ -20,12 +20,13 @@ type cell =
 type board = cell list list
 
 type player = {
+  name : string;
   board : board;
   ships : ship list;
 }
 
 type game = {
-  players : player list;
+  players : player * player;
   mutable current_player : int;
 }
 
@@ -33,41 +34,50 @@ let init_board () =
   List.init board_size (fun y -> List.init board_size (fun x -> Empty (x, y)))
 
 let init_ship len = { length = len; hits = 0 }
-
-let create_ship x =
-  match x with
-  | 0 -> init_ship carrier
-  | 1 | 2 -> init_ship destroyer
-  | 3 | 4 | 5 -> init_ship submarine
-  | 6 | 7 | 8 | 9 -> init_ship patrol
-  | _ -> raise (invalid_arg "Too many ships")
-
 let get_ship_length s = s.length
-let init_player () = { board = init_board (); ships = List.init 10 create_ship }
+
+let init_player name =
+  let create_ship x =
+    match x with
+    | 0 -> init_ship carrier
+    | 1 | 2 -> init_ship destroyer
+    | 3 | 4 | 5 -> init_ship submarine
+    | 6 | 7 | 8 | 9 -> init_ship patrol
+    | _ -> raise (invalid_arg "Too many ships")
+  in
+  { name; board = init_board (); ships = List.init 10 create_ship }
+
+let get_player g i = if i = 1 then fst g.players else snd g.players
+let get_player_board p = p.board
+
+let init_game name1 name2 =
+  { players = (init_player name1, init_player name2); current_player = 0 }
+
+(** [string_of_coord x] is the string representation of x. *)
+let string_of_coord x =
+  "(" ^ string_of_int (fst x) ^ "," ^ string_of_int (snd x) ^ ")"
 
 (** [is_adjacent lst x a] is whether the element at position [x] in the matrix
     is adjacent, including diagonals, to the element at position [a].*)
 let rec is_adjacent (lst : cell list list) (x : int * int) (a : int * int) :
     bool =
-  if
-    fst x < 0
-    || fst x >= board_size
-    || snd x < 0
-    || snd x >= board_size
-    || fst a < 0
-    || fst a >= board_size
-    || snd a < 0
-    || snd a >= board_size
-  then raise InvalidPosition
+  if fst x < 0 || fst x >= board_size || snd x < 0 || snd x >= board_size then
+    raise (InvalidPosition (string_of_coord x))
+  else if fst a < 0 || fst a >= board_size || snd a < 0 || snd a >= board_size
+  then raise (InvalidPosition (string_of_coord a))
   else
     let dx = abs (fst x - fst a) in
     let dy = abs (snd x - snd a) in
     dx <= 1 && dy <= 1
 
+(** [extract_pos c] is the coordinates associated to [c]*)
 let extract_pos (cell : cell) =
   match cell with
   | Empty t | Hit t | Miss t -> t
   | Ship t -> t.position
+
+let get_coordinate b x =
+  (List.find (fun a -> extract_pos a = x)) (List.flatten b)
 
 (** [pos_of_ship board ship x y dir] is all the coordinates on board which
     [ship] will occupy when placed on position ([x],[y]) facing direction [dir].
@@ -78,7 +88,7 @@ let pos_of_ship ship x y dir =
     | [] -> acc
     | h :: t ->
         if fst h < 0 || fst h > board_size || snd h < 0 || snd h > board_size
-        then raise InvalidPosition
+        then raise (InvalidPosition (string_of_coord h))
         else check_bounds (h :: acc) t
   in
   (match ship.length with
@@ -92,6 +102,7 @@ let pos_of_ship ship x y dir =
   | _ -> [])
   |> check_bounds []
 
+(** [check_position b s] is whether all in [s] are empty.*)
 let rec check_position (board : board) (ship_spots : (int * int) list) =
   match board with
   | [] -> true
@@ -105,6 +116,9 @@ let rec check_position (board : board) (ship_spots : (int * int) list) =
           h
       then check_position t ship_spots
       else false
+
+let is_placeable board ship x y dir =
+  check_position board (pos_of_ship ship x y dir)
 
 let place_ship player ship x y dir =
   let updated_board board ship ship_spots =

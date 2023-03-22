@@ -8,5 +8,5 @@ let num_box = 13
 let box_off = 4
 let background_llx = 70
 let background_lly = 120
-
 let background_length = 634
+let background_tly = background_lly + background_length

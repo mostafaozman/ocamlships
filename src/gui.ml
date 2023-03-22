@@ -12,6 +12,7 @@ let go_green = 0x1B512D
 let quit_red = 0x94241a
 let logo_wht = 0xF7F7F2
 let ocean_blue = 0x7BB5FF
+let game = init_game "Joel" "AI"
 
 let write mv_x mv_y color string size =
   set_font
@@ -51,10 +52,30 @@ let play_board () =
 
 let quit () = exit 0
 
+let draw_cell color x y =
+  draw_btn color
+    (background_llx + box_off + (box_size * x))
+    (background_tly - box_size - (box_size * y))
+    41 41
+
+let draw_player_board p =
+  draw_btn black background_llx background_lly background_length
+    background_length;
+  moveto background_llx background_tly;
+  for y = 0 to num_box do
+    for x = 0 to num_box do
+      match get_coordinate (get_player_board p) (x, y) with
+      | Empty t -> draw_cell ocean_blue x y
+      | Hit t -> draw_cell quit_red x y
+      | Miss t -> draw_cell logo_wht x y
+      | Ship t -> draw_cell green x y
+    done
+  done
+
 let go_start () =
   state := PLACING;
   clear_graph ();
-  play_board ()
+  draw_player_board (get_player game 1)
 
 let start_loop () =
   let st = wait_next_event [ Button_down; Key_pressed ] in
@@ -73,13 +94,13 @@ let start_loop () =
 let start_game () =
   let _ = open_graph " 800x800" in
   home ();
+
   while !state = START do
     start_loop ()
   done;
 
   while !state = PLACING do
-    let st = wait_next_event [ Button_down ] in
-    synchronize ()
+    ()
     (* if (st.mouse_x >= 100 && st.mouse_x <= 250) && (st.mouse_y >= 20 &&
        st.mouse_y <= 70) then *)
   done
