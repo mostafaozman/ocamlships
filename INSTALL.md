@@ -27,3 +27,13 @@ open_graph " 480x270";;
 
 The result should result in an empty window popping up with the specified 
 dimensions in the open_graph command.
+
+For Windows users: there are fonts not installed in wsl by default so you have to install
+this xfonts library inorder to be able to see the font properly and play the game
+
+sudo apt-get install -y xfonts-base
+
+After running these commands you should be all set to play Aleph Null's 
+Battle Ship game.
+
+Have fun !!
