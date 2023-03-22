@@ -75,7 +75,7 @@ let draw_player_board p =
 let go_start () =
   state := PLACING;
   clear_graph ();
-  draw_player_board (get_player game 1)
+  draw_player_board (place_ship (get_player game 1) (init_ship 5) 3 3 0)
 
 let start_loop () =
   let st = wait_next_event [ Button_down; Key_pressed ] in
