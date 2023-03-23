@@ -32,7 +32,7 @@ let write mv_x mv_y color string size =
     ("-*-fixed-medium-r-semicondensed--" ^ string_of_int size
    ^ "-*-*-*-*-*-iso8859-1");
   moveto mv_x mv_y;
-  set_color white;
+  set_color color;
   draw_string string
 
 (** [draw_btn c x y w h] draws a rectangle at pixel position ([x],[y]) with
@@ -122,10 +122,16 @@ let rec place_loop g =
   synchronize ();
   let tup = convert st.mouse_x st.mouse_y in
   match tup with
-  | None -> place_loop g
-  | Some tup ->
-      place_ship (get_player g 1) (init_ship 5) (fst tup) (snd tup) 0
-      |> draw_player_board true
+  | None ->
+      write 400 35 black "Invalid Position" 15;
+      place_loop g
+  | Some tup -> (
+      try
+        place_ship (get_player g 1) (init_ship 5) (fst tup) (snd tup) 0
+        |> draw_player_board true
+      with e ->
+        write 400 35 black "Invalid Position" 15;
+        place_loop g)
 
 let placing_loop g =
   let st = wait_next_event [ Button_down; Key_pressed ] in

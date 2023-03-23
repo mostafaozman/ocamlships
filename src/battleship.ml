@@ -135,9 +135,6 @@ let place_ship player ship x y dir =
     else board
   in
   let ship_spots = pos_of_ship ship x y dir in
-  print_newline ();
-  print_endline
-    (String.concat ";" (List.map (fun x -> string_of_coord x) ship_spots));
   { player with board = updated_board player.board (ref ship) ship_spots }
 
 let fire board x y = raise (Failure "init_board Unimplemented")
