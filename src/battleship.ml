@@ -57,7 +57,7 @@ let string_of_coord x =
   "(" ^ string_of_int (fst x) ^ "," ^ string_of_int (snd x) ^ ")"
 
 (** [is_adjacent lst x a] is whether the element at position [x] in the matrix
-    is adjacent, including diagonals, to the element at position [a].*)
+    is adjacent, including diagonals, to the element at position [a]. *)
 let rec is_adjacent (lst : cell list list) (x : int * int) (a : int * int) :
     bool =
   if fst x < 0 || fst x >= board_size || snd x < 0 || snd x >= board_size then
@@ -78,9 +78,9 @@ let extract_pos (cell : cell) =
 let get_coordinate b x =
   (List.find (fun a -> extract_pos a = x)) (List.flatten b)
 
-(** [pos_of_ship board ship x y dir] is all the coordinates on board which
-    [ship] will occupy when placed on position ([x],[y]) facing direction [dir].
-    Raises InvalidPosition if any coordinates are out of bounds *)
+(** [pos_of_ship board ship x y dir] is all the coordinates which [ship] will
+    occupy when placed on grid position ([x],[y]) facing direction [dir]. Raises
+    InvalidPosition if any coordinates are out of bounds *)
 let pos_of_ship ship x y dir =
   let rec check_bounds acc lst =
     match lst with
