@@ -113,14 +113,14 @@ let rec place_loop g =
   let tup = convert st.mouse_x st.mouse_y in
   match tup with
   | None ->
-      write 400 35 black "Invalid Position" 15;
+      write 400 35 black "Invalid Position" 30;
       place_loop g
   | Some tup -> (
       try
         place_ship (get_player g 1) (init_ship 5) (fst tup) (snd tup) 0
         |> draw_player_board true
       with e ->
-        write 400 35 black "Invalid Position" 15;
+        write 400 35 black "Invalid Position" 30;
         place_loop g)
 
 let placing_loop g =
