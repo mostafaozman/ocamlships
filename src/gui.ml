@@ -60,16 +60,6 @@ let draw_cell color x y =
     (background_tly - box_size - (box_size * y))
     41 41
 
-(** [play_board ()] draws the placing ship screen of the game. *)
-let play_board () =
-  draw_btn black background_llx background_lly background_length
-    background_length;
-  for y = 0 to num_box do
-    for x = 0 to num_box do
-      draw_cell ocean_blue x y
-    done
-  done
-
 let quit () = exit 0
 
 (** [draw_player_board p] draws the board associated with player [p]. If the
