@@ -1,4 +1,4 @@
 (* Main code to run to play game *)
-open Ships.Gui
+open Ships.State
 
-let _ = Ships.Gui.main ()
+let _ = Ships.State.main ()
