@@ -10,3 +10,7 @@ let background_llx = 70
 let background_lly = 120
 let background_length = 634
 let background_tly = background_lly + background_length
+let go_green = 0x1B512D
+let quit_red = 0x94241a
+let logo_wht = 0xF7F7F2
+let ocean_blue = 0x7BB5FF

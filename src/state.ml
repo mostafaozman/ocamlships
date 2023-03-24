@@ -24,6 +24,7 @@ let convert x y =
     let c = (x - background_llx - box_off) / box_size in
     Some (c, r)
 
+(** [quit ()] exits the program with exit status 0. *)
 let quit () = exit 0
 
 (** [go_start g] changes state to PLACING and draws the board of player 1 in
@@ -51,31 +52,35 @@ let start_loop game =
     && st.mouse_y >= 100 && st.mouse_y <= 225
   then quit ()
 
-let rec place_loop game i =
+(** [place_loop g p i] draws the board of player number [p] after they have
+    placed a ship of length [i] in game [g]. *)
+let rec place_loop game p i =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   clear_graph ();
-  draw_placing_screen game 1;
+  draw_placing_screen game p;
   let tup = convert st.mouse_x st.mouse_y in
   match tup with
   | None ->
       write 400 35 black "Invalid Position" 30;
-      place_loop game i
+      place_loop game p i
   | Some tup -> (
       try
         place_ship (get_player !game 1) (init_ship i) (fst tup) (snd tup) 0
         |> draw_player_board true
       with e ->
         write 400 35 black "Invalid Position" 30;
-        place_loop game i)
+        place_loop game p i)
 
-let placing_loop game =
+(** [placing_loog g p] waits for player [p] to press the button for which ship
+    they will place and then allows them to place it in game [g]. *)
+let placing_loop game p =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   if
     (st.mouse_x >= 100 && st.mouse_x <= 250)
     && st.mouse_y >= 20 && st.mouse_y <= 70
-  then place_loop game 5
+  then place_loop game 1 5
 
 let main () =
   let _ = open_graph " 800x800" in
@@ -86,5 +91,5 @@ let main () =
   done;
 
   while !state = PLACING do
-    placing_loop game
+    placing_loop game 1
   done

@@ -2,11 +2,6 @@ open Graphics
 open Battleship
 open Consts
 
-let go_green = 0x1B512D
-let quit_red = 0x94241a
-let logo_wht = 0xF7F7F2
-let ocean_blue = 0x7BB5FF
-
 let write mv_x mv_y color string size =
   set_font
     ("-*-fixed-medium-r-semicondensed--" ^ string_of_int size
