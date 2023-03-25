@@ -40,21 +40,20 @@ val get_ship_length : ship -> int
 val init_player : string -> player
 (** [init_player ()] initializes a player with an empty board *)
 
-val init_game : string -> string -> game
-(** [init_game name1 name2] starts a game with two players, the player with
-    [name1] will go first, followed by player with [name2] *)
+val make_game : player -> player -> bool -> game
+(** [init_game p1 p2 curr] creates a game with two players, player [p1] will go
+    first if [curr] is true, player [p2] will go first otherwise *)
 
-val get_player : game -> int -> player
-(** [get_player g i] is player [i] in game [g]. Requires [i] is 1 or 2*)
+val get_player : game -> bool -> player
+(** [get_player g b] is player 1, in game [g], if [b] is true and player 2
+    otherwise. *)
 
 val get_player_board : player -> board
 (** [get_player_board p] is the board associated with player [p]*)
 
-(* val is_placeable : board -> ship -> int -> int -> int -> bool (**
-   [is_placeable board ship x y dir] is whether [ship] can be placed at position
-   ([x],[y] on the [board]. It is true if it can be placed, false otherwise. The
-   ship can be placed if and only if the coordinates it will occupy are
-   empty)*) *)
+val num_placed : player -> int -> int
+(** [num_placed p i] is the number of ships of length [i] that player [p] has on
+    their board. *)
 
 val get_coordinate : board -> int * int -> cell
 (** [get_coordinate x] is the cell at board coordinate [x]. *)

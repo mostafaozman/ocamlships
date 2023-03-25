@@ -27,7 +27,7 @@ type player = {
 
 type game = {
   players : player * player;
-  mutable current_player : int;
+  mutable current_player : bool;
 }
 
 let init_board () =
@@ -47,11 +47,9 @@ let init_player name =
   in
   { name; board = init_board (); ships = List.init 10 create_ship }
 
-let get_player g i = if i = 1 then fst g.players else snd g.players
+let get_player g b = if b then fst g.players else snd g.players
 let get_player_board p = p.board
-
-let init_game name1 name2 =
-  { players = (init_player name1, init_player name2); current_player = 0 }
+let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
 
 let string_of_coord x =
   "(" ^ string_of_int (fst x) ^ "," ^ string_of_int (snd x) ^ ")"
@@ -136,6 +134,24 @@ let place_ship player ship x y dir =
   in
   let ship_spots = pos_of_ship ship x y dir in
   { player with board = updated_board player.board (ref ship) ship_spots }
+
+let num_placed player i =
+  let get_ship_cell i cell =
+    match cell with
+    | Empty _ | Hit _ | Miss _ -> false
+    | Ship t -> if !(t.ship).length = i then true else false
+  in
+  let get_ship_refs acc x =
+    match x with
+    | Empty _ | Hit _ | Miss _ -> acc
+    | Ship t -> t.ship :: acc
+  in
+  let check_unique acc x = if List.memq x acc then acc else x :: acc in
+  List.flatten player.board
+  |> List.filter (get_ship_cell i)
+  |> List.fold_left get_ship_refs []
+  |> List.fold_left check_unique []
+  |> List.length
 
 let fire board x y = raise (Failure "init_board Unimplemented")
 let get_ships player = player.ships
