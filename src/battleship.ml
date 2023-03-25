@@ -153,6 +153,8 @@ let num_placed player i =
   |> List.fold_left check_unique []
   |> List.length
 
-let fire board x y = raise (Failure "init_board Unimplemented")
+let fire board x y = raise (Failure "Battleship.fire Unimplemented")
 let get_ships player = player.ships
-let is_game_over player = raise (Failure "init_board Unimplemented")
+
+let is_game_over player =
+  raise (Failure "Battleship.is_game_over Unimplemented")

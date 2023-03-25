@@ -41,7 +41,7 @@ val init_player : string -> player
 (** [init_player ()] initializes a player with an empty board *)
 
 val make_game : player -> player -> bool -> game
-(** [init_game p1 p2 curr] creates a game with two players, player [p1] will go
+(** [make_game p1 p2 curr] creates a game with two players, player [p1] will go
     first if [curr] is true, player [p2] will go first otherwise *)
 
 val get_player : game -> bool -> player
