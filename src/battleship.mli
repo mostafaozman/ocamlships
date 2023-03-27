@@ -22,9 +22,6 @@ type game
 
 exception InvalidPosition of string
 
-(* type game = { players : player list; mutable current_player : int; } *)
-(** Type representing the game itself. *)
-
 val init_board : unit -> board
 (** [init_board ()] initializes a new, empty game board. *)
 

@@ -141,16 +141,14 @@ let num_placed player i =
     | Empty _ | Hit _ | Miss _ -> false
     | Ship t -> if !(t.ship).length = i then true else false
   in
-  let get_ship_refs acc x =
+  let get_unique_ship_refs acc x =
     match x with
     | Empty _ | Hit _ | Miss _ -> acc
-    | Ship t -> t.ship :: acc
+    | Ship t -> if List.memq t.ship acc then acc else t.ship :: acc
   in
-  let check_unique acc x = if List.memq x acc then acc else x :: acc in
   List.flatten player.board
   |> List.filter (get_ship_cell i)
-  |> List.fold_left get_ship_refs []
-  |> List.fold_left check_unique []
+  |> List.fold_left get_unique_ship_refs []
   |> List.length
 
 let fire board x y = raise (Failure "Battleship.fire Unimplemented")
