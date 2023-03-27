@@ -64,9 +64,6 @@ val fire : board -> int -> int -> board
 (** [fire board x y] is the updated [board] after a shot is fired at board
     position ([x],[y]) on the board *)
 
-val get_ships : player -> ship list
-(** [get_ships player] is the list of all ships belonging to the [player]*)
-
 val is_game_over : player -> bool
 (** [is_game_over player] is whether all of [player]'s ships have been
     destroyed. *)

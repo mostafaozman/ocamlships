@@ -22,7 +22,6 @@ type board = cell list list
 type player = {
   name : string;
   board : board;
-  ships : ship list;
 }
 
 type game = {
@@ -35,18 +34,7 @@ let init_board () =
 
 let init_ship len = { length = len; hits = 0 }
 let get_ship_length s = s.length
-
-let init_player name =
-  let create_ship x =
-    match x with
-    | 0 -> init_ship carrier
-    | 1 | 2 -> init_ship destroyer
-    | 3 | 4 | 5 -> init_ship submarine
-    | 6 | 7 | 8 | 9 -> init_ship patrol
-    | _ -> raise (invalid_arg "Too many ships")
-  in
-  { name; board = init_board (); ships = List.init 10 create_ship }
-
+let init_player name = { name; board = init_board () }
 let get_player g b = if b then fst g.players else snd g.players
 let get_player_board p = p.board
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
@@ -152,7 +140,6 @@ let num_placed player i =
   |> List.length
 
 let fire board x y = raise (Failure "Battleship.fire Unimplemented")
-let get_ships player = player.ships
 
 let is_game_over player =
   raise (Failure "Battleship.is_game_over Unimplemented")
