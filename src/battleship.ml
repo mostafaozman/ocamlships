@@ -5,7 +5,7 @@ exception InvalidPosition of string
 
 type ship = {
   length : int;
-  mutable hits : int;
+  adjacents : (int * int) list;
 }
 
 type cell =
@@ -32,7 +32,7 @@ type game = {
 let init_board () =
   List.init board_size (fun y -> List.init board_size (fun x -> Empty (x, y)))
 
-let init_ship len = { length = len; hits = 0 }
+let init_ship len = { length = len; adjacents = [] }
 let get_ship_length s = s.length
 let init_player name = { name; board = init_board () }
 let get_player g b = if b then fst g.players else snd g.players
@@ -44,8 +44,7 @@ let string_of_coord x =
 
 (** [is_adjacent lst x a] is whether the element at position [x] in the matrix
     is adjacent, including diagonals, to the element at position [a]. *)
-let rec is_adjacent (lst : cell list list) (x : int * int) (a : int * int) :
-    bool =
+let rec is_adjacent (x : int * int) (a : int * int) : bool =
   if fst x < 0 || fst x >= board_size || snd x < 0 || snd x >= board_size then
     raise (InvalidPosition (string_of_coord x))
   else if fst a < 0 || fst a >= board_size || snd a < 0 || snd a >= board_size
@@ -76,16 +75,20 @@ let pos_of_ship ship x y dir =
         then raise (InvalidPosition (string_of_coord h))
         else check_bounds (h :: acc) t
   in
-  (match ship.length with
-  | 5 ->
-      if dir = 0 then List.init 5 (fun i -> (x + (-2 + i), y))
-      else List.init 5 (fun y -> (x, y + (-2 + y)))
-  | 3 | 4 ->
-      if dir = 0 then List.init ship.length (fun i -> (x + (-1 + i), y))
-      else List.init ship.length (fun i -> (x, y + (-1 + i)))
-  | 2 -> if dir = 0 then [ (x, y); (x + 1, y) ] else [ (x, y); (x, y + 1) ]
-  | _ -> [])
-  |> check_bounds []
+  begin
+    begin
+      match ship.length with
+      | 5 ->
+          if dir = 0 then List.init 5 (fun i -> (x + (-2 + i), y))
+          else List.init 5 (fun y -> (x, y + (-2 + y)))
+      | 4 | 3 ->
+          if dir = 0 then List.init ship.length (fun i -> (x + (-1 + i), y))
+          else List.init ship.length (fun i -> (x, y + (-1 + i)))
+      | 2 -> if dir = 0 then [ (x, y); (x + 1, y) ] else [ (x, y); (x, y + 1) ]
+      | _ -> []
+    end
+    |> check_bounds []
+  end
 
 (** [is_valid_position b s] is whether all in [s] are empty.*)
 let rec is_valid_position (board : board) (ship_spots : (int * int) list) =
@@ -114,6 +117,32 @@ let place_ship_helper board ship ship_spots =
         y)
     board
 
+let are_adjacents s coord dir =
+  let rec adjacent_for_length l (x, y) dir =
+    match dir with
+    | true -> begin
+        match l mod 2 = 0 with
+        | true ->
+            List.init ((2 * l) + 6) (fun i -> i)
+            |> List.mapi (fun idx i -> x - ((l / 2) + 1))
+        | false -> []
+      end
+    | false -> []
+  in
+  adjacent_for_length s.length coord dir
+
+let rec loop2 l (x, y) dir r c acc =
+  if dir = 0 then
+    if c = x + ((l / 2) + 2) then acc
+    else if r <> y || (c = y && (c = x - 3 || c = x + 3)) then
+      loop2 l (x, y) dir r (c + 1) (Some (Miss (c, r)) :: acc)
+    else loop2 l (x, y) dir r (c + 1) (None :: acc)
+  else acc
+let rec loop1 l (x, y) dir r acc =
+  if dir = 0 then
+    if r = y + 2 then acc else loop1 l (x,y) dir (r+1) (loop2 l (x, y) dir r (x - ((l / 2) + 1)) [] :: acc)
+  else acc
+
 let place_ship player ship x y dir =
   let updated_board board ship ship_spots =
     if is_valid_position board ship_spots then
@@ -139,7 +168,32 @@ let num_placed player i =
   |> List.fold_left get_unique_ship_refs []
   |> List.length
 
-let fire board x y = raise (Failure "Battleship.fire Unimplemented")
+let fire_transformer board x y transformation =
+  List.init board_size (fun h ->
+      List.init board_size (fun w ->
+          if (w, h) = (x, y) then transformation else get_coordinate board (w, x)))
+
+let get_same_refs board ship =
+  List.flatten board
+  |> List.filter (fun cell ->
+         match cell with
+         | Empty _ | Hit _ | Miss _ -> false
+         | Ship { position = pos; ship = s } -> s == ship)
+
+let adjacent_transform board ship =
+  List.init board_size (fun h ->
+      List.init board_size (fun w ->
+          if List.mem (w, h) ship.adjacents then Miss (w, h)
+          else get_coordinate board (w, h)))
+
+let fire board x y =
+  match get_coordinate board (x, y) with
+  | Empty _ -> fire_transformer board x y (Miss (x, y))
+  | Ship { position; ship } ->
+      if List.length (get_same_refs board ship) = 1 then
+        adjacent_transform board !ship
+      else fire_transformer board x y (Hit (x, y))
+  | _ -> raise (InvalidPosition (string_of_coord (x, y)))
 
 let is_game_over player =
   raise (Failure "Battleship.is_game_over Unimplemented")

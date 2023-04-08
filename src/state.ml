@@ -89,7 +89,7 @@ let rec placing_loop game p =
     st.mouse_x >= 100 && st.mouse_x <= 250 && st.mouse_y >= 20
     && st.mouse_y <= 70
   then
-    if num_placed (get_player !game p) 5 < 1 then place_loop game p 5
+    if num_placed (get_player !game p) carrier < 1 then place_loop game p 5
     else (
       write 400 35 black "Max length 5 ships on board" 30;
       placing_loop game p)
