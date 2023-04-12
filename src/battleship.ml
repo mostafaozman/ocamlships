@@ -208,10 +208,8 @@ let fire p x y =
     | Ship { position; ship } ->
         let same_refs = List.length (get_same_refs board ship) in
         if same_refs = 1 then (
-          print_endline (string_of_int same_refs);
           adjacent_transform board !ship (x, y))
         else (
-          print_endline "Strange";
           fire_transform board x y (Hit (x, y)))
     | _ -> raise (InvalidPosition (string_of_coord (x, y)))
   in
