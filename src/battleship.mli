@@ -53,16 +53,20 @@ val num_placed : player -> int -> int
     their board. *)
 
 val get_coordinate : board -> int * int -> cell
-(** [get_coordinate x] is the cell at board coordinate [x]. *)
+(** [get_coordinate x] is the cell at board coordinate [x]. Raises
+    InvalidPosition if [x] is out of the board's bounds. *)
 
 val place_ship : player -> ship -> int -> int -> int -> player
 (** [place_ship board ship x y dir] is the board after a ship has been placed in
     board position ([x],[y]) facing direction [dir]. [dir] is 0 if the ship is
-    horizontal, 1 if vertical. Requires: [dir] is 0 or 1.*)
+    horizontal, 1 if vertical. Raises Invalid Position if position is out of
+    bounds, already has ship, or is adjacent to another ship. Requires: [dir] is
+    0 or 1. *)
 
-val fire : board -> int -> int -> board
+val fire : player -> int -> int -> player
 (** [fire board x y] is the updated [board] after a shot is fired at board
-    position ([x],[y]) on the board *)
+    position ([x],[y]) on the board. Raises InvalidPosition if position
+    ([x],[y]) is a Hit or Miss cell. *)
 
 val is_game_over : player -> bool
 (** [is_game_over player] is whether all of [player]'s ships have been

@@ -21,4 +21,5 @@ let create_placements p =
   in
   loop (carrier_num + destroyer_num + submarine_num + patrol_num) p
 
-let ai_fire board = fire board (R.int board_size) (R.int board_size)
+let rec ai_fire p =
+  try fire p (R.int board_size) (R.int board_size) with exn -> ai_fire p

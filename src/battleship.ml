@@ -201,18 +201,21 @@ let adjacent_transform board ship (x, y) =
           else if (w, h) = (x, y) then Hit (w, h)
           else get_coordinate board (w, h)))
 
-let fire board x y =
-  match get_coordinate board (x, y) with
-  | Empty _ -> fire_transform board x y (Miss (x, y))
-  | Ship { position; ship } ->
-      let same_refs = List.length (get_same_refs board ship) in
-      if same_refs = 1 then (
-        print_endline (string_of_int same_refs);
-        adjacent_transform board !ship (x, y))
-      else (
-        print_endline "Strange";
-        fire_transform board x y (Hit (x, y)))
-  | _ -> raise (InvalidPosition (string_of_coord (x, y)))
+let fire p x y =
+  let fire_helper board x y =
+    match get_coordinate board (x, y) with
+    | Empty _ -> fire_transform board x y (Miss (x, y))
+    | Ship { position; ship } ->
+        let same_refs = List.length (get_same_refs board ship) in
+        if same_refs = 1 then (
+          print_endline (string_of_int same_refs);
+          adjacent_transform board !ship (x, y))
+        else (
+          print_endline "Strange";
+          fire_transform board x y (Hit (x, y)))
+    | _ -> raise (InvalidPosition (string_of_coord (x, y)))
+  in
+  { p with board = fire_helper p.board x y }
 
 let is_game_over player =
   raise (Failure "Battleship.is_game_over Unimplemented")
