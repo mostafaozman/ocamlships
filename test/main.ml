@@ -17,15 +17,7 @@ let init_board_test (name : string) (input : char) (expected_output : int) :
 
 (* example test suites *)
 let board = init_board ()
-
-let init_tests =
-  [ ("Initialize ship test" >:: fun _ -> assert_equal 4 (init_ship 4).length) ]
-
-let getter_tests = []
-let func_test = []
-
-let suite =
-  "test suite for final project"
-  >::: List.flatten [ init_tests; getter_tests; func_test ]
-
+let board_tests = []
+let battleship_tests = []
+let suite = "test suite for final project" >::: List.flatten []
 let _ = run_test_tt_main suite

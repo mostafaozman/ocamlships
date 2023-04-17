@@ -175,5 +175,16 @@ let fire p x y =
   in
   { p with board = fire_helper p.board x y }
 
+let placed_ready player =
+  if carrier_num != num_placed player carrier then false
+  else if destroyer_num != num_placed player destroyer then false
+  else if submarine_num != num_placed player submarine then false
+  else if patrol_num != num_placed player patrol then false
+  else true
+
 let is_game_over player =
-  raise (Failure "Battleship.is_game_over Unimplemented")
+  if num_placed player carrier != 0 then false
+  else if num_placed player destroyer != 0 then false
+  else if num_placed player submarine != 0 then false
+  else if num_placed player patrol != 0 then false
+  else true
