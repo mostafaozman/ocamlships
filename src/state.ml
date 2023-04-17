@@ -64,7 +64,7 @@ let rec place_loop game p i dir =
   let tup = convert st.mouse_x st.mouse_y in
   match tup with
   | None ->
-      write 400 35 black "Invalid Position" 30;
+      write 400 35 black "Invalid Position 1" 30;
       place_loop game p i dir
   | Some tup -> (
       try
@@ -77,31 +77,31 @@ let rec place_loop game p i dir =
         else game := make_game (get_player !game (not p)) updated_p p;
         draw_player_board true updated_p
       with e ->
-        write 400 35 black "Invalid Position" 30;
+        write 400 35 black "Invalid Position 2" 30;
         place_loop game p i dir)
 
 (** [placing_loop g p] waits for player 1 if [p] is true, player 2 otherwise, to
     press the button for which ship they will place and then allows them to
     place it in game [g]. *)
-let rec placing_loop game p =
+let rec placing_loop game p dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   draw_placing_screen game p;
-  if
-    st.mouse_x >= 100 && st.mouse_x <= 250 && st.mouse_y >= 20
-    && st.mouse_y <= 70
-  then
-    if num_placed (get_player !game p) carrier < 1 then place_loop game p 5 true
-    else (
-      write 400 35 black "Max length 5 ships on board" 30;
-      placing_loop game p);
   (*Check for rotation*)
   if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 360
     && st.mouse_y <= 410
   then (
     write 400 35 black "Rotate!" 30;
-    placing_loop game p)
+    placing_loop game p (not dir));
+  if
+    st.mouse_x >= 100 && st.mouse_x <= 250 && st.mouse_y >= 20
+    && st.mouse_y <= 70
+  then
+    if num_placed (get_player !game p) carrier < 1 then place_loop game p 5 dir
+    else (
+      write 400 35 black "Max length 5 ships on board" 30;
+      placing_loop game p dir)
 
 let main () =
   let _ = open_graph " 800x800" in
@@ -112,5 +112,5 @@ let main () =
   done;
 
   while !state = PLACING do
-    placing_loop game true
+    placing_loop game true true
   done

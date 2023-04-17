@@ -48,7 +48,7 @@ let pos_of_ship ship x y dir =
     (match ship.length with
     | 5 ->
         if dir then List.init 5 (fun i -> (x + (-2 + i), y))
-        else List.init 5 (fun y -> (x, y + (-2 + y)))
+        else List.init 5 (fun i -> (x, y + (-2 + i)))
     | 4 | 3 ->
         if dir then List.init ship.length (fun i -> (x + (-1 + i), y))
         else List.init ship.length (fun i -> (x, y + (-1 + i)))
