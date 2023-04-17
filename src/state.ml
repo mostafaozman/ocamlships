@@ -11,7 +11,9 @@ type state =
   | PLAY
 
 let state = ref START
-let game = ref (make_game (init_player "Player") (init_player "AI") true)
+let player_board = init_player "Player"
+let op_board = init_player "AI"
+let game = ref (make_game player_board op_board true)
 
 (** [convert x y] is the grid coordinate associated with pixel position
     ([x],[y]). None if coordinate is outside the grid. *)
@@ -87,6 +89,7 @@ let rec placing_loop game p dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   draw_placing_screen game p;
+  if st.key == 'q' then quit ();
   (*Check for rotation*)
   if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 360
@@ -94,6 +97,13 @@ let rec placing_loop game p dir =
   then (
     write 400 35 black "Rotate!" 30;
     placing_loop game p (not dir));
+  if
+    st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 700
+    && st.mouse_y <= 800
+  then (
+    game := make_game (init_player "Player") op_board true;
+    write 400 35 black "Click again to reset!" 30;
+    placing_loop game p dir);
   if
     st.mouse_x >= 100 && st.mouse_x <= 250 && st.mouse_y >= 20
     && st.mouse_y <= 70
