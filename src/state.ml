@@ -7,6 +7,7 @@ open Draw
 type state =
   | START
   | PLACING
+  | PLAY
 
 let state = ref START
 let game = ref (make_game (init_player "Player") (init_player "AI") true)
@@ -92,7 +93,14 @@ let rec placing_loop game p =
     if num_placed (get_player !game p) carrier < 1 then place_loop game p 5
     else (
       write 400 35 black "Max length 5 ships on board" 30;
-      placing_loop game p)
+      placing_loop game p);
+  (*Check for rotation*)
+  if
+    st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 360
+    && st.mouse_y <= 410
+  then (
+    write 400 35 black "Rotate!" 30;
+    placing_loop game p)
 
 let main () =
   let _ = open_graph " 800x800" in
