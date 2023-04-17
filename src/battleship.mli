@@ -24,12 +24,11 @@ val num_placed : player -> int -> int
 (** [num_placed p i] is the number of ships of length [i] that player [p] has on
     their board. *)
 
-val place_ship : player -> ship -> int -> int -> int -> player
+val place_ship : player -> ship -> int -> int -> bool -> player
 (** [place_ship board ship x y dir] is the board after a ship has been placed in
-    board position ([x],[y]) facing direction [dir]. [dir] is 0 if the ship is
-    horizontal, 1 if vertical. Raises Invalid Position if position is out of
-    bounds, already has ship, or is adjacent to another ship. Requires: [dir] is
-    0 or 1. *)
+    board position ([x],[y]) facing direction [dir]. [dir] is true if the ship
+    is horizontal, false if vertical. Raises Invalid Position if position is out
+    of bounds, already has ship, or is adjacent to another ship. *)
 
 val fire : player -> int -> int -> player
 (** [fire board x y] is the updated [board] after a shot is fired at board

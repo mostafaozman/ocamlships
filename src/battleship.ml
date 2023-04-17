@@ -47,12 +47,12 @@ let pos_of_ship ship x y dir =
   begin
     (match ship.length with
     | 5 ->
-        if dir = 0 then List.init 5 (fun i -> (x + (-2 + i), y))
+        if dir then List.init 5 (fun i -> (x + (-2 + i), y))
         else List.init 5 (fun y -> (x, y + (-2 + y)))
     | 4 | 3 ->
-        if dir = 0 then List.init ship.length (fun i -> (x + (-1 + i), y))
+        if dir then List.init ship.length (fun i -> (x + (-1 + i), y))
         else List.init ship.length (fun i -> (x, y + (-1 + i)))
-    | 2 -> if dir = 0 then [ (x, y); (x + 1, y) ] else [ (x, y); (x, y + 1) ]
+    | 2 -> if dir then [ (x, y); (x + 1, y) ] else [ (x, y); (x, y + 1) ]
     | _ -> [])
     |> check_bounds []
   end

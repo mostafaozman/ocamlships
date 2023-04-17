@@ -56,7 +56,7 @@ let start_loop game =
 
 (** [place_loop g p i] draws the board of player 1 if [p] is true, player 2
     otherwise, after they have placed a ship of length [i] in game [g]. *)
-let rec place_loop game p i =
+let rec place_loop game p i dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   clear_graph ();
@@ -65,11 +65,11 @@ let rec place_loop game p i =
   match tup with
   | None ->
       write 400 35 black "Invalid Position" 30;
-      place_loop game p i
+      place_loop game p i dir
   | Some tup -> (
       try
         let updated_p =
-          place_ship (get_player !game p) (init_ship i) (fst tup) (snd tup) 0
+          place_ship (get_player !game p) (init_ship i) (fst tup) (snd tup) dir
         in
         if p then (
           game := make_game updated_p (get_player !game (not p)) p;
@@ -78,7 +78,7 @@ let rec place_loop game p i =
         draw_player_board true updated_p
       with e ->
         write 400 35 black "Invalid Position" 30;
-        place_loop game p i)
+        place_loop game p i dir)
 
 (** [placing_loop g p] waits for player 1 if [p] is true, player 2 otherwise, to
     press the button for which ship they will place and then allows them to
@@ -91,7 +91,7 @@ let rec placing_loop game p =
     st.mouse_x >= 100 && st.mouse_x <= 250 && st.mouse_y >= 20
     && st.mouse_y <= 70
   then
-    if num_placed (get_player !game p) carrier < 1 then place_loop game p 5
+    if num_placed (get_player !game p) carrier < 1 then place_loop game p 5 true
     else (
       write 400 35 black "Max length 5 ships on board" 30;
       placing_loop game p);

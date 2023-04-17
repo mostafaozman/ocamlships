@@ -7,7 +7,7 @@ let create_placements p =
   let rec helper (sz : int) (p : player) =
     try
       place_ship p (init_ship sz) (R.int board_size) (R.int board_size)
-        (R.int 2)
+        (R.bool ())
     with exn -> helper sz p
   in
   let rec loop (i : int) (acc : player) =
