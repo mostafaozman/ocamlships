@@ -107,16 +107,19 @@ let placer board ship ship_spots =
   helper ship_spots board
 
 let place_ship player ship x y dir =
-  let updated_board board ship ship_spots =
+  let update_board board ship ship_spots =
     let adjacency_list = get_adjacents ship_spots in
     if
       is_valid_position board ship_spots
       && List.for_all (pred board) adjacency_list
-    then placer board { ship with adjacents = adjacency_list } ship_spots
-    else board
+    then
+      ( ship_spots,
+        placer board { ship with adjacents = adjacency_list } ship_spots )
+    else ([], board)
   in
   let ship_spots = pos_of_ship ship x y dir in
-  { player with board = updated_board player.board ship ship_spots }
+  let lst, board = update_board player.board ship ship_spots in
+  (lst, { player with board })
 
 let num_placed player i =
   let get_ship_cell i cell =

@@ -13,12 +13,12 @@ let create_placements p =
   let rec loop (i : int) (acc : player) =
     match i with
     | 0 -> acc
-    | n when n < patrol_num -> loop (i - 1) (helper patrol acc)
+    | n when n < patrol_num -> loop (i - 1) (helper patrol acc |> snd)
     | n when n < patrol_num + submarine_num ->
-        loop (i - 1) (helper submarine acc)
+        loop (i - 1) (helper submarine acc |> snd)
     | n when n < patrol_num + submarine_num + destroyer_num ->
-        loop (i - 1) (helper destroyer acc)
-    | _ -> loop (i - 1) (helper carrier acc)
+        loop (i - 1) (helper destroyer acc |> snd)
+    | _ -> loop (i - 1) (helper carrier acc |> snd)
   in
   loop (carrier_num + destroyer_num + submarine_num + patrol_num) p
 

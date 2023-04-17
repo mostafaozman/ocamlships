@@ -72,10 +72,10 @@ let rec place_loop game p i dir =
           place_ship (get_player !game p) (init_ship i) (fst tup) (snd tup) dir
         in
         if p then (
-          game := make_game updated_p (get_player !game (not p)) p;
-          draw_player_board true updated_p)
-        else game := make_game (get_player !game (not p)) updated_p p;
-        draw_player_board true updated_p
+          game := make_game (snd updated_p) (get_player !game (not p)) p;
+          update_cells true (fst updated_p))
+        else game := make_game (get_player !game (not p)) (snd updated_p) p;
+        update_cells true (fst updated_p)
       with e ->
         write 400 35 black "Invalid Position 2" 30;
         place_loop game p i dir)

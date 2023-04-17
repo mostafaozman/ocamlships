@@ -24,7 +24,8 @@ val num_placed : player -> int -> int
 (** [num_placed p i] is the number of ships of length [i] that player [p] has on
     their board. *)
 
-val place_ship : player -> ship -> int -> int -> bool -> player
+val place_ship :
+  player -> ship -> int -> int -> bool -> (int * int) list * player
 (** [place_ship board ship x y dir] is the board after a ship has been placed in
     board position ([x],[y]) facing direction [dir]. [dir] is true if the ship
     is horizontal, false if vertical. Raises Invalid Position if position is out

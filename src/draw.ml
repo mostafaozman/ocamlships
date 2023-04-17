@@ -51,7 +51,6 @@ let home () =
 
   draw_rect quit_red 200 100 400 125;
   write 355 140 white "Quit" 50;
-
   draw_rect black 0 620 800 280;
   write 280 680 white "Battle Ships" 50
 
@@ -59,3 +58,10 @@ let draw_placing_screen game player =
   draw_player_board true (get_player !game player);
   draw_rect quit_red 100 20 150 50;
   write 125 35 white "Length 5 ship" 15
+
+let rec update_cells self lst =
+  match lst with
+  | [] -> ()
+  | (x, y) :: t ->
+      if self = true then draw_cell green x y else draw_cell ocean_blue x y;
+      update_cells self t
