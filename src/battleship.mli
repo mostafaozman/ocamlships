@@ -35,6 +35,10 @@ val fire : player -> int -> int -> player
     position ([x],[y]) on the board. Raises InvalidPosition if position
     ([x],[y]) is a Hit or Miss cell. *)
 
+val placed_ready : player -> bool
+(**[placed_ready player] is whether all of the [player]'s ships have been placed
+   on the board*)
+
 val is_game_over : player -> bool
 (** [is_game_over player] is whether all of [player]'s ships have been
     destroyed. *)
