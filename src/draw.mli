@@ -27,3 +27,6 @@ val draw_placing_screen : game ref -> bool -> unit
     placing if [p] is true, player 2 otherwise. *)
 
 val update_cells : bool -> (int * int) list -> unit
+(** [update_cells self lst] draws the cells at the positions in [lst]. Ship
+    cells will be drawn like empty cells if [self] if true, will be green
+    otherwise. *)
