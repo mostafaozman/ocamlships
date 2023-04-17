@@ -1,0 +1,5 @@
+#mod_use "src/consts.ml";;
+#mod_use "src/board.ml";;
+#mod_use "src/battleship.ml";;
+#use "src/battleship.ml";;
+#use "src/ai.ml";;

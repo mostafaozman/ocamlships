@@ -1,5 +1,6 @@
-open Battleship
 open Consts
+open Battleship
+open Board
 module R = Random
 
 let create_placements p =
@@ -21,5 +22,5 @@ let create_placements p =
   in
   loop (carrier_num + destroyer_num + submarine_num + patrol_num) p
 
-let rec ai_fire p =
-  try fire p (R.int board_size) (R.int board_size) with exn -> ai_fire p
+let rec shoot p =
+  try fire p (R.int board_size) (R.int board_size) with exn -> shoot p

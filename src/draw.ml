@@ -1,6 +1,7 @@
 open Graphics
-open Battleship
 open Consts
+open Battleship
+open Board
 
 let write mv_x mv_y color string size =
   set_font
@@ -26,11 +27,11 @@ let draw_player_board self p =
   moveto background_llx background_tly;
   for y = 0 to num_box do
     for x = 0 to num_box do
-      match get_coordinate (get_player_board p) (x, y) with
-      | Empty t -> draw_cell ocean_blue x y
-      | Hit t -> draw_cell quit_red x y
-      | Miss t -> draw_cell logo_wht x y
-      | Ship t ->
+      match get_cell (get_player_board p) (x, y) with
+      | Empty -> draw_cell ocean_blue x y
+      | Hit -> draw_cell quit_red x y
+      | Miss -> draw_cell logo_wht x y
+      | Ship _ ->
           if self = true then draw_cell green x y else draw_cell ocean_blue x y
     done
   done
