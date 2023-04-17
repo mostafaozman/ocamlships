@@ -1,23 +1,6 @@
 (* Implement functions from battleship.mli *)
 open Consts
-
-exception InvalidPosition of string
-
-type ship = {
-  length : int;
-  adjacents : (int * int) list;
-}
-
-type cell =
-  | Empty of (int * int)
-  | Ship of {
-      position : int * int;
-      ship : ship ref;
-    }
-  | Hit of (int * int)
-  | Miss of (int * int)
-
-type board = cell list list
+open Board
 
 type player = {
   name : string;
@@ -29,18 +12,10 @@ type game = {
   mutable current_player : bool;
 }
 
-let init_board () =
-  List.init board_size (fun y -> List.init board_size (fun x -> Empty (x, y)))
-
-let init_ship len = { length = len; adjacents = [] }
-let get_ship_length s = s.length
 let init_player name = { name; board = init_board () }
 let get_player g b = if b then fst g.players else snd g.players
 let get_player_board p = p.board
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
-
-let string_of_coord x =
-  "(" ^ string_of_int (fst x) ^ "," ^ string_of_int (snd x) ^ ")"
 
 (** [pp l] is the string representation of a list of coordinates. *)
 let pp l = "[" ^ String.concat ";" (List.map string_of_coord l) ^ "]"
@@ -56,14 +31,6 @@ let rec is_adjacent (x : int * int) (a : int * int) : bool =
     let dx = abs (fst x - fst a) in
     let dy = abs (snd x - snd a) in
     dx <= 1 && dy <= 1
-
-(** [extract_pos c] is the coordinates associated to [c]*)
-let extract_pos (cell : cell) =
-  match cell with
-  | Empty t | Hit t | Miss t -> t
-  | Ship t -> t.position
-
-let get_coordinate b x = List.find (fun a -> extract_pos a = x) (List.flatten b)
 
 (** [pos_of_ship board ship x y dir] is all the coordinates which [ship] will
     occupy when placed on grid position ([x],[y]) facing direction [dir]. Raises
@@ -92,18 +59,13 @@ let pos_of_ship ship x y dir =
 
 (** [is_valid_position b s] is whether all in [s] are empty.*)
 let rec is_valid_position (board : board) (ship_spots : (int * int) list) =
-  match board with
+  match ship_spots with
   | [] -> true
-  | h :: t ->
-      if
-        List.for_all
-          (fun x ->
-            let pos_x = extract_pos x in
-            if List.mem pos_x ship_spots then x = Empty (fst pos_x, snd pos_x)
-            else true)
-          h
-      then is_valid_position t ship_spots
-      else false
+  | (x, y) :: t -> begin
+      match find (x, y) board with
+      | None -> raise (InvalidPosition (string_of_coord (x, y)))
+      | Some c -> c = Empty && is_valid_position board t
+    end
 
 (** [get_adjacents s] is all coordinates that are adjacent to the coordinates in
     [s] within the board's bounds. *)
@@ -128,8 +90,8 @@ let get_adjacents spots =
 (** [pred b c] is true if the coordinate c is a non-ship cell in board [b].
     Raises: InvalidPosition otherwise.*)
 let pred board c =
-  match get_coordinate board c with
-  | Empty _ | Hit _ | Miss _ -> true
+  match get_cell board c with
+  | Empty | Hit | Miss -> true
   | Ship _ ->
       raise (InvalidPosition (string_of_coord c ^ " is an adjacent ship"))
 
@@ -137,16 +99,12 @@ let pred board c =
     in [sp] is placed on board [b]. *)
 let placer board ship ship_spots =
   let ship = ref ship in
-  List.map
-    (fun y ->
-      List.map
-        (fun x ->
-          let pos_x = extract_pos x in
-          if List.mem pos_x ship_spots then
-            Ship { position = (fst pos_x, snd pos_x); ship }
-          else x)
-        y)
-    board
+  let rec helper s acc =
+    match s with
+    | [] -> acc
+    | (x, y) :: t -> helper t (insert (x, y) (Ship { ship }) acc)
+  in
+  helper ship_spots board
 
 let place_ship player ship x y dir =
   let updated_board board ship ship_spots =
@@ -163,54 +121,53 @@ let place_ship player ship x y dir =
 let num_placed player i =
   let get_ship_cell i cell =
     match cell with
-    | Empty _ | Hit _ | Miss _ -> false
+    | Empty | Hit | Miss -> false
     | Ship t -> if !(t.ship).length = i then true else false
   in
   let get_unique_ship_refs acc x =
     match x with
-    | Empty _ | Hit _ | Miss _ -> acc
+    | Empty | Hit | Miss -> acc
     | Ship t -> if List.memq t.ship acc then acc else t.ship :: acc
   in
-  List.flatten player.board
-  |> List.filter (get_ship_cell i)
+  let b = player.board in
+  fold
+    (fun (x, y) v acc ->
+      if get_ship_cell i (get_cell b (x, y)) then v :: acc else acc)
+    [] b
   |> List.fold_left get_unique_ship_refs []
   |> List.length
 
 (** [get_same_refs b s] is all the cells on board [b] that share a memory
     location with [s]. *)
 let get_same_refs board ship =
-  List.flatten board
-  |> List.filter (fun cell ->
-         match cell with
-         | Empty _ | Hit _ | Miss _ -> false
-         | Ship { position = pos; ship = s } -> s == ship)
-
-(** [fire_transform b x y t] is the board after the cell at position ([x],[y])
-    on the board [b] is transformed into [t]*)
-let fire_transform board x y transformation =
-  List.init board_size (fun h ->
-      List.init board_size (fun w ->
-          if (w, h) = (x, y) then transformation else get_coordinate board (w, h)))
+  fold
+    (fun (x, y) cell acc ->
+      if
+        match get_cell board (x, y) with
+        | Empty | Hit | Miss -> false
+        | Ship { ship = s } -> s == ship
+      then cell :: acc
+      else acc)
+    [] board
 
 (** [adjacent_transform b s coord] is the board [b] after all cells adjacent to
     [s] become a Miss and the cell at [coord] becomes a Hit. *)
 let adjacent_transform board ship (x, y) =
-  List.init board_size (fun h ->
-      List.init board_size (fun w ->
-          if List.mem (w, h) ship.adjacents then Miss (w, h)
-          else if (w, h) = (x, y) then Hit (w, h)
-          else get_coordinate board (w, h)))
+  let rec helper lst acc =
+    match lst with
+    | [] -> acc
+    | (a, b) :: t -> helper t (insert (a, b) Miss acc)
+  in
+  helper ship.adjacents (insert (x, y) Hit board)
 
 let fire p x y =
   let fire_helper board x y =
-    match get_coordinate board (x, y) with
-    | Empty _ -> fire_transform board x y (Miss (x, y))
-    | Ship { position; ship } ->
+    match get_cell board (x, y) with
+    | Empty -> insert (x, y) Miss board
+    | Ship { ship } ->
         let same_refs = List.length (get_same_refs board ship) in
-        if same_refs = 1 then (
-          adjacent_transform board !ship (x, y))
-        else (
-          fire_transform board x y (Hit (x, y)))
+        if same_refs = 1 then adjacent_transform board !ship (x, y)
+        else insert (x, y) Hit board
     | _ -> raise (InvalidPosition (string_of_coord (x, y)))
   in
   { p with board = fire_helper p.board x y }

@@ -1,4 +1,5 @@
 open OUnit2
+open Ships.Board
 open Ships.Battleship
 
 (********************************************************************
@@ -15,13 +16,10 @@ let init_board_test (name : string) (input : char) (expected_output : int) :
  ********************************************************************)
 
 (* example test suites *)
-let board = init_board
+let board = init_board ()
 
 let init_tests =
-  [
-    ( "Initialize ship test" >:: fun _ ->
-      assert_equal 4 (init_ship 4 |> get_ship_length) );
-  ]
+  [ ("Initialize ship test" >:: fun _ -> assert_equal 4 (init_ship 4).length) ]
 
 let getter_tests = []
 let func_test = []

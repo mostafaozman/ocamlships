@@ -14,10 +14,10 @@ val draw_cell : color -> int -> int -> unit
     the grid. *)
 
 val draw_player_board : bool -> player -> unit
-(** [draw_player_board p] draws the board associated with player [p]. If the
-    board belongs to the current player [self] is true and cells with ships will
-    be drawn the same as empty cells. if [self] is false, then ship cells will
-    be drawn differently than empty cells. *)
+(** [draw_player_board self p] draws the board associated with player [p]. If
+    the board belongs to the current player [self] is true and cells with ships
+    will be drawn the same as empty cells. if [self] is false, then ship cells
+    will be drawn differently than empty cells. *)
 
 val home : unit -> unit
 (** [home ()] draws the start screen of the game. *)

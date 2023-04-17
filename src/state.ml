@@ -1,7 +1,8 @@
-(* Implement functions from gui.mli *)
+(* Implement functions from state.mli *)
 open Graphics
-open Battleship
 open Consts
+open Board
+open Battleship
 open Draw
 
 type state =
