@@ -97,7 +97,7 @@ let rec placing_loop game p dir =
   then (
     write 295 760 black "Rotate!" 30;
     placing_loop game p (not dir));
-    (* Check ready button *)
+  (* Check ready button *)
   if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 430
     && st.mouse_y <= 480
@@ -105,7 +105,7 @@ let rec placing_loop game p dir =
     (* Place check for ships on board here *)
     write 295 760 black "Ready!" 30;
     placing_loop game p (not dir));
-    (* Check reset button *)
+  (* Check reset button *)
   if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 700
     && st.mouse_y <= 800
@@ -113,10 +113,10 @@ let rec placing_loop game p dir =
     game := make_game (init_player "Player") op_board true;
     write 200 760 black "Click again to reset!" 30;
     placing_loop game p dir);
-    (* Length 5 ship *)
+  (* Length 5 ship *)
   if
-    st.mouse_x >= 100 && st.mouse_x <= 250 && st.mouse_y >= 20
-    && st.mouse_y <= 70
+    st.mouse_x >= 21 && st.mouse_x <= 171 && st.mouse_y >= 10
+    && st.mouse_y <= 50
   then
     if num_placed (get_player !game p) carrier < 1 then place_loop game p 5 dir
     else (
