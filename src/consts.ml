@@ -20,4 +20,5 @@ let logo_wht = 0xF7F7F2
 let ocean_blue = 0x7BB5FF
 let piss_yellow = 0xFFBF00
 let depression_grey = 0xABB0B8
+let white = 0xFFFFFF
 let rotate = "⟳"

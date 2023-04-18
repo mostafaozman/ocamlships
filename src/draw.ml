@@ -56,8 +56,18 @@ let home () =
 
 let draw_placing_screen game player =
   draw_player_board true (get_player !game player);
-  draw_rect quit_red 100 20 150 50;
-  write 125 35 white "Length 5 ship" 15
+  draw_rect quit_red 21 10 150 40;
+  write 46 24 white "Length 5 ship" 15;
+  draw_rect quit_red 21 60 150 40;
+  write 46 74 white "Length 5 ship" 15;
+  draw_rect quit_red 181 10 150 40;
+  write 206 24 white "Length 4 ship" 15;
+  draw_rect quit_red 181 60 150 40;
+  write 206 74 white "Length 4 ship" 15;
+  draw_rect quit_red 341 10 150 40;
+  write 366 24 white "Length 3 ship" 15;
+  draw_rect quit_red 341 60 150 40;
+  write 366 74 white "Length 3 ship" 15
 
 let rec update_cells self lst =
   match lst with

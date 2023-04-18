@@ -66,7 +66,7 @@ let rec place_loop game p i dir =
   let tup = convert st.mouse_x st.mouse_y in
   match tup with
   | None ->
-      write 400 35 black "Invalid Position 1" 30;
+      write 200 760 black "Invalid Position 1" 30;
       place_loop game p i dir
   | Some tup -> (
       try
@@ -79,7 +79,7 @@ let rec place_loop game p i dir =
         else game := make_game (get_player !game (not p)) (snd updated_p) p;
         update_cells true (fst updated_p)
       with e ->
-        write 400 35 black "Invalid Position 2" 30;
+        write 200 760 black "Invalid Position 2" 30;
         place_loop game p i dir)
 
 (** [placing_loop g p] waits for player 1 if [p] is true, player 2 otherwise, to
@@ -95,22 +95,32 @@ let rec placing_loop game p dir =
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 360
     && st.mouse_y <= 410
   then (
-    write 400 35 black "Rotate!" 30;
+    write 295 760 black "Rotate!" 30;
     placing_loop game p (not dir));
+    (* Check ready button *)
+  if
+    st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 430
+    && st.mouse_y <= 480
+  then (
+    (* Place check for ships on board here *)
+    write 295 760 black "Ready!" 30;
+    placing_loop game p (not dir));
+    (* Check reset button *)
   if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 700
     && st.mouse_y <= 800
   then (
     game := make_game (init_player "Player") op_board true;
-    write 400 35 black "Click again to reset!" 30;
+    write 200 760 black "Click again to reset!" 30;
     placing_loop game p dir);
+    (* Length 5 ship *)
   if
     st.mouse_x >= 100 && st.mouse_x <= 250 && st.mouse_y >= 20
     && st.mouse_y <= 70
   then
     if num_placed (get_player !game p) carrier < 1 then place_loop game p 5 dir
     else (
-      write 400 35 black "Max length 5 ships on board" 30;
+      write 170 760 black "Max length 5 ships on board" 30;
       placing_loop game p dir)
 
 let main () =
