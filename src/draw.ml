@@ -67,7 +67,12 @@ let draw_placing_screen game player =
   draw_rect quit_red 341 10 150 40;
   write 366 24 white "Length 3 ship" 15;
   draw_rect quit_red 341 60 150 40;
-  write 366 74 white "Length 3 ship" 15
+  write 366 74 white "Length 3 ship" 15;
+
+  draw_rect quit_red 501 10 150 40;
+  write 526 24 white "Length 2 ship" 15;
+  draw_rect quit_red 501 60 150 40;
+  write 526 74 white "Length 2 ship" 15
 
 let rec update_cells self lst =
   match lst with
