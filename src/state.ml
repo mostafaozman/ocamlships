@@ -10,6 +10,9 @@ type state =
   | PLACING
   | PLAY
 
+let num_carrier = ref 0
+let num_destroyer = ref 0
+let num_submarine = ref 0
 let state = ref START
 let player_board = init_player "Player"
 let op_board = init_player "AI"
@@ -106,12 +109,13 @@ let rec placing_loop game p dir =
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 430
     && st.mouse_y <= 480
   then
-    if carrier >= 2 && destroyer >= 2 && submarine >= 2 then (
+    if !num_carrier = 2 && !num_destroyer = 2 && !num_submarine = 2 then (
+      print_endline (string_of_int carrier);
       write 295 760 black "Ready!" 30;
       go_play !game)
     else (
       write 200 760 black "Place all ships to start!" 30;
-      placing_loop game p (not dir));
+      placing_loop game p dir);
   (* Check reset button *)
   if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 700
@@ -119,6 +123,9 @@ let rec placing_loop game p dir =
   then (
     game := make_game (init_player "Player") op_board true;
     write 200 760 black "Click again to reset!" 30;
+    num_carrier := 0;
+    num_destroyer := 0;
+    num_submarine := 0;
     placing_loop game p dir);
   (* Length 5 ship *)
   if
@@ -127,7 +134,9 @@ let rec placing_loop game p dir =
     || st.mouse_x >= 21 && st.mouse_x <= 171 && st.mouse_y >= 60
        && st.mouse_y <= 100
   then
-    if num_placed (get_player !game p) carrier < 2 then place_loop game p 5 dir
+    if num_placed (get_player !game p) carrier < 2 then (
+      place_loop game p 5 dir;
+      incr num_carrier)
     else (
       write 170 760 black "Max length 5 ships on board" 30;
       placing_loop game p dir);
@@ -138,8 +147,9 @@ let rec placing_loop game p dir =
     || st.mouse_x >= 181 && st.mouse_x <= 331 && st.mouse_y >= 60
        && st.mouse_y <= 100
   then
-    if num_placed (get_player !game p) destroyer < 2 then
-      place_loop game p 4 dir
+    if num_placed (get_player !game p) destroyer < 2 then (
+      place_loop game p 4 dir;
+      incr num_destroyer)
     else (
       write 170 760 black "Max length 4 ships on board" 30;
       placing_loop game p dir);
@@ -150,8 +160,9 @@ let rec placing_loop game p dir =
     || st.mouse_x >= 341 && st.mouse_x <= 491 && st.mouse_y >= 60
        && st.mouse_y <= 100
   then
-    if num_placed (get_player !game p) submarine < 2 then
-      place_loop game p 3 dir
+    if num_placed (get_player !game p) submarine < 2 then (
+      place_loop game p 3 dir;
+      incr num_submarine)
     else (
       write 170 760 black "Max length 3 ships on board" 30;
       placing_loop game p dir)
