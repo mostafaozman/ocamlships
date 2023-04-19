@@ -10,6 +10,9 @@ type state =
   | PLACING
   | PLAY
 
+let num_carrier = ref 0
+let num_destroyer = ref 0
+let num_submarine = ref 0
 let state = ref START
 let player_board = init_player "Player"
 let op_board = init_player "AI"
@@ -106,12 +109,13 @@ let rec placing_loop game p dir =
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 430
     && st.mouse_y <= 480
   then
-    if carrier >= 2 && destroyer >= 2 && submarine >= 2 then (
+    if !num_carrier = 2 && !num_destroyer = 2 && !num_submarine = 2 then (
+      print_endline (string_of_int carrier);
       write 295 760 black "Ready!" 30;
       go_play !game)
     else (
       write 200 760 black "Place all ships to start!" 30;
-      placing_loop game p (not dir));
+      placing_loop game p dir);
   (* Check reset button *)
   if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 700
@@ -119,6 +123,9 @@ let rec placing_loop game p dir =
   then (
     game := make_game (init_player "Player") op_board true;
     write 200 760 black "Click again to reset!" 30;
+    num_carrier := 0;
+    num_destroyer := 0;
+    num_submarine := 0;
     placing_loop game p dir);
   (* Length 5 ship *)
   if
