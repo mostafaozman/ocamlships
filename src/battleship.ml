@@ -175,6 +175,8 @@ let fire p x y =
   in
   { p with board = fire_helper p.board x y }
 
+let empty_player_board p = { p with board = init_board () }
+
 let placed_ready player =
   if carrier_num <> num_placed player carrier then false
   else if destroyer_num <> num_placed player destroyer then false

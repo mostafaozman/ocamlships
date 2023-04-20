@@ -17,6 +17,9 @@ val get_player : game -> bool -> player
 (** [get_player g b] is player 1, in game [g], if [b] is true and player 2
     otherwise. *)
 
+val empty_player_board : player -> player
+(** [empty_player_board p] is player [p] with an empty board. *)
+
 val get_player_board : player -> board
 (** [get_player_board p] is the board associated with player [p]*)
 

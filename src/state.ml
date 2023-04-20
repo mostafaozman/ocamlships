@@ -3,6 +3,7 @@ open Graphics
 open Consts
 open Board
 open Battleship
+open Ai
 open Draw
 
 type state =
@@ -10,12 +11,9 @@ type state =
   | PLACING
   | PLAY
 
-let num_carrier = ref 0
-let num_destroyer = ref 0
-let num_submarine = ref 0
 let state = ref START
 let player_board = init_player "Player"
-let op_board = init_player "AI"
+let op_board = init_player "AI" |> create_placements
 let game = ref (make_game player_board op_board true)
 
 (** [convert x y] is the grid coordinate associated with pixel position
@@ -97,84 +95,89 @@ let rec placing_loop game p dir =
   synchronize ();
   draw_placing_screen game p;
   if st.key == 'q' then quit ();
-  (* Check for rotation *)
   if
+    (* Check for rotation *)
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 360
     && st.mouse_y <= 410
-  then (
-    write 295 760 black "Rotate!" 30;
-    placing_loop game p (not dir));
-  (* Check ready button *)
-  if
+  then rotate game p dir
+  else if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 430
     && st.mouse_y <= 480
-  then
-    if !num_carrier = 2 && !num_destroyer = 2 && !num_submarine = 2 then (
-      print_endline (string_of_int carrier);
-      write 295 760 black "Ready!" 30;
-      go_play !game)
-    else (
-      write 200 760 black "Place all ships to start!" 30;
-      placing_loop game p dir);
-  (* Check reset button *)
-  if
+  then ready game p dir
+  else if
+    (* Check reset button *)
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 700
     && st.mouse_y <= 800
-  then (
-    game := make_game (init_player "Player") op_board true;
-    write 200 760 black "Click again to reset!" 30;
-    num_carrier := 0;
-    num_destroyer := 0;
-    num_submarine := 0;
-    placing_loop game p dir);
-  (* Length 5 ship *)
-  if
+  then reset game p dir
+  else if
+    (* Length 5 ship *)
     st.mouse_x >= 21 && st.mouse_x <= 171 && st.mouse_y >= 10
     && st.mouse_y <= 50
     || st.mouse_x >= 21 && st.mouse_x <= 171 && st.mouse_y >= 60
        && st.mouse_y <= 100
-  then
-    if num_placed (get_player !game p) carrier < carrier_num then
-      place_loop game p 5 dir
-    else (
-      write 170 760 black "Max length 5 ships on board" 30;
-      placing_loop game p dir);
-  (* Length 4 ship *)
-  if
+  then ship_placer game p dir carrier
+  else if
+    (* Length 4 ship *)
     st.mouse_x >= 181 && st.mouse_x <= 331 && st.mouse_y >= 10
     && st.mouse_y <= 50
     || st.mouse_x >= 181 && st.mouse_x <= 331 && st.mouse_y >= 60
        && st.mouse_y <= 100
-  then
-    if num_placed (get_player !game p) destroyer < destroyer_num then
-      place_loop game p 4 dir
-    else (
-      write 170 760 black "Max length 4 ships on board" 30;
-      placing_loop game p dir);
-  (* Length 3 ship *)
-  if
+  then ship_placer game p dir destroyer
+  else if
+    (* Length 3 ship *)
     st.mouse_x >= 341 && st.mouse_x <= 491 && st.mouse_y >= 10
     && st.mouse_y <= 50
     || st.mouse_x >= 341 && st.mouse_x <= 491 && st.mouse_y >= 60
        && st.mouse_y <= 100
-  then
-    if num_placed (get_player !game p) submarine < submarine_num then
-      place_loop game p 3 dir
-    else (
-      write 170 760 black "Max length 3 ships on board" 30;
-      placing_loop game p dir);
-  (* Length 2 ship *)
-  if
+  then ship_placer game p dir submarine
+  else if
+    (* Length 2 ship *)
     st.mouse_x >= 501 && st.mouse_x <= 651 && st.mouse_y >= 10
     && st.mouse_y <= 50
     || st.mouse_x >= 501 && st.mouse_x <= 651 && st.mouse_y >= 60
        && st.mouse_y <= 100
-  then
-    if num_placed (get_player !game p) patrol < patrol_num then
-      place_loop game p 2 dir
-    else (
-      write 170 760 black "Max length 2 ships on board" 30;
-      placing_loop game p dir)
+  then ship_placer game p dir patrol
+
+and rotate game p dir =
+  write 295 760 black "Rotate!" 30;
+  placing_loop game p (not dir)
+
+and ready game p dir =
+  if placed_ready (get_player !game p) then (
+    print_endline (string_of_int carrier);
+    write 295 760 black "Ready!" 30;
+    go_play !game)
+  else (
+    write 200 760 black "Place all ships to start!" 30;
+    placing_loop game p dir)
+
+and reset game p dir =
+  if p then
+    game :=
+      make_game
+        (empty_player_board (get_player !game p))
+        (get_player !game (not p)) p
+  else
+    game :=
+      make_game (get_player !game (not p))
+        (empty_player_board (get_player !game p))
+        p;
+
+  write 200 760 black "Click again to reset!" 30;
+  placing_loop game p dir
+
+and ship_placer game p dir i =
+  let ship_num =
+    match i with
+    | n when n = carrier -> carrier_num
+    | n when n = destroyer -> destroyer_num
+    | n when n = submarine -> submarine_num
+    | _ -> patrol_num
+  in
+  if num_placed (get_player !game p) i < ship_num then place_loop game p i dir
+  else (
+    write 170 760 black ("Max length " ^ string_of_int i ^ " ships on board") 30;
+    placing_loop game p dir)
 
 let main () =
   let _ = open_graph " 800x800" in
@@ -186,4 +189,6 @@ let main () =
 
   while !state = PLACING do
     placing_loop game true true
-  done
+  done;
+
+  print_endline "PLAY state unimplemented"
