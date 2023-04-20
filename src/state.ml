@@ -73,7 +73,7 @@ let rec place_loop game p i dir =
   let tup = convert st.mouse_x st.mouse_y in
   match tup with
   | None ->
-      write 200 760 black "Invalid Position 1" 30;
+      write 200 760 black "Select position on board" 25;
       place_loop game p i dir
   | Some tup -> (
       try
@@ -86,7 +86,7 @@ let rec place_loop game p i dir =
         else game := make_game (get_player !game (not p)) (snd updated_p) p;
         update_cells true (fst updated_p)
       with e ->
-        write 200 760 black "Invalid Position 2" 30;
+        write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
 
 (** [placing_loop g p] waits for player 1 if [p] is true, player 2 otherwise, to
@@ -97,7 +97,7 @@ let rec placing_loop game p dir =
   synchronize ();
   draw_placing_screen game p;
   if st.key == 'q' then quit ();
-  (*Check for rotation*)
+  (* Check for rotation *)
   if
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 360
     && st.mouse_y <= 410
