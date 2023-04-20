@@ -24,15 +24,6 @@ let draw_cell color x y =
 let draw_player_board self p =
   draw_rect black background_llx background_lly background_length
     background_length;
-  (*Ready button*)
-  draw_rect go_green 680 430 100 50;
-  write 705 448 white "Ready" 20;
-  (*Reset button*)
-  draw_rect depression_grey 680 700 100 50;
-  write 705 715 white "Reset" 20;
-  (*Rotate button*)
-  draw_rect piss_yellow 680 360 100 50;
-  write 700 378 white "Rotate" 20;
   moveto background_llx background_tly;
   for y = 0 to num_box do
     for x = 0 to num_box do
@@ -56,6 +47,16 @@ let home () =
 
 let draw_placing_screen game player =
   draw_player_board true (get_player !game player);
+  (* Ready button *)
+  draw_rect go_green 680 430 100 50;
+  write 705 448 white "Ready" 20;
+  (* Reset button *)
+  draw_rect depression_grey 680 700 100 50;
+  write 705 715 white "Reset" 20;
+  (* Rotate button *)
+  draw_rect piss_yellow 680 360 100 50;
+  write 700 378 white "Rotate" 20;
+
   draw_rect quit_red 21 10 150 40;
   write 46 24 white "Length 5 ship" 15;
   draw_rect quit_red 21 60 150 40;
