@@ -127,13 +127,17 @@ and rotate game p dir =
   placing_loop game p (not dir)
 
 and ready game p dir =
-  if placed_ready (get_player !game p) then (
-    print_endline (string_of_int carrier);
-    write 295 760 black "Ready!" 30;
-    go_play !game)
-  else (
-    write 200 760 black "Place all ships to start!" 30;
-    placing_loop game p dir)
+  let curr_player_ready = placed_ready (get_player !game p) in
+  let opp_player_ready = placed_ready (get_player !game (not p)) in
+  match (curr_player_ready, opp_player_ready) with
+  | true, true ->
+      print_endline (string_of_int carrier);
+      write 295 760 black "Ready!" 30;
+      go_play !game
+  | true, false -> placing_loop game (not p) dir
+  | _ ->
+      write 200 760 black "Place all ships to start!" 30;
+      placing_loop game p dir
 
 and reset game p dir =
   if p then
