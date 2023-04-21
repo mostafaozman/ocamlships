@@ -57,21 +57,13 @@ let draw_placing_screen game player =
   draw_rect piss_yellow 680 360 100 50;
   write 700 378 white "Rotate" 20;
 
-  draw_rect quit_red 21 10 150 40;
-  write 46 24 white "Length 5 ship" 15;
   draw_rect quit_red 21 60 150 40;
   write 46 74 white "Length 5 ship" 15;
-  draw_rect quit_red 181 10 150 40;
-  write 206 24 white "Length 4 ship" 15;
   draw_rect quit_red 181 60 150 40;
   write 206 74 white "Length 4 ship" 15;
-  draw_rect quit_red 341 10 150 40;
-  write 366 24 white "Length 3 ship" 15;
   draw_rect quit_red 341 60 150 40;
   write 366 74 white "Length 3 ship" 15;
 
-  draw_rect quit_red 501 10 150 40;
-  write 526 24 white "Length 2 ship" 15;
   draw_rect quit_red 501 60 150 40;
   write 526 74 white "Length 2 ship" 15
 

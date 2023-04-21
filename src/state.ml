@@ -87,6 +87,13 @@ let rec place_loop game p i dir =
         write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
 
+(** [button_bound_check low_x high_x low_y high_y st] is whether the x
+    coordinate of [st] is within [low_x]...[high_x] and the y coordinate is
+    within [low_y]...[high_y]. Ranges are inclusive on both ends. *)
+let button_bound_check low_x high_x low_y high_y st =
+  st.mouse_x >= low_x && st.mouse_x <= high_x && st.mouse_y >= low_y
+  && st.mouse_y <= high_y
+
 (** [placing_loop g p d] waits for player 1 if [p] is true, player 2 otherwise,
     to press the button for which ship they will place and then allows them to
     place it in game [g] facing direction [d]. [d] being true will place a
@@ -95,50 +102,25 @@ let rec placing_loop game p dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   draw_placing_screen game p;
-  if st.key == 'q' then quit ();
-  if
-    (* Check for rotation *)
-    st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 360
-    && st.mouse_y <= 410
-  then rotate game p dir
-  else if
-    (* Check ready button *)
-    st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 430
-    && st.mouse_y <= 480
-  then ready game p dir
-  else if
-    (* Check reset button *)
-    st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 700
-    && st.mouse_y <= 800
-  then reset game p dir
-  else if
-    (* Length 5 ship *)
-    st.mouse_x >= 21 && st.mouse_x <= 171 && st.mouse_y >= 10
-    && st.mouse_y <= 50
-    || st.mouse_x >= 21 && st.mouse_x <= 171 && st.mouse_y >= 60
-       && st.mouse_y <= 100
-  then ship_placer game p dir carrier
-  else if
-    (* Length 4 ship *)
-    st.mouse_x >= 181 && st.mouse_x <= 331 && st.mouse_y >= 10
-    && st.mouse_y <= 50
-    || st.mouse_x >= 181 && st.mouse_x <= 331 && st.mouse_y >= 60
-       && st.mouse_y <= 100
-  then ship_placer game p dir destroyer
-  else if
-    (* Length 3 ship *)
-    st.mouse_x >= 341 && st.mouse_x <= 491 && st.mouse_y >= 10
-    && st.mouse_y <= 50
-    || st.mouse_x >= 341 && st.mouse_x <= 491 && st.mouse_y >= 60
-       && st.mouse_y <= 100
-  then ship_placer game p dir submarine
-  else if
-    (* Length 2 ship *)
-    st.mouse_x >= 501 && st.mouse_x <= 651 && st.mouse_y >= 10
-    && st.mouse_y <= 50
-    || st.mouse_x >= 501 && st.mouse_x <= 651 && st.mouse_y >= 60
-       && st.mouse_y <= 100
-  then ship_placer game p dir patrol
+  if st.key == 'q' then quit ()
+  else if (* Check for rotation *)
+          button_bound_check 680 780 360 410 st then rotate game p dir
+  else if (* Check ready button *)
+          button_bound_check 680 780 430 480 st then ready game p dir
+  else if (* Check reset button *)
+          button_bound_check 680 780 700 800 st then reset game p dir
+  else if (* Length 5 ship *)
+          button_bound_check 21 171 60 100 st then
+    ship_placer game p dir carrier
+  else if (* Length 4 ship *)
+          button_bound_check 181 331 60 100 st then
+    ship_placer game p dir destroyer
+  else if (* Length 3 ship *)
+          button_bound_check 341 491 60 100 st then
+    ship_placer game p dir submarine
+  else if (* Length 2 ship *)
+          button_bound_check 501 651 60 100 st then
+    ship_placer game p dir patrol
 
 and rotate game p dir =
   write 295 760 black "Rotate!" 30;
