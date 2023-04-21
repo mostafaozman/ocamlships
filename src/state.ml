@@ -75,14 +75,14 @@ let rec place_loop game p i dir =
       place_loop game p i dir
   | Some tup -> (
       try
-        let updated_p =
+        let ship_coords, updated_player =
           place_ship (get_player !game p) (init_ship i) (fst tup) (snd tup) dir
         in
         if p then (
-          game := make_game (snd updated_p) (get_player !game (not p)) p;
-          update_cells true (fst updated_p))
-        else game := make_game (get_player !game (not p)) (snd updated_p) p;
-        update_cells true (fst updated_p)
+          game := make_game updated_player (get_player !game (not p)) p;
+          update_cells true ship_coords)
+        else game := make_game (get_player !game (not p)) updated_player p;
+        update_cells true ship_coords
       with e ->
         write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
