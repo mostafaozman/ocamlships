@@ -179,6 +179,11 @@ and ship_placer game p dir i =
     write 170 760 black ("Max length " ^ string_of_int i ^ " ships on board") 30;
     placing_loop game p dir)
 
+let rec play_loop game p =
+  let _ = wait_next_event [ Button_down; Key_pressed ] in
+  synchronize ();
+  draw_player_board true (get_player !game false)
+
 let main () =
   let _ = open_graph " 800x800" in
   home ();
@@ -191,4 +196,6 @@ let main () =
     placing_loop game true true
   done;
 
-  print_endline "PLAY state unimplemented"
+  while !state = PLAY do
+    play_loop game true
+  done
