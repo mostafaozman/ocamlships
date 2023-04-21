@@ -3,6 +3,8 @@ open Battleship
 open Board
 module R = Random
 
+let _ = R.self_init ()
+
 let create_placements p =
   let rec helper (sz : int) (p : player) =
     try

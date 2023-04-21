@@ -87,9 +87,10 @@ let rec place_loop game p i dir =
         write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
 
-(** [placing_loop g p] waits for player 1 if [p] is true, player 2 otherwise, to
-    press the button for which ship they will place and then allows them to
-    place it in game [g]. *)
+(** [placing_loop g p d] waits for player 1 if [p] is true, player 2 otherwise,
+    to press the button for which ship they will place and then allows them to
+    place it in game [g] facing direction [d]. [d] being true will place a
+    horizontal ship, vertical otherwise. *)
 let rec placing_loop game p dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
@@ -101,6 +102,7 @@ let rec placing_loop game p dir =
     && st.mouse_y <= 410
   then rotate game p dir
   else if
+    (* Check ready button *)
     st.mouse_x >= 680 && st.mouse_x <= 780 && st.mouse_y >= 430
     && st.mouse_y <= 480
   then ready game p dir
