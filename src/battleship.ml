@@ -46,13 +46,14 @@ let pos_of_ship ship x y dir =
   in
   begin
     (match ship.length with
-    | 5 ->
-        if dir then List.init 5 (fun i -> (x + (-2 + i), y))
-        else List.init 5 (fun i -> (x, y + (-2 + i)))
-    | 4 | 3 ->
+    | n when n = carrier ->
+        if dir then List.init carrier (fun i -> (x + (-2 + i), y))
+        else List.init carrier (fun i -> (x, y + (-2 + i)))
+    | n when n = destroyer || n = submarine ->
         if dir then List.init ship.length (fun i -> (x + (-1 + i), y))
         else List.init ship.length (fun i -> (x, y - (-1 + i)))
-    | 2 -> if dir then [ (x, y); (x + 1, y) ] else [ (x, y); (x, y - 1) ]
+    | n when n = patrol ->
+        if dir then [ (x, y); (x + 1, y) ] else [ (x, y); (x, y - 1) ]
     | _ -> [])
     |> check_bounds []
   end
@@ -178,15 +179,14 @@ let fire p x y =
 let empty_player_board p = { p with board = init_board () }
 
 let placed_ready player =
-  if carrier_num <> num_placed player carrier then false
-  else if destroyer_num <> num_placed player destroyer then false
-  else if submarine_num <> num_placed player submarine then false
-  else if patrol_num <> num_placed player patrol then false
-  else true
+  carrier_num = num_placed player carrier
+  && destroyer_num = num_placed player destroyer
+  && submarine_num = num_placed player submarine
+  && patrol_num = num_placed player patrol
 
 let is_game_over player =
-  if num_placed player carrier <> 0 then false
-  else if num_placed player destroyer <> 0 then false
-  else if num_placed player submarine <> 0 then false
-  else if num_placed player patrol <> 0 then false
-  else true
+  num_placed player carrier
+  + num_placed player destroyer
+  + num_placed player submarine
+  + num_placed player patrol
+  = 0

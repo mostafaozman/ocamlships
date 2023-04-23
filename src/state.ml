@@ -41,7 +41,8 @@ let go_start game =
 
 let go_play game =
   state := PLAY;
-  clear_graph ()
+  clear_graph ();
+  draw_player_board true (get_player game false)
 
 (** [start_loop g] is the start screen of game [g]. *)
 let start_loop game =
@@ -154,17 +155,20 @@ and reset game p dir =
   write 200 760 black "Click again to reset!" 30;
   placing_loop game p dir
 
-and ship_placer game p dir i =
+and ship_placer game p dir ship_length =
   let ship_num =
-    match i with
+    match ship_length with
     | n when n = carrier -> carrier_num
     | n when n = destroyer -> destroyer_num
     | n when n = submarine -> submarine_num
     | _ -> patrol_num
   in
-  if num_placed (get_player !game p) i < ship_num then place_loop game p i dir
+  if num_placed (get_player !game p) ship_length < ship_num then
+    place_loop game p ship_length dir
   else (
-    write 170 760 black ("Max length " ^ string_of_int i ^ " ships on board") 30;
+    write 170 760 black
+      ("Max length " ^ string_of_int ship_length ^ " ships on board")
+      30;
     placing_loop game p dir)
 
 let rec play_loop game p =
