@@ -14,7 +14,8 @@ type state =
 let state = ref START
 let player_board = init_player "Player"
 let op_board = init_player "AI" |> create_placements
-let game = ref (make_game player_board op_board true)
+let g = make_game player_board op_board true
+let game = ref g
 
 (** [convert x y] is the grid coordinate associated with pixel position
     ([x],[y]). None if coordinate is outside the grid. *)
