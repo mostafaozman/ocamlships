@@ -68,7 +68,6 @@ let start_loop game =
 let rec place_loop game p i dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
-  clear_graph ();
   draw_placing_screen game p;
   let tup = convert st.mouse_x st.mouse_y in
   match tup with

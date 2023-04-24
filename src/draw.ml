@@ -48,6 +48,7 @@ let home () =
 let draw_placing_screen game player =
   draw_player_board true (get_player !game player);
   (* Ready button *)
+  draw_rect white 0 755 800 45;
   draw_rect go_green 680 430 100 50;
   write 705 448 white "Ready" 20;
   (* Reset button *)
