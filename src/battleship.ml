@@ -32,6 +32,11 @@ let rec is_adjacent (x : int * int) (a : int * int) : bool =
     let dy = abs (snd x - snd a) in
     dx <= 1 && dy <= 1
 
+let get_cell b x =
+  match find x b with
+  | None -> raise (InvalidPosition (string_of_coord x))
+  | Some t -> t
+
 (** [pos_of_ship board ship x y dir] is all the coordinates which [ship] will
     occupy when placed on grid position ([x],[y]) facing direction [dir]. Raises
     InvalidPosition if any coordinates are out of bounds *)

@@ -23,6 +23,10 @@ val empty_player_board : player -> player
 val get_player_board : player -> board
 (** [get_player_board p] is the board associated with player [p]*)
 
+val get_cell : board -> int * int -> cell
+(** [get_coordinate x] is the cell at board coordinate [x]. Raises
+    InvalidPosition if [x] is out of the board's bounds. *)
+
 val num_placed : player -> int -> int
 (** [num_placed p i] is the number of ships of length [i] that player [p] has on
     their board. *)

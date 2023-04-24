@@ -25,10 +25,6 @@ val init_ship : int -> ship
 val string_of_coord : int * int -> string
 (** [string_of_coord x] is the string representation of x. *)
 
-val get_cell : board -> int * int -> cell
-(** [get_coordinate x] is the cell at board coordinate [x]. Raises
-    InvalidPosition if [x] is out of the board's bounds. *)
-
 val insert : int * int -> cell -> board -> board
 (** [insert k v d] adds the binding (k,v) to [d] and replaces any previous
     binding. *)
