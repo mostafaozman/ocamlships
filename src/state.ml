@@ -89,10 +89,10 @@ let rec place_loop game p i dir =
         write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
 
-(** [button_bound_check low_x high_x low_y high_y st] is whether the x
+(** [button_bound_check (low_x,high_x) (low_y,high_y) st] is whether the x
     coordinate of [st] is within [low_x]...[high_x] and the y coordinate is
     within [low_y]...[high_y]. Ranges are inclusive on both ends. *)
-let button_bound_check low_x high_x low_y high_y st =
+let button_bound_check (low_x, high_x) (low_y, high_y) st =
   st.mouse_x >= low_x && st.mouse_x <= high_x && st.mouse_y >= low_y
   && st.mouse_y <= high_y
 
@@ -106,22 +106,25 @@ let rec placing_loop game p dir =
   draw_placing_screen game p;
   if st.key == 'q' then quit ()
   else if (* Check for rotation *)
-          button_bound_check 680 780 360 410 st then rotate game p dir
+          button_bound_check (680, 780) (360, 410) st
+  then rotate game p dir
   else if (* Check ready button *)
-          button_bound_check 680 780 430 480 st then ready game p dir
+          button_bound_check (680, 780) (430, 480) st
+  then ready game p dir
   else if (* Check reset button *)
-          button_bound_check 680 780 700 800 st then reset game p dir
+          button_bound_check (680, 780) (700, 800) st
+  then reset game p dir
   else if (* Length 5 ship *)
-          button_bound_check 21 171 60 100 st then
+          button_bound_check (21, 171) (60, 100) st then
     ship_placer game p dir carrier
   else if (* Length 4 ship *)
-          button_bound_check 181 331 60 100 st then
+          button_bound_check (181, 331) (60, 100) st then
     ship_placer game p dir destroyer
   else if (* Length 3 ship *)
-          button_bound_check 341 491 60 100 st then
+          button_bound_check (341, 491) (60, 100) st then
     ship_placer game p dir submarine
   else if (* Length 2 ship *)
-          button_bound_check 501 651 60 100 st then
+          button_bound_check (501, 651) (60, 100) st then
     ship_placer game p dir patrol
 
 and rotate game p dir =

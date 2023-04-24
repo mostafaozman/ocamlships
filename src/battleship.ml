@@ -88,9 +88,9 @@ let get_adjacents spots =
          (not (List.mem (x, y) spots))
          && x >= 0 && x < board_size && y >= 0 && y < board_size)
 
-(** [pred b c] is true if the coordinate c is a non-ship cell in board [b].
-    Raises: InvalidPosition otherwise.*)
-let pred board c =
+(** [not_ship b c] is true if the coordinate [c] is a non-ship cell in board
+    [b]. Raises: InvalidPosition otherwise.*)
+let not_ship board c =
   match get_cell board c with
   | Empty | Hit | Miss -> true
   | Ship _ ->
@@ -112,7 +112,7 @@ let place_ship player ship x y dir =
     let adjacency_list = get_adjacents ship_spots in
     if
       is_valid_position board ship_spots
-      && List.for_all (pred board) adjacency_list
+      && List.for_all (not_ship board) adjacency_list
     then
       ( ship_spots,
         placer board { ship with adjacents = adjacency_list } ship_spots )
