@@ -55,7 +55,14 @@ let board_tests =
          get_cell b (2, 2)) );
   ]
 
+(* AI tests *)
+let ai_tests = []
+
 (* Battleship Tests *)
 let battleship_tests = []
-let suite = "test suite for final project" >::: List.flatten [ board_tests ]
+
+let suite =
+  "test suite for final project"
+  >::: List.flatten [ board_tests; ai_tests; battleship_tests ]
+
 let _ = run_test_tt_main suite
