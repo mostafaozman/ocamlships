@@ -112,8 +112,3 @@ let init_board () =
 
 let init_ship length = { length; adjacents = [] }
 let string_of_coord (x, y) = "(" ^ string_of_int x ^ "," ^ string_of_int y ^ ")"
-
-let get_cell b x =
-  match find x b with
-  | None -> raise (InvalidPosition (string_of_coord x))
-  | Some t -> t
