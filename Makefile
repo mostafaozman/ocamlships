@@ -4,7 +4,7 @@ zip:
 	rm -f ships.zip
 	zip -r ships.zip . -x@exclude.lst
 
-clean:
+clean:bisect-clean
 	dune clean
 	rm -f ships.zip
 
@@ -25,3 +25,10 @@ doc:
 	
 opendoc: doc
 	@bash opendoc.sh
+
+bisect: bisect-clean
+	-dune exec --instrument-with bisect_ppx --force test/main.exe
+	bisect-ppx-report html
+
+bisect-clean:
+	rm -rf _coverage bisect*.coverage
