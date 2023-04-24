@@ -309,19 +309,19 @@ type board = (int * int, cell) rbtree
 (** [ @&lt;&lt; (x,y) (a,b)] is whether (x,y) is less than (a,b). Priority is given to
     the second element. *)
 let ( @&lt;&lt; ) (x, y) (a, b) =
-  <span data-count="18601">i</span>f y &lt; b then <span data-count="9552">t</span>rue
-  else <span data-count="9049">i</span>f y &gt; b then <span data-count="21">f</span>alse
-  else <span data-count="9028">i</span>f x &lt; a then <span data-count="5685">t</span>rue
-  else <span data-count="3343">i</span>f x &gt; a then <span data-count="3336">f</span>alse
+  <span data-count="14485">i</span>f y &lt; b then <span data-count="7436">t</span>rue
+  else <span data-count="7049">i</span>f y &gt; b then <span data-count="21">f</span>alse
+  else <span data-count="7028">i</span>f x &lt; a then <span data-count="4425">t</span>rue
+  else <span data-count="2603">i</span>f x &gt; a then <span data-count="2596">f</span>alse
   else <span data-count="7">f</span>alse
 
 (** [ &gt;&gt;@ (x,y) (a,b)] is whether (x,y) is greater than (a,b). Priority is given
     to the second element. *)
 let ( &gt;&gt;@ ) (x, y) (a, b) =
-  <span data-count="3364">i</span>f y &lt; b then <span data-count="0">f</span>alse
-  else <span data-count="3364">i</span>f y &gt; b then <span data-count="21">t</span>rue
-  else <span data-count="3343">i</span>f x &lt; a then <span data-count="0">f</span>alse
-  else <span data-count="3343">i</span>f x &gt; a then <span data-count="3336">t</span>rue
+  <span data-count="2624">i</span>f y &lt; b then <span data-count="0">f</span>alse
+  else <span data-count="2624">i</span>f y &gt; b then <span data-count="21">t</span>rue
+  else <span data-count="2603">i</span>f x &lt; a then <span data-count="0">f</span>alse
+  else <span data-count="2603">i</span>f x &gt; a then <span data-count="2596">t</span>rue
   else <span data-count="7">f</span>alse
 
 (** [empty] is the board with no cells. *)
@@ -338,24 +338,24 @@ let rec size d =
 
 (** [balance t] balances the tree with root Node [t]. *)
 let balance = function
-  | <span data-count="1080">B</span>lack, z, Node (Red, y, Node (Red, x, a, b), c), d
-  | <span data-count="1287">B</span>lack, z, Node (Red, x, a, Node (Red, y, b, c)), d
+  | <span data-count="840">B</span>lack, z, Node (Red, y, Node (Red, x, a, b), c), d
+  | <span data-count="1001">B</span>lack, z, Node (Red, x, a, Node (Red, y, b, c)), d
   | <span data-count="0">B</span>lack, x, a, Node (Red, z, Node (Red, y, b, c), d)
-  | <span data-count="72">B</span>lack, x, a, Node (Red, y, b, Node (Red, z, c, d)) -&gt;
+  | <span data-count="56">B</span>lack, x, a, Node (Red, y, b, Node (Red, z, c, d)) -&gt;
       Node (Red, y, Node (Black, x, a, b), Node (Black, z, c, d))
-  | <span data-count="16107">a</span>, b, c, d -&gt; Node (a, b, c, d)
+  | <span data-count="12533">a</span>, b, c, d -&gt; Node (a, b, c, d)
 
 let insert k v d =
-  <span data-count="3531">l</span>et rec ins = function
-    | <span data-count="3528">L</span>eaf -&gt; Node (Red, (k, v), Leaf, Leaf)
-    | <span data-count="18549">N</span>ode (color, (k', v'), a, b) -&gt;
-        if k @&lt;&lt; k' then <span data-count="15207">b</span>alance (color, (k', v'), in<span data-count="15207">s</span> a, b)
-        else <span data-count="3342">i</span>f k &gt;&gt;@ k' then <span data-count="3339">b</span>alance (color, (k', v'), a, in<span data-count="3339">s</span> b)
+  <span data-count="2747">l</span>et rec ins = function
+    | <span data-count="2744">L</span>eaf -&gt; Node (Red, (k, v), Leaf, Leaf)
+    | <span data-count="14433">N</span>ode (color, (k', v'), a, b) -&gt;
+        if k @&lt;&lt; k' then <span data-count="11831">b</span>alance (color, (k', v'), in<span data-count="11831">s</span> a, b)
+        else <span data-count="2602">i</span>f k &gt;&gt;@ k' then <span data-count="2599">b</span>alance (color, (k', v'), a, in<span data-count="2599">s</span> b)
         else <span data-count="3">N</span>ode (color, (k, v), a, b)
   in
   let output =
     match ins d with
-    | <span data-count="3531">N</span>ode (_, y, a, b) -&gt; Node (Black, y, a, b)
+    | <span data-count="2747">N</span>ode (_, y, a, b) -&gt; Node (Black, y, a, b)
     | <span data-count="0">L</span>eaf -&gt; failwith "RBT insert failed"
   in
   output
@@ -367,26 +367,26 @@ let rec find k d =
       if k @&lt;&lt; k' then <span data-count="30">f</span>ind k l else <span data-count="22">i</span>f k &gt;&gt;@ k' then <span data-count="18">f</span>ind k r else <span data-count="4">S</span>ome v'
 
 let rec fold f acc d =
-  <span data-count="3654">m</span>atch d with
-  | <span data-count="1890">L</span>eaf -&gt; acc
-  | <span data-count="1764">N</span>ode (_, (k, v), l, r) -&gt; fold f (<span data-count="1764">f</span> k v (fol<span data-count="1764">d</span> f acc l)) r
+  <span data-count="2842">m</span>atch d with
+  | <span data-count="1470">L</span>eaf -&gt; acc
+  | <span data-count="1372">N</span>ode (_, (k, v), l, r) -&gt; fold f (<span data-count="1372">f</span> k v (fol<span data-count="1372">d</span> f acc l)) r
 
 let to_list d = <span data-count="0">f</span>old (fun k v acc -&gt; <span data-count="0">(</span>k, v) :: acc) [] d |&gt; <span data-count="0">L</span>ist.rev
 
 let init_board () =
-  <span data-count="9">l</span>et rec helper_y y acc =
-    <span data-count="135">l</span>et rec helper_x x acc =
-      <span data-count="1890">m</span>atch x with
-      | <span data-count="126">-</span>1 -&gt; acc
-      | <span data-count="1764">_</span> -&gt; helper_x (x - 1) (inser<span data-count="1764">t</span> (x, y) Empty acc)
+  <span data-count="7">l</span>et rec helper_y y acc =
+    <span data-count="105">l</span>et rec helper_x x acc =
+      <span data-count="1470">m</span>atch x with
+      | <span data-count="98">-</span>1 -&gt; acc
+      | <span data-count="1372">_</span> -&gt; helper_x (x - 1) (inser<span data-count="1372">t</span> (x, y) Empty acc)
     in
     match y with
-    | <span data-count="9">-</span>1 -&gt; acc
-    | <span data-count="126">_</span> -&gt; helper_y (y - 1) (fol<span data-count="126">d</span> insert acc (helper_<span data-count="126">x</span> (board_size - 1) empty))
+    | <span data-count="7">-</span>1 -&gt; acc
+    | <span data-count="98">_</span> -&gt; helper_y (y - 1) (fol<span data-count="98">d</span> insert acc (helper_<span data-count="98">x</span> (board_size - 1) empty))
   in
   helper_y (board_size - 1) empty
 
-let init_ship length = <span data-count="9">{</span> length; adjacents = [] }
+let init_ship length = <span data-count="7">{</span> length; adjacents = [] }
 let string_of_coord (x, y) = <span data-count="5">"</span>(" ^ string_of_in<span data-count="5">t</span> x ^ "," ^ string_of_in<span data-count="5">t</span> y ^ ")"
 
 let get_cell b x =

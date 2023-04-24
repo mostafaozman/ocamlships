@@ -38,8 +38,8 @@ val find : int * int -> board -> cell option
     is at position [k]. *)
 
 val fold : (int * int -> cell -> 'a -> 'a) -> 'a -> board -> 'a
-(** [fold f acc d] applies [f] to all elements in [d] in sorted order starting
-    with [acc]. *)
+(** [fold f acc d] applies [f] to all elements in [d] in ascending order
+    starting with [acc]. *)
 
 val to_list : board -> ((int * int) * cell) list
 (** [to_list d] is [d] as a sorted a association list. *)

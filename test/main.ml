@@ -33,17 +33,16 @@ let board_tests =
       assert_equal "(0,0)" (string_of_coord (0, 0)) );
     ( "string_of_cords (14,14) is \"(14,14)\"" >:: fun _ ->
       assert_equal "(14,14)" (string_of_coord (14, 14)) );
-    (* get_cells tests: 4 *)
-    ( "get_cell empty board is empty" >:: fun _ ->
-      assert_equal Empty (get_cell board (2, 2)) );
-    ( "get_cell lower bound is empty" >:: fun _ ->
-      assert_equal Empty (get_cell board (0, 0)) );
-    ( "get_cell upper bound is empty" >:: fun _ ->
-      assert_equal Empty (get_cell board (14, 14)) );
-    ( "get_cell (-1,-1) raises failure" >:: fun _ ->
-      assert_raises (InvalidPosition "(-1,-1)") (fun () ->
-          get_cell board (-1, -1)) );
-    (*insert tests: 2 *)
+    (*Find test: 4 *)
+    ( "find on empty board is empty" >:: fun _ ->
+      assert_equal (Some Empty) (board |> find (2, 2)) );
+    ( "find lower bound is Some Empty" >:: fun _ ->
+      assert_equal (Some Empty) (board |> find (0, 0)) );
+    ( "find upper bound is Some Empty" >:: fun _ ->
+      assert_equal (Some Empty) (board |> find (13, 13)) );
+    ( "find out of bounds is None" >:: fun _ ->
+      assert_equal None (board |> find (22, 22)) );
+    (*insert tests: 4 *)
     ( "get_cell after insert non-duplicate" >:: fun _ ->
       assert_equal
         (Ship { ship })
@@ -53,13 +52,33 @@ let board_tests =
       assert_equal Hit
         (let b = board |> insert (2, 2) (Ship { ship }) |> insert (2, 2) Hit in
          get_cell b (2, 2)) );
+    ( "find after insert duplicate" >:: fun _ ->
+      assert_equal
+        (Some (Ship { ship }))
+        (board |> insert (2, 2) (Ship { ship }) |> find (2, 2)) );
+    ( "find after insert duplicate" >:: fun _ ->
+      assert_equal None (board |> insert (2, 2) (Ship { ship }) |> find (22, 22))
+    )
+    (* fold tests *);
   ]
 
 (* AI tests *)
 let ai_tests = []
 
 (* Battleship Tests *)
-let battleship_tests = []
+let battleship_tests =
+  [
+    (* get_cells tests: 4 *)
+    ( "get_cell on empty board is empty" >:: fun _ ->
+      assert_equal Empty (get_cell board (2, 2)) );
+    ( "get_cell lower bound is empty" >:: fun _ ->
+      assert_equal Empty (get_cell board (0, 0)) );
+    ( "get_cell upper bound is empty" >:: fun _ ->
+      assert_equal Empty (get_cell board (13, 13)) );
+    ( "get_cell (-1,-1) raises failure" >:: fun _ ->
+      assert_raises (InvalidPosition "(-1,-1)") (fun () ->
+          get_cell board (-1, -1)) );
+  ]
 
 let suite =
   "test suite for final project"
