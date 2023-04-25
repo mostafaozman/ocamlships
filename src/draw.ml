@@ -25,9 +25,10 @@ let draw_player_board self p =
   draw_rect black background_llx background_lly background_length
     background_length;
   moveto background_llx background_tly;
-  for y = 0 to num_box do
-    for x = 0 to num_box do
-      match get_cell (get_player_board p) (x, y) with
+  let board = get_player_board p in
+  for y = 0 to board_size - 1 do
+    for x = 0 to board_size - 1 do
+      match get_cell board (x, y) with
       | Empty -> draw_cell ocean_blue x y
       | Hit -> draw_cell quit_red x y
       | Miss -> draw_cell logo_wht x y

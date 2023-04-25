@@ -8,7 +8,6 @@ let destroyer_num = 2
 let submarine_num = 3
 let patrol_num = 4
 let box_size = 45
-let num_box = 13
 let box_off = 4
 let background_llx = 20
 let background_lly = 120
