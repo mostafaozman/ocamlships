@@ -35,7 +35,6 @@ type ai = {
 }
 
 module type ArtIntelligence = sig
-  val ai : ai
   val shoot : player -> (int * int) list * player
 end
 
@@ -99,6 +98,6 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
   let rec shoot p =
     match D.difficulty with
     | Easy -> shoot_easy ai p
-    | Medium -> shoot p
-    | Hard -> shoot p
+    | Medium -> shoot_easy ai p
+    | Hard -> shoot_easy ai p
 end
