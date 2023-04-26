@@ -1,12 +1,17 @@
 open Board
 
+(** type representing whether a player is an AI or not. *)
+type p =
+  | AI
+  | Player
+
 type player
 (** Type representing a player. Each player has a board and ships. *)
 
 type game
 (** Type representing a Battleship game*)
 
-val init_player : string -> player
+val init_player : p -> player
 (** [init_player ()] initializes a player with an empty board *)
 
 val make_game : player -> player -> bool -> game

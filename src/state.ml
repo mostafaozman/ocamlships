@@ -12,8 +12,8 @@ type state =
   | PLAY
 
 let state = ref START
-let player_board = init_player "Player"
-let op_board = init_player "AI" |> create_placements
+let player_board = init_player Player
+let op_board = init_player AI |> create_placements
 let g = make_game player_board op_board true
 let game = ref g
 

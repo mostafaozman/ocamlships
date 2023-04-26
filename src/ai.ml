@@ -15,40 +15,29 @@ module type Diff = sig
   val difficulty : difficulty
 end
 
-let gen_module diff =
+let gen_diff_module diff =
   (module struct
     let difficulty = diff
   end : Diff)
 
-let set_difficulty diff = gen_module diff
+module type Player = sig
+  val player : player
+end
 
-(** [gen_array p] generates a sorted array in ascending order out of player
-    [p]'s board coordinates. *)
-let gen_array p =
-  fold (fun (x, y) _ acc -> (x, y) :: acc) [] (get_player_board p)
-  |> List.rev |> A.of_list
+let gen_player_module player =
+  (module struct
+    let player = player
+  end : Player)
 
-(** [shuffle p] generates a shuffled array of coordinates out of player [p]'s
-    board. *)
-let shuffle p =
-  let shuffle_helper (arr : (int * int) array) =
-    for i = A.length arr - 1 downto 1 do
-      let j = R.int (i + 1) in
-      let temp = arr.(i) in
-      arr.(i) <- arr.(j);
-      arr.(j) <- temp
-    done
-  in
-  let arr = gen_array p in
-  shuffle_helper arr;
-  arr
+type ai = {
+  mutable arr : (int * int) array;
+  mutable turn : int;
+}
 
-(* TODO: Shoot will go through the shuffled array to determine where to fire.
-   Need shoot to return different output each time its called. Need shoot to
-   remove elements from array after that spot has been fired at or been revealed
-   by being adjacent to a sunken ship. *)
-let rec shoot p =
-  try fire p (R.int board_size) (R.int board_size) with exn -> shoot p
+module type ArtIntelligence = sig
+  val ai : ai
+  val shoot : player -> (int * int) list * player
+end
 
 let create_placements p =
   let rec helper (sz : int) (p : player) =
@@ -69,14 +58,47 @@ let create_placements p =
   in
   loop (carrier_num + destroyer_num + submarine_num + patrol_num) p
 
+(** [gen_array p] generates a sorted array in ascending order out of player
+    [p]'s board coordinates. *)
+let gen_array p =
+  fold (fun (x, y) _ acc -> (x, y) :: acc) [] (get_player_board p)
+  |> List.rev |> A.of_list
+
+(** [swap a i j] swaps the values of index [i] and [j] in array [a]. *)
+let swap a i j =
+  let temp = a.(i) in
+  a.(i) <- a.(j);
+  a.(j) <- temp
+
+(** [shuffle p] generates a shuffled array of coordinates out of player [p]'s
+    board. *)
+let shuffle p =
+  let shuffle_helper (arr : (int * int) array) =
+    for i = A.length arr - 1 downto 1 do
+      let j = R.int (i + 1) in
+      swap arr i j
+    done
+  in
+  let arr = gen_array p in
+  shuffle_helper arr;
+  arr
+
+(** [shoot_easy ai p] is a tuple containing a list of coordinates of the cells
+    of player [p]'s board that have changed AND an updated player after [p]'s
+    board has been fired at. Utilizes a naively random algorithm to determine
+    where to shoot. *)
+let shoot_easy ai p =
+  let x, y = ai.arr.(ai.turn) in
+  ai.turn <- ai.turn + 1;
+  fire p x y
+
 (* ########################################################################## *)
-module AI (D : Diff) = struct
+module Make (D : Diff) (P : Player) : ArtIntelligence = struct
+  let ai = { arr = shuffle P.player; turn = 0 }
+
   let rec shoot p =
     match D.difficulty with
-    | Easy -> (
-        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
-    | Medium -> (
-        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
-    | Hard -> (
-        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
+    | Easy -> shoot_easy ai p
+    | Medium -> shoot p
+    | Hard -> shoot p
 end

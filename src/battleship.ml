@@ -2,8 +2,12 @@
 open Consts
 open Board
 
+type p =
+  | AI
+  | Player
+
 type player = {
-  name : string;
+  of_type : p;
   board : board;
 }
 
@@ -12,8 +16,12 @@ type game = {
   mutable current_player : bool;
 }
 
-let init_player name = { name; board = init_board () }
-let get_player g b = if b then fst g.players else snd g.players
+let init_player of_type = { of_type; board = init_board () }
+
+let get_player g b =
+  let player1, player2 = g.players in
+  if b then player1 else player2
+
 let get_player_board p = p.board
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
 
