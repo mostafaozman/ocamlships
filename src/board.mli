@@ -26,7 +26,7 @@ val ( @<< ) : int * int -> int * int -> bool
 (** [ @<< (x,y) (a,b)] is whether (x,y) is less than (a,b). Priority is given to
     the second element. *)
 
-val ( @<< ) : int * int -> int * int -> bool
+val ( >>@ ) : int * int -> int * int -> bool
 (** [ >>@ (x,y) (a,b)] is whether (x,y) is greater than (a,b). Priority is given
     to the second element. *)
 
