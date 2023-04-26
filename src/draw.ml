@@ -30,7 +30,8 @@ let draw_player_board self p =
     for x = 0 to board_size - 1 do
       match get_cell board (x, y) with
       | Empty -> draw_cell ocean_blue x y
-      | Hit -> draw_cell quit_red x y
+      | Hit _ -> draw_cell quit_red x y
+      | Sunk _ -> draw_cell piss_yellow x y
       | Miss -> draw_cell logo_wht x y
       | Ship _ ->
           if self = true then draw_cell green x y else draw_cell ocean_blue x y

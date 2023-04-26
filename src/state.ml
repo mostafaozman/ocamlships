@@ -136,7 +136,6 @@ and ready game p dir =
   let opp_player_ready = placed_ready (get_player !game (not p)) in
   match (curr_player_ready, opp_player_ready) with
   | true, true ->
-      print_endline (string_of_int carrier);
       write 295 760 black "Ready!" 30;
       go_play !game
   | true, false -> placing_loop game (not p) dir

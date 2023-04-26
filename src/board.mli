@@ -1,13 +1,12 @@
-type ship = {
-  length : int;
-}
+type ship = { length : int }
 (** The type representing a ship. *)
 
 (** The type representing a cell on the board. *)
 type cell =
   | Empty
   | Ship of { ship : ship ref }
-  | Hit
+  | Hit of { ship : ship ref }
+  | Sunk of { ship : ship ref }
   | Miss
 
 type board

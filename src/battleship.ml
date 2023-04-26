@@ -105,7 +105,7 @@ let get_adjacents spots =
     [b]. Raises: InvalidPosition otherwise.*)
 let not_ship board c =
   match get_cell board c with
-  | Empty | Hit | Miss -> true
+  | Empty | Hit _ | Miss | Sunk _ -> true
   | Ship _ ->
       raise (InvalidPosition (string_of_coord c ^ " is an adjacent ship"))
 
@@ -133,12 +133,12 @@ let place_ship player ship x y dir =
 let num_placed player i =
   let get_ship_cell i cell =
     match cell with
-    | Empty | Hit | Miss -> false
+    | Empty | Hit _ | Miss | Sunk _ -> false
     | Ship t -> if !(t.ship).length = i then true else false
   in
   let get_unique_ship_refs acc x =
     match x with
-    | Empty | Hit | Miss -> acc
+    | Empty | Hit _ | Miss | Sunk _ -> acc
     | Ship t -> if List.memq t.ship acc then acc else t.ship :: acc
   in
   let b = player.board in
@@ -149,14 +149,14 @@ let num_placed player i =
   |> List.fold_left get_unique_ship_refs []
   |> List.length
 
-(** [get_same_refs b s] is all the cells on board [b] that share a memory
+(** [get_same_refs b s] is all the ship cells on board [b] that share a memory
     location with [s]. *)
 let get_same_refs board ship =
   fold
     (fun (x, y) cell acc ->
       if
         match get_cell board (x, y) with
-        | Empty | Hit | Miss -> false
+        | Empty | Hit _ | Miss | Sunk _ -> false
         | Ship { ship = s } -> s == ship
       then cell :: acc
       else acc)
@@ -166,7 +166,7 @@ let fire p x y =
   let fire_helper board x y =
     match get_cell board (x, y) with
     | Empty -> ([ (x, y) ], insert (x, y) Miss board)
-    | Ship { ship } -> ([ (x, y) ], insert (x, y) Hit board)
+    | Ship { ship } -> ([ (x, y) ], insert (x, y) (Hit { ship }) board)
     | _ -> raise (InvalidPosition (string_of_coord (x, y)))
   in
   let coords, new_board = fire_helper p.board x y in

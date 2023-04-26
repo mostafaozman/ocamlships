@@ -22,7 +22,8 @@ type ship = { length : int }
 type cell =
   | Empty
   | Ship of { ship : ship ref }
-  | Hit
+  | Hit of { ship : ship ref }
+  | Sunk of { ship : ship ref }
   | Miss
 
 type board = (int * int, cell) rbtree

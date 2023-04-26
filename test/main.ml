@@ -48,8 +48,13 @@ let board_tests =
         (let b = board |> insert (2, 2) (Ship { ship }) in
          get_cell b (2, 2)) );
     ( "get_cell after insert duplicate" >:: fun _ ->
-      assert_equal Hit
-        (let b = board |> insert (2, 2) (Ship { ship }) |> insert (2, 2) Hit in
+      assert_equal
+        (Hit { ship })
+        (let b =
+           board
+           |> insert (2, 2) (Ship { ship })
+           |> insert (2, 2) (Hit { ship })
+         in
          get_cell b (2, 2)) );
     ( "find after insert duplicate" >:: fun _ ->
       assert_equal
