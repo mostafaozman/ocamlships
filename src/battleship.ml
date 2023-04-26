@@ -101,14 +101,6 @@ let get_adjacents spots =
          (not (List.mem (x, y) spots))
          && x >= 0 && x < board_size && y >= 0 && y < board_size)
 
-(** [not_ship b c] is true if the coordinate [c] is a non-ship cell in board
-    [b]. Raises: InvalidPosition otherwise.*)
-let not_ship board c =
-  match get_cell board c with
-  | Empty | Hit _ | Miss | Sunk _ -> true
-  | Ship _ ->
-      raise (InvalidPosition (string_of_coord c ^ " is an adjacent ship"))
-
 (** [placer b s sp] is the board after the ship [s] which occupies the positions
     in [sp] is placed on board [b]. *)
 let placer board ship ship_spots =
@@ -149,24 +141,47 @@ let num_placed player i =
   |> List.fold_left get_unique_ship_refs []
   |> List.length
 
-(** [get_same_refs b s] is all the ship cells on board [b] that share a memory
-    location with [s]. *)
+(** [get_same_refs b s] is all the coordinates and their corresponding cells on
+    board [b] that have a ship which shares a memory location with [s]. *)
 let get_same_refs board ship =
   fold
     (fun (x, y) cell acc ->
       if
-        match get_cell board (x, y) with
-        | Empty | Hit _ | Miss | Sunk _ -> false
-        | Ship { ship = s } -> s == ship
-      then cell :: acc
+        match cell with
+        | Empty | Miss -> false
+        | Hit { ship = ship_ref }
+        | Ship { ship = ship_ref }
+        | Sunk { ship = ship_ref } -> ship_ref == ship
+      then ((x, y), cell) :: acc
       else acc)
     [] board
+
+(** [is_ship b c] is true if the cell of the tuple is a ship cell in board [b].
+    Raises: InvalidPosition otherwise. *)
+let is_ship tup =
+  match tup with
+  | _, Ship _ -> true
+  | _ -> false
+
+let sunk_transform board ship_ref coords =
+  let rec sunk_helper acc coords =
+    match coords with
+    | [] -> acc
+    | (x, y) :: t ->
+        sunk_helper (insert (x, y) (Sunk { ship = ship_ref }) board) t
+  in
+  sunk_helper board coords
 
 let fire p x y =
   let fire_helper board x y =
     match get_cell board (x, y) with
     | Empty -> ([ (x, y) ], insert (x, y) Miss board)
-    | Ship { ship } -> ([ (x, y) ], insert (x, y) (Hit { ship }) board)
+    | Ship { ship } ->
+        let same_ship_tups = get_same_refs board ship in
+        if List.length (List.filter is_ship same_ship_tups) = 1 then
+          let coords = List.map (fun (tup, c) -> tup) same_ship_tups in
+          (coords, sunk_transform board ship coords)
+        else ([ (x, y) ], insert (x, y) (Hit { ship }) board)
     | _ -> raise (InvalidPosition (string_of_coord (x, y)))
   in
   let coords, new_board = fire_helper p.board x y in
