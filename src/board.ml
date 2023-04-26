@@ -30,8 +30,6 @@ type cell =
 
 type board = (int * int, cell) rbtree
 
-(** [ @<< (x,y) (a,b)] is whether (x,y) is less than (a,b). Priority is given to
-    the second element. *)
 let ( @<< ) (x, y) (a, b) =
   if y < b then true
   else if y > b then false
@@ -39,8 +37,6 @@ let ( @<< ) (x, y) (a, b) =
   else if x > a then false
   else false
 
-(** [ >>@ (x,y) (a,b)] is whether (x,y) is greater than (a,b). Priority is given
-    to the second element. *)
 let ( >>@ ) (x, y) (a, b) =
   if y < b then false
   else if y > b then true

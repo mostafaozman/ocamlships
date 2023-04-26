@@ -1,6 +1,7 @@
 open Consts
 open Battleship
 open Board
+module A = Array
 module R = Random
 
 let _ = R.self_init ()
@@ -19,18 +20,38 @@ let gen_module diff =
     let difficulty = diff
   end : Diff)
 
-let easy = gen_module Easy
-let medium = gen_module Medium
-let hard = gen_module Hard
+let set_difficulty diff = gen_module diff
 
-let d =
-  let module D = (val easy) in
-  D.difficulty
+(** [gen_array p] generates a sorted array in ascending order out of player
+    [p]'s board. *)
+let gen_array p =
+  fold (fun (x, y) _ acc -> (x, y) :: acc) [] (get_player_board p)
+  |> List.rev |> A.of_list
 
-let set_difficulty diff =
-  let diff_ai = gen_module diff in
-  let module D = (val diff_ai) in
-  D.difficulty
+(** [shuffle p] generates a shuffled array out of player [p]'s board. *)
+let shuffle p =
+  let shuffle_helper (arr : (int * int) array) =
+    for i = A.length arr - 1 downto 1 do
+      let j = R.int (i + 1) in
+      let temp = arr.(i) in
+      arr.(i) <- arr.(j);
+      arr.(j) <- temp
+    done
+  in
+  let arr = gen_array p in
+  shuffle_helper arr;
+  arr
+
+module AI (D : Diff) = struct
+  let rec shoot p =
+    match D.difficulty with
+    | Easy -> (
+        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
+    | Medium -> (
+        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
+    | Hard -> (
+        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
+end
 
 let rec shoot p =
   try fire p (R.int board_size) (R.int board_size) with exn -> shoot p
