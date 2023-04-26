@@ -114,13 +114,8 @@ let placer board ship ship_spots =
 
 let place_ship player ship x y dir =
   let update_board board ship ship_spots =
-    let adjacency_list = get_adjacents ship_spots in
-    if
-      is_valid_position board ship_spots
-      && List.for_all (not_ship board) adjacency_list
-    then
-      ( ship_spots,
-        placer board { ship with adjacents = adjacency_list } ship_spots )
+    if is_valid_position board ship_spots then
+      (ship_spots, placer board ship ship_spots)
     else raise (InvalidPosition "")
   in
   let ship_spots = pos_of_ship ship x y dir in
@@ -159,27 +154,15 @@ let get_same_refs board ship =
       else acc)
     [] board
 
-(** [adjacent_transform b s coord] is the board [b] after all cells adjacent to
-    [s] become a Miss and the cell at [coord] becomes a Hit. *)
-let adjacent_transform board ship (x, y) =
-  let rec helper lst acc =
-    match lst with
-    | [] -> acc
-    | (a, b) :: t -> helper t (insert (a, b) Miss acc)
-  in
-  helper ship.adjacents (insert (x, y) Hit board)
-
 let fire p x y =
   let fire_helper board x y =
     match get_cell board (x, y) with
-    | Empty -> insert (x, y) Miss board
-    | Ship { ship } ->
-        let same_refs = List.length (get_same_refs board ship) in
-        if same_refs = 1 then adjacent_transform board !ship (x, y)
-        else insert (x, y) Hit board
+    | Empty -> ([ (x, y) ], insert (x, y) Miss board)
+    | Ship { ship } -> ([ (x, y) ], insert (x, y) Hit board)
     | _ -> raise (InvalidPosition (string_of_coord (x, y)))
   in
-  { p with board = fire_helper p.board x y }
+  let coords, new_board = fire_helper p.board x y in
+  (coords, { p with board = new_board })
 
 let empty_player_board p = { p with board = init_board () }
 
@@ -190,8 +173,7 @@ let placed_ready player =
   && patrol_num = num_placed player patrol
 
 let is_game_over player =
-  num_placed player carrier
-  + num_placed player destroyer
-  + num_placed player submarine
-  + num_placed player patrol
-  = 0
+  num_placed player carrier = 0
+  && num_placed player destroyer = 0
+  && num_placed player submarine = 0
+  && num_placed player patrol = 0

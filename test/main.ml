@@ -25,7 +25,6 @@ let board_tests =
     (* ("init_board test" >:: fun _ -> assert_equal 2 board.); *)
     (* init_ship tests: 2*)
     ("init_ship length test" >:: fun _ -> assert_equal 4 !ship.length);
-    ("init_ship adjacents test" >:: fun _ -> assert_equal [] !ship.adjacents);
     (* string_of_cords tests: 3 *)
     ( "string_of_cords (5,2) is \"(5,2)\"" >:: fun _ ->
       assert_equal "(5,2)" (string_of_coord (5, 2)) );

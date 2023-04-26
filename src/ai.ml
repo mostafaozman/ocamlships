@@ -23,12 +23,13 @@ let gen_module diff =
 let set_difficulty diff = gen_module diff
 
 (** [gen_array p] generates a sorted array in ascending order out of player
-    [p]'s board. *)
+    [p]'s board coordinates. *)
 let gen_array p =
   fold (fun (x, y) _ acc -> (x, y) :: acc) [] (get_player_board p)
   |> List.rev |> A.of_list
 
-(** [shuffle p] generates a shuffled array out of player [p]'s board. *)
+(** [shuffle p] generates a shuffled array of coordinates out of player [p]'s
+    board. *)
 let shuffle p =
   let shuffle_helper (arr : (int * int) array) =
     for i = A.length arr - 1 downto 1 do
@@ -42,17 +43,10 @@ let shuffle p =
   shuffle_helper arr;
   arr
 
-module AI (D : Diff) = struct
-  let rec shoot p =
-    match D.difficulty with
-    | Easy -> (
-        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
-    | Medium -> (
-        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
-    | Hard -> (
-        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
-end
-
+(* TODO: Shoot will go through the shuffled array to determine where to fire.
+   Need shoot to return different output each time its called. Need shoot to
+   remove elements from array after that spot has been fired at or been revealed
+   by being adjacent to a sunken ship. *)
 let rec shoot p =
   try fire p (R.int board_size) (R.int board_size) with exn -> shoot p
 
@@ -74,3 +68,15 @@ let create_placements p =
     | _ -> loop (i - 1) (helper carrier acc |> snd)
   in
   loop (carrier_num + destroyer_num + submarine_num + patrol_num) p
+
+(* ########################################################################## *)
+module AI (D : Diff) = struct
+  let rec shoot p =
+    match D.difficulty with
+    | Easy -> (
+        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
+    | Medium -> (
+        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
+    | Hard -> (
+        try fire p (R.int board_size) (R.int board_size) with exn -> shoot p)
+end

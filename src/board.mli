@@ -1,6 +1,5 @@
 type ship = {
   length : int;
-  adjacents : (int * int) list;
 }
 (** The type representing a ship. *)
 

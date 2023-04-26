@@ -39,14 +39,15 @@ val place_ship :
     ship is horizontal, false if vertical. Raises Invalid Position if position
     is out of bounds, already has ship, or is adjacent to another ship. *)
 
-val fire : player -> int -> int -> player
-(** [fire board x y] is the updated [board] after a shot is fired at board
-    position ([x],[y]) on the board. Raises InvalidPosition if position
-    ([x],[y]) is a Hit or Miss cell. *)
+val fire : player -> int -> int -> (int * int) list * player
+(** [fire player x y] is the tuple with the coordinates of [player]'s board that
+    have changed AND the updated player after a shot is fired at board position
+    ([x],[y]) Raises InvalidPosition if position ([x],[y]) is a Hit or Miss
+    cell. *)
 
 val placed_ready : player -> bool
-(** [placed_ready player] is whether all of the [player]'s ships have been placed
-   on the board. *)
+(** [placed_ready player] is whether all of the [player]'s ships have been
+    placed on the board. *)
 
 val is_game_over : player -> bool
 (** [is_game_over player] is whether all of [player]'s ships have been

@@ -17,10 +17,7 @@ type ('k, 'v) rbtree =
   | Node of color * ('k * 'v) * ('k, 'v) rbtree * ('k, 'v) rbtree
   | Leaf
 
-type ship = {
-  length : int;
-  adjacents : (int * int) list;
-}
+type ship = { length : int }
 
 type cell =
   | Empty
@@ -106,5 +103,5 @@ let init_board () =
   in
   helper_y (board_size - 1) empty
 
-let init_ship length = { length; adjacents = [] }
+let init_ship length = { length }
 let string_of_coord (x, y) = "(" ^ string_of_int x ^ "," ^ string_of_int y ^ ")"
