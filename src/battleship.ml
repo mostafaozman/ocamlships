@@ -168,7 +168,7 @@ let sunk_transform board ship_ref coords =
     match coords with
     | [] -> acc
     | (x, y) :: t ->
-        sunk_helper (insert (x, y) (Sunk { ship = ship_ref }) board) t
+        sunk_helper (insert (x, y) (Sunk { ship = ship_ref }) acc) t
   in
   sunk_helper board coords
 
