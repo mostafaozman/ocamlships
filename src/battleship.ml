@@ -140,8 +140,7 @@ let num_placed player i =
   in
   let b = player.board in
   fold
-    (fun (x, y) v acc ->
-      if get_ship_cell i (get_cell b (x, y)) then v :: acc else acc)
+    (fun (x, y) cell acc -> if get_ship_cell i cell then cell :: acc else acc)
     [] b
   |> List.fold_left get_unique_ship_refs []
   |> List.length
