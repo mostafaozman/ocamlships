@@ -6,6 +6,11 @@ type p =
   | AI
   | Player
 
+type result =
+  | ShipHit
+  | ShipSunk
+  | ShipMissed
+
 type player = {
   of_type : p;
   board : board;
@@ -175,17 +180,17 @@ let sunk_transform board ship_ref coords =
 let fire p x y =
   let fire_helper board x y =
     match get_cell board (x, y) with
-    | Empty -> ([ (x, y) ], insert (x, y) Miss board)
+    | Empty -> ([ (x, y) ], insert (x, y) Miss board, ShipMissed)
     | Ship { ship } ->
         let same_ship_tups = get_same_refs board ship in
         if List.length (List.filter is_ship same_ship_tups) = 1 then
           let coords = List.map (fun (tup, c) -> tup) same_ship_tups in
-          (coords, sunk_transform board ship coords)
-        else ([ (x, y) ], insert (x, y) (Hit { ship }) board)
+          (coords, sunk_transform board ship coords, ShipSunk)
+        else ([ (x, y) ], insert (x, y) (Hit { ship }) board, ShipHit)
     | _ -> raise (InvalidPosition (string_of_coord (x, y)))
   in
-  let coords, new_board = fire_helper p.board x y in
-  (coords, { p with board = new_board })
+  let coords, new_board, result = fire_helper p.board x y in
+  (coords, { p with board = new_board }, result)
 
 let empty_player_board p = { p with board = init_board () }
 

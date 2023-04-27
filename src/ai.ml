@@ -35,7 +35,7 @@ type ai = {
 }
 
 module type ArtIntelligence = sig
-  val shoot : player -> (int * int) list * player
+  val shoot : player -> (int * int) list * player * result
 end
 
 let create_placements p =
@@ -84,8 +84,8 @@ let shuffle p =
 
 (** [shoot_easy ai p] is a tuple containing a list of coordinates of the cells
     of player [p]'s board that have changed AND an updated player after [p]'s
-    board has been fired at. Utilizes a naively random algorithm to determine
-    where to shoot. *)
+    board has been fired at AND the result of the shot. Utilizes a naively
+    random algorithm to determine where to shoot. *)
 let shoot_easy ai p =
   let x, y = ai.arr.(ai.turn) in
   ai.turn <- ai.turn + 1;

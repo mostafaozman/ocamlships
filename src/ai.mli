@@ -21,7 +21,7 @@ end
 
 (** type representing an AI firing at a player's board. *)
 module type ArtIntelligence = sig
-  val shoot : player -> (int * int) list * player
+  val shoot : player -> (int * int) list * player * result
 end
 
 val gen_diff_module : difficulty -> (module Diff)

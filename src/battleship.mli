@@ -5,6 +5,12 @@ type p =
   | AI
   | Player
 
+(** type representing the result of a shot onto a board. *)
+type result =
+  | ShipHit
+  | ShipSunk
+  | ShipMissed
+
 type player
 (** Type representing a player. Each player has a board and ships. *)
 
@@ -44,11 +50,11 @@ val place_ship :
     ship is horizontal, false if vertical. Raises Invalid Position if position
     is out of bounds, already has ship, or is adjacent to another ship. *)
 
-val fire : player -> int -> int -> (int * int) list * player
+val fire : player -> int -> int -> (int * int) list * player * result
 (** [fire player x y] is the tuple with the coordinates of [player]'s board that
     have changed AND the updated player after a shot is fired at board position
-    ([x],[y]) Raises InvalidPosition if position ([x],[y]) is a Hit or Miss
-    cell. *)
+    ([x],[y]) AND the result of firing at the coordinate. Raises InvalidPosition
+    if position ([x],[y]) is a Hit or Miss cell. *)
 
 val placed_ready : player -> bool
 (** [placed_ready player] is whether all of the [player]'s ships have been
