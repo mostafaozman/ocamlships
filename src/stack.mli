@@ -23,6 +23,10 @@ val pop : 'a t -> 'a t
 val size : 'a t -> int
 (** [size t] is the number of elements in [t]. *)
 
+val append : 'a t -> 'a t -> 'a t
+(** [append t1 t2] is [t2] appended to [t1]. First element of [t1] is at the top
+    of the stack. *)
+
 val rem_elements : 'a list -> 'a t -> 'a t
 (** [rem_elements e t] is [t] with all elements also in [e] removed. *)
 
@@ -35,3 +39,5 @@ val of_list : 'a list -> 'a t
 val of_array : 'a array -> 'a t
 (** [of_array arr] is the stack consisting of [arr]'s elements. The first
     element of [arr] is the topmost element of the stack. *)
+
+val string_of_stack : ('a -> string) -> 'a t -> string

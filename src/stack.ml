@@ -21,6 +21,7 @@ let pop = function
 let size = List.length
 let to_list = Fun.id
 let of_list = Fun.id
+let append = List.append
 let rec rem_elements elems t = List.filter (fun x -> not (List.mem x elems)) t
 
 let of_array arr =
@@ -28,4 +29,8 @@ let of_array arr =
     | -1 -> acc
     | i -> of_array_helper (arr.(i) :: acc) (i - 1)
   in
-  of_array_helper empty (Array.length arr)
+  of_array_helper empty (Array.length arr - 1)
+
+let string_of_stack f s =
+  let s = List.map f s in
+  "[" ^ String.concat ";" s ^ "]"

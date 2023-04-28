@@ -93,8 +93,16 @@ let shoot_easy ai p =
   ai.low_priority_stack <- S.pop stack;
   fire p x y
 
+let shoot_mid_helper (x, y) (coords, p, result) =
+  get_adjacents_of_point (x, y)
+  |> List.filter (fun (x, y) ->
+         match get_cell (get_player_board p) (x, y) with
+         | Empty | Ship _ -> true
+         | _ -> false)
+
+(** [shoot_mid ai p] is the same as shoot_easy but utilizes an improved
+    algorithm for determining where to shoot. *)
 let shoot_mid ai p =
-  (* If AI has not hit ship recently *)
   if S.is_empty ai.high_priority_stack then (
     let x, y =
       try S.peek ai.low_priority_stack
@@ -104,13 +112,7 @@ let shoot_mid ai p =
     let coords, p, result = fire p x y in
 
     if result = ShipHit then (
-      let next =
-        get_adjacents_of_point (x, y)
-        |> List.filter (fun (x, y) ->
-               match get_cell (get_player_board p) (x, y) with
-               | Empty | Ship _ -> true
-               | _ -> false)
-      in
+      let next = shoot_mid_helper (x, y) (coords, p, result) in
       ai.high_priority_stack <- S.of_list next;
       ai.low_priority_stack <- S.rem_elements next ai.low_priority_stack);
 
@@ -118,7 +120,13 @@ let shoot_mid ai p =
   else
     let x, y = S.peek ai.high_priority_stack in
     ai.high_priority_stack <- S.pop ai.high_priority_stack;
-    fire p x y
+    let coords, p, result = fire p x y in
+    if result = ShipHit then (
+      let next = shoot_mid_helper (x, y) (coords, p, result) in
+      ai.high_priority_stack <-
+        S.append (S.of_list next) (S.rem_elements next ai.high_priority_stack);
+      ai.low_priority_stack <- S.rem_elements next ai.low_priority_stack);
+    (coords, p, result)
 
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
@@ -129,6 +137,6 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
   let rec shoot p =
     match D.difficulty with
     | Easy -> shoot_easy ai p
-    | Medium -> shoot_easy ai p
+    | Medium -> shoot_mid ai p
     | Hard -> shoot_easy ai p
 end
