@@ -2,6 +2,7 @@ open Consts
 open Battleship
 open Board
 module A = Array
+module S = Stack.Stack
 module R = Random
 
 let _ = R.self_init ()
@@ -32,6 +33,7 @@ let gen_player_module player =
 type ai = {
   mutable arr : (int * int) array;
   mutable turn : int;
+  mutable stack : (int * int) S.t;
 }
 
 module type ArtIntelligence = sig
@@ -93,7 +95,9 @@ let shoot_easy ai p =
 
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
-  let ai = { arr = shuffle P.player; turn = 0 }
+  let ai =
+    let shuffled_array = shuffle P.player in
+    { arr = shuffled_array; turn = 0; stack = S.of_array shuffled_array }
 
   let rec shoot p =
     match D.difficulty with
