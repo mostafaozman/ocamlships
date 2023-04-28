@@ -2,7 +2,7 @@ open Consts
 open Battleship
 open Board
 module A = Array
-module S = Stack.Stack
+module S = Stack
 module R = Random
 
 let _ = R.self_init ()
@@ -31,9 +31,8 @@ let gen_player_module player =
   end : Player)
 
 type ai = {
-  mutable arr : (int * int) array;
-  mutable turn : int;
-  mutable stack : (int * int) S.t;
+  mutable low_priority_stack : (int * int) S.t;
+  mutable high_priority_stack : (int * int) S.t;
 }
 
 module type ArtIntelligence = sig
@@ -89,15 +88,43 @@ let shuffle p =
     board has been fired at AND the result of the shot. Utilizes a naively
     random algorithm to determine where to shoot. *)
 let shoot_easy ai p =
-  let x, y = ai.arr.(ai.turn) in
-  ai.turn <- ai.turn + 1;
+  let stack = ai.low_priority_stack in
+  let x, y = S.peek stack in
+  ai.low_priority_stack <- S.pop stack;
   fire p x y
+
+let shoot_mid ai p =
+  (* If AI has not hit ship recently *)
+  if S.is_empty ai.high_priority_stack then (
+    let x, y =
+      try S.peek ai.low_priority_stack
+      with exn -> raise (invalid_arg "Game should be over")
+    in
+    ai.low_priority_stack <- S.pop ai.low_priority_stack;
+    let coords, p, result = fire p x y in
+
+    if result = ShipHit then (
+      let next =
+        get_adjacents_of_point (x, y)
+        |> List.filter (fun (x, y) ->
+               match get_cell (get_player_board p) (x, y) with
+               | Empty | Ship _ -> true
+               | _ -> false)
+      in
+      ai.high_priority_stack <- S.of_list next;
+      ai.low_priority_stack <- S.rem_elements next ai.low_priority_stack);
+
+    (coords, p, result))
+  else
+    let x, y = S.peek ai.high_priority_stack in
+    ai.high_priority_stack <- S.pop ai.high_priority_stack;
+    fire p x y
 
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
   let ai =
-    let shuffled_array = shuffle P.player in
-    { arr = shuffled_array; turn = 0; stack = S.of_array shuffled_array }
+    let shuffled_stack = shuffle P.player |> S.of_array in
+    { low_priority_stack = shuffled_stack; high_priority_stack = S.empty }
 
   let rec shoot p =
     match D.difficulty with

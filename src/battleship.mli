@@ -38,6 +38,10 @@ val get_cell : board -> int * int -> cell
 (** [get_coordinate x] is the cell at board coordinate [x]. Raises
     InvalidPosition if [x] is out of the board's bounds. *)
 
+val get_adjacents_of_point : int * int -> (int * int) list
+(** [get_adjacents_of_point (x,y)] is a list of all coordinates adjacent to
+    [(x,y)] that are within the board's bounds. *)
+
 val num_placed : player -> int -> int
 (** [num_placed p i] is the number of ships of length [i] that player [p] has on
     their board. *)

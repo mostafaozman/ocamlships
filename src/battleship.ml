@@ -86,20 +86,18 @@ let rec is_valid_position (board : board) (ship_spots : (int * int) list) =
       | Some c -> c = Empty && is_valid_position board t
     end
 
+let get_adjacents_of_point (x, y) =
+  let top = (x, y + 1) in
+  let left = (x - 1, y) in
+  let bottom = (x, y - 1) in
+  let right = (x + 1, y) in
+  [ top; left; bottom; right ]
+  |> List.filter (fun (x, y) ->
+         x >= 0 && x < board_size && y >= 0 && y < board_size)
+
 (** [get_adjacents s] is all coordinates that are adjacent to the coordinates in
     [s] within the board's bounds. *)
 let get_adjacents spots =
-  let get_adjacents_of_point (x, y) =
-    let top = (x, y + 1) in
-    let left = (x - 1, y) in
-    let bottom = (x, y - 1) in
-    let right = (x + 1, y) in
-    let top_left = (x - 1, y + 1) in
-    let bottom_left = (x - 1, y - 1) in
-    let top_right = (x + 1, y + 1) in
-    let bottom_right = (x + 1, y - 1) in
-    [ top; left; bottom; right; top_left; bottom_left; top_right; bottom_right ]
-  in
   List.map get_adjacents_of_point spots
   |> List.flatten |> List.sort_uniq compare
   |> List.filter (fun (x, y) ->
