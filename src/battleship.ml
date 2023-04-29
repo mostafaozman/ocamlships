@@ -18,7 +18,7 @@ type player = {
 
 type game = {
   players : player * player;
-  mutable current_player : bool;
+  current_player : bool;
 }
 
 let init_player of_type = { of_type; board = init_board () }
