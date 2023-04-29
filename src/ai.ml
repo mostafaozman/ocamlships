@@ -93,7 +93,9 @@ let shoot_easy ai p =
   ai.low_priority_stack <- S.pop stack;
   fire p x y
 
-let shoot_mid_helper (x, y) (coords, p, result) =
+(** [shoot_mid_helper (x,y) p] is the list of coordinates that are adjacent to
+    [(x,y)] but have not been shot at on [p]'s board. *)
+let shoot_mid_helper (x, y) p =
   get_adjacents_of_point (x, y)
   |> List.filter (fun (x, y) ->
          match get_cell (get_player_board p) (x, y) with
@@ -112,7 +114,7 @@ let shoot_mid ai p =
     let coords, p, result = fire p x y in
 
     if result = ShipHit then (
-      let next = shoot_mid_helper (x, y) (coords, p, result) in
+      let next = shoot_mid_helper (x, y) p in
       ai.high_priority_stack <- S.of_list next;
       ai.low_priority_stack <- S.rem_elements next ai.low_priority_stack);
 
@@ -122,7 +124,7 @@ let shoot_mid ai p =
     ai.high_priority_stack <- S.pop ai.high_priority_stack;
     let coords, p, result = fire p x y in
     if result = ShipHit then (
-      let next = shoot_mid_helper (x, y) (coords, p, result) in
+      let next = shoot_mid_helper (x, y) p in
       ai.high_priority_stack <-
         S.append (S.of_list next) (S.rem_elements next ai.high_priority_stack);
       ai.low_priority_stack <- S.rem_elements next ai.low_priority_stack);
