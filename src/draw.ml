@@ -17,9 +17,9 @@ let draw_rect color x y width height =
 
 let draw_cell color x y =
   draw_rect color
-    (background_llx + box_off + (box_size * x))
-    (background_tly - box_size - (box_size * y))
-    41 41
+    (background_llx + box_off + ((box_size + box_off) * x))
+    (background_tly - (box_size + box_off) - ((box_size + box_off) * y))
+    box_size box_size
 
 let draw_player_board self p =
   draw_rect black background_llx background_lly background_length

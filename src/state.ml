@@ -31,8 +31,8 @@ let convert x y =
     || y < background_lly || y > background_tly
   then None
   else
-    let r = (background_tly - y - box_off) / box_size in
-    let c = (x - background_llx - box_off) / box_size in
+    let r = (background_tly - y - box_off) / (box_size + box_off) in
+    let c = (x - background_llx - box_off) / (box_size + box_off) in
     Some (c, r)
 
 (** [button_bound_check (low_x,high_x) (low_y,high_y) st] is whether the x
