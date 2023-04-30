@@ -49,16 +49,17 @@ let rec create_placements arr player =
         (R.bool ())
     with exn -> helper sz p
   in
-  let rec loop (i : int) (acc : player) =
+  let rec loop (index : int) (i : int) (acc : player) =
     match i with
     | 0 -> acc
-    | n when n <= arr.(3) -> loop (i - 1) (helper patrol acc |> snd)
-    | n when n <= arr.(2) + arr.(3) -> loop (i - 1) (helper submarine acc |> snd)
-    | n when n <= arr.(1) + arr.(2) + arr.(3) ->
-        loop (i - 1) (helper destroyer acc |> snd)
-    | _ -> loop (i - 1) (helper carrier acc |> snd)
+    | _ ->
+        let ship_length = 5 - index in
+        loop index (i - 1) (helper ship_length acc |> snd)
   in
-  loop (arr.(0) + arr.(1) + arr.(2) + arr.(3)) player
+  A.fold_left
+    (fun (index, p) num -> (index + 1, loop index num p))
+    (0, player) arr
+  |> snd
 
 (** [gen_array p] generates a sorted array in ascending order out of player
     [p]'s board coordinates. *)
@@ -221,7 +222,6 @@ let shoot_hard ai p =
   in
   let coords, p, result = fire p x y in
 
-  print_endline (pp coords);
   (if result = ShipSunk then
    let len_of_ship =
      match get_cell (get_player_board p) (List.hd coords) with
