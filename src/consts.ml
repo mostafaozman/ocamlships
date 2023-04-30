@@ -7,6 +7,8 @@ let carrier_num = 1
 let destroyer_num = 1
 let submarine_num = 2
 let patrol_num = 3
+
+let ship_num_arr = [| carrier_num; destroyer_num; submarine_num; patrol_num |]
 let box_size = 58
 let box_off = 5
 let background_llx = 20

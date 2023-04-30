@@ -42,6 +42,9 @@ val get_adjacents_of_point : int * int -> (int * int) list
 (** [get_adjacents_of_point (x,y)] is a list of all coordinates adjacent to
     [(x,y)] that are within the board's bounds. *)
 
+val pp : (int * int) list -> string
+(** [pp l] is the string representation of a list of coordinates. *)
+
 val num_placed : player -> int -> int
 (** [num_placed p i] is the number of ships of length [i] that player [p] has on
     their board. *)
@@ -68,15 +71,5 @@ val is_game_over : player -> bool
 (** [is_game_over player] is whether all of [player]'s ships have been
     destroyed. *)
 
-val custom_place :
-  (board -> (int * int) list -> bool) ->
-  player ->
-  ship ->
-  int * int ->
-  bool ->
-  (int * int) list * player
-(** [custom_pos_check f p s (x,y) dir] is the list of coordinates that have
-    changed after placing [s] on [p]'s board at position [(x,y)] laying
-    horizontally if [dir], vertically otherwise AND the resulting player.
-    Raises: InvalidPosition if cells at the coordinates are not valid according
-    to [f] or if the coordinates are outside of the board's bounds. *)
+val set_board : player -> board -> player
+(** [set_board b p] is player [p] with their board set to [b]. *)

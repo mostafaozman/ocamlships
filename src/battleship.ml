@@ -28,9 +28,9 @@ let get_player g b =
   if b then player1 else player2
 
 let get_player_board p = p.board
+let set_board p b = { p with board = b }
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
 
-(** [pp l] is the string representation of a list of coordinates. *)
 let pp l = "[" ^ String.concat ";" (List.map string_of_coord l) ^ "]"
 
 (** [is_adjacent lst x a] is whether the element at position [x] in the matrix
@@ -202,12 +202,3 @@ let is_game_over player =
   && num_placed player destroyer = 0
   && num_placed player submarine = 0
   && num_placed player patrol = 0
-
-let custom_place is_valid player ship (x, y) dir =
-  let update_board board ship ship_spots =
-    if is_valid board ship_spots then (ship_spots, placer board ship ship_spots)
-    else raise (InvalidPosition "")
-  in
-  let ship_spots = pos_of_ship ship x y dir in
-  let lst, board = update_board player.board ship ship_spots in
-  (lst, { player with board })

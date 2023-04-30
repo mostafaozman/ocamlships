@@ -13,7 +13,7 @@ type state =
 
 let state = ref START
 let player = init_player Player
-let opp = init_player AI |> create_placements
+let opp = init_player AI |> create_placements ship_num_arr
 let g = make_game player opp true
 let game = ref g
 

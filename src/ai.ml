@@ -40,7 +40,8 @@ module type ArtIntelligence = sig
   val shoot : player -> (int * int) list * player * result
 end
 
-let create_placements p =
+(* ############################## Easy AI ################################### *)
+let rec create_placements arr player =
   let rec helper (sz : int) (p : player) =
     try
       place_ship p (init_ship sz)
@@ -51,14 +52,13 @@ let create_placements p =
   let rec loop (i : int) (acc : player) =
     match i with
     | 0 -> acc
-    | n when n <= patrol_num -> loop (i - 1) (helper patrol acc |> snd)
-    | n when n <= patrol_num + submarine_num ->
-        loop (i - 1) (helper submarine acc |> snd)
-    | n when n <= patrol_num + submarine_num + destroyer_num ->
+    | n when n <= arr.(3) -> loop (i - 1) (helper patrol acc |> snd)
+    | n when n <= arr.(2) + arr.(3) -> loop (i - 1) (helper submarine acc |> snd)
+    | n when n <= arr.(1) + arr.(2) + arr.(3) ->
         loop (i - 1) (helper destroyer acc |> snd)
     | _ -> loop (i - 1) (helper carrier acc |> snd)
   in
-  loop (carrier_num + destroyer_num + submarine_num + patrol_num) p
+  loop (arr.(0) + arr.(1) + arr.(2) + arr.(3)) player
 
 (** [gen_array p] generates a sorted array in ascending order out of player
     [p]'s board coordinates. *)
@@ -95,6 +95,8 @@ let shoot_easy ai p =
   let x, y = S.peek stack in
   ai.low_priority_stack <- S.pop stack;
   fire p x y
+
+(* ################################## Mid AI ################################ *)
 
 (** [shoot_mid_helper (x,y) p] is the list of coordinates that are adjacent to
     [(x,y)] but have not been shot at on [p]'s board. *)
@@ -133,10 +135,73 @@ let shoot_mid ai p =
       ai.low_priority_stack <- S.rem_elements next ai.low_priority_stack);
     (coords, p, result)
 
+(* ################################ Hard AI ################################# *)
+
+(** [new_ship_spots ai player] is all the coordinates on [player]'s board that
+    have a ship on them after randomly generating possible configurations for
+    it. *)
+let new_ship_spots ai player =
+  let new_player = create_placements ai.num_remaining player in
+  fold
+    (fun (x, y) cell acc ->
+      match cell with
+      | Ship _ -> (x, y) :: acc
+      | _ -> acc)
+    []
+    (get_player_board new_player)
+
+let sanitize player =
+  let b =
+    fold
+      (fun (x, y) cell acc ->
+        match cell with
+        | Ship _ | Hit _ -> insert (x, y) Empty acc
+        | _ -> insert (x, y) cell acc)
+      empty (get_player_board player)
+  in
+  set_board player b
+
+let monte_carlo_sim ai player samples =
+  let rec sim_helper ai player samples acc =
+    match samples with
+    | 0 -> acc
+    | _ ->
+        sim_helper ai player (samples - 1)
+          (new_ship_spots ai (sanitize player) :: acc)
+  in
+  List.flatten (sim_helper ai player samples [])
+
 let shoot_hard ai p =
   let board = get_player_board p in
   let map = Hashtbl.create (board_size * board_size) in
-  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board
+  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
+  List.fold_left
+    (fun () (x, y) -> Hashtbl.replace map (x, y) (Hashtbl.find map (x, y) + 1))
+    () (monte_carlo_sim ai p 500);
+  let weight, (x, y) =
+    Hashtbl.fold
+      (fun (x, y) num_occured (maxer, coord) ->
+        match get_cell board (x, y) with
+        | Hit _ | Miss | Sunk _ -> (maxer, coord)
+        | _ ->
+            if num_occured >= maxer then (num_occured, (x, y))
+            else (maxer, coord))
+      map
+      (0, (0, 0))
+  in
+  let coords, p, result = fire p x y in
+
+  print_endline (pp coords);
+  (if result = ShipSunk then
+   let len_of_ship =
+     match get_cell (get_player_board p) (List.hd coords) with
+     | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
+     | Sunk { ship } -> !ship.length
+   in
+   let index = -len_of_ship + carrier in
+   ai.num_remaining.(index) <- ai.num_remaining.(index) - 1);
+
+  (coords, p, result)
 
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
@@ -152,13 +217,12 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
       {
         low_priority_stack = S.empty;
         high_priority_stack = S.empty;
-        num_remaining =
-          [| carrier_num; destroyer_num; submarine_num; patrol_num |];
+        num_remaining = ship_num_arr;
       }
 
   let rec shoot p =
     match D.difficulty with
     | Easy -> shoot_easy ai p
     | Medium -> shoot_mid ai p
-    | Hard -> shoot_easy ai p
+    | Hard -> shoot_hard ai p
 end
