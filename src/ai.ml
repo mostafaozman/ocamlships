@@ -150,6 +150,8 @@ let new_ship_spots ai player =
     []
     (get_player_board new_player)
 
+(** [sanitize player] is [player] with Ship and Hit cells labeled as Empty. This
+    is to prevent the AI from cheating. *)
 let sanitize player =
   let b =
     fold
@@ -161,6 +163,8 @@ let sanitize player =
   in
   set_board player b
 
+(** [monte_carlo_sim ai player samples] is every coordinate with a ship after
+    [sample] random attempts at generating a board based on [player]'s board. *)
 let monte_carlo_sim ai player samples =
   let rec sim_helper ai player samples acc =
     match samples with
@@ -177,7 +181,8 @@ let shoot_hard ai p =
   fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
   List.fold_left
     (fun () (x, y) -> Hashtbl.replace map (x, y) (Hashtbl.find map (x, y) + 1))
-    () (monte_carlo_sim ai p 500);
+    ()
+    (monte_carlo_sim ai p samples);
   let weight, (x, y) =
     Hashtbl.fold
       (fun (x, y) num_occured (maxer, coord) ->

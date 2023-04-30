@@ -7,7 +7,6 @@ let carrier_num = 1
 let destroyer_num = 1
 let submarine_num = 2
 let patrol_num = 3
-
 let ship_num_arr = [| carrier_num; destroyer_num; submarine_num; patrol_num |]
 let box_size = 58
 let box_off = 5
@@ -22,4 +21,4 @@ let ocean_blue = 0x7BB5FF
 let piss_yellow = 0xFFBF00
 let depression_grey = 0xABB0B8
 let white = 0xFFFFFF
-let rotate = "⟳"
+let samples = 500
