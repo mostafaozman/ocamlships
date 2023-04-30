@@ -18,7 +18,7 @@ type player = {
 
 type game = {
   players : player * player;
-  mutable current_player : bool;
+  current_player : bool;
 }
 
 let init_player of_type = { of_type; board = init_board () }
@@ -28,9 +28,9 @@ let get_player g b =
   if b then player1 else player2
 
 let get_player_board p = p.board
+let set_board p b = { p with board = b }
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
 
-(** [pp l] is the string representation of a list of coordinates. *)
 let pp l = "[" ^ String.concat ";" (List.map string_of_coord l) ^ "]"
 
 (** [is_adjacent lst x a] is whether the element at position [x] in the matrix
@@ -115,7 +115,7 @@ let placer board ship ship_spots =
   in
   helper ship_spots board
 
-let place_ship player ship x y dir =
+let place_ship player ship (x, y) dir =
   let update_board board ship ship_spots =
     if is_valid_position board ship_spots then
       (ship_spots, placer board ship ship_spots)
