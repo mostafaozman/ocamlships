@@ -33,6 +33,7 @@ let gen_player_module player =
 type ai = {
   mutable low_priority_stack : (int * int) S.t;
   mutable high_priority_stack : (int * int) S.t;
+  mutable num_remaining : int array;
 }
 
 module type ArtIntelligence = sig
@@ -42,7 +43,8 @@ end
 let create_placements p =
   let rec helper (sz : int) (p : player) =
     try
-      place_ship p (init_ship sz) (R.int board_size) (R.int board_size)
+      place_ship p (init_ship sz)
+        (R.int board_size, R.int board_size)
         (R.bool ())
     with exn -> helper sz p
   in
@@ -61,8 +63,9 @@ let create_placements p =
 (** [gen_array p] generates a sorted array in ascending order out of player
     [p]'s board coordinates. *)
 let gen_array p =
-  fold (fun (x, y) _ acc -> (x, y) :: acc) [] (get_player_board p)
-  |> List.rev |> A.of_list
+  get_player_board p |> to_list
+  |> List.map (fun (coord, cell) -> coord)
+  |> A.of_list
 
 (** [swap a i j] swaps the values of index [i] and [j] in array [a]. *)
 let swap a i j =
@@ -130,11 +133,28 @@ let shoot_mid ai p =
       ai.low_priority_stack <- S.rem_elements next ai.low_priority_stack);
     (coords, p, result)
 
+let shoot_hard ai p =
+  let board = get_player_board p in
+  let map = Hashtbl.create (board_size * board_size) in
+  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board
+
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
   let ai =
     let shuffled_stack = shuffle P.player |> S.of_array in
-    { low_priority_stack = shuffled_stack; high_priority_stack = S.empty }
+    if D.difficulty <> Hard then
+      {
+        low_priority_stack = shuffled_stack;
+        high_priority_stack = S.empty;
+        num_remaining = [||];
+      }
+    else
+      {
+        low_priority_stack = S.empty;
+        high_priority_stack = S.empty;
+        num_remaining =
+          [| carrier_num; destroyer_num; submarine_num; patrol_num |];
+      }
 
   let rec shoot p =
     match D.difficulty with

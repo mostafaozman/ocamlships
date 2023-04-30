@@ -47,12 +47,12 @@ val num_placed : player -> int -> int
     their board. *)
 
 val place_ship :
-  player -> ship -> int -> int -> bool -> (int * int) list * player
+  player -> ship -> int * int -> bool -> (int * int) list * player
 (** [place_ship board ship x y dir] is the tuple with the coordinates of the
     board that have changed AND the updated player after a ship has been placed
-    in board position ([x],[y]) facing direction [dir]. [dir] is true if the
-    ship is horizontal, false if vertical. Raises Invalid Position if position
-    is out of bounds, already has ship, or is adjacent to another ship. *)
+    in board position [(x,y)] facing direction [dir]. [dir] is true if the ship
+    is horizontal, false if vertical. Raises Invalid Position if position is out
+    of bounds, already has ship, or is adjacent to another ship. *)
 
 val fire : player -> int -> int -> (int * int) list * player * result
 (** [fire player x y] is the tuple with the coordinates of [player]'s board that
@@ -67,3 +67,16 @@ val placed_ready : player -> bool
 val is_game_over : player -> bool
 (** [is_game_over player] is whether all of [player]'s ships have been
     destroyed. *)
+
+val custom_place :
+  (board -> (int * int) list -> bool) ->
+  player ->
+  ship ->
+  int * int ->
+  bool ->
+  (int * int) list * player
+(** [custom_pos_check f p s (x,y) dir] is the list of coordinates that have
+    changed after placing [s] on [p]'s board at position [(x,y)] laying
+    horizontally if [dir], vertically otherwise AND the resulting player.
+    Raises: InvalidPosition if cells at the coordinates are not valid according
+    to [f] or if the coordinates are outside of the board's bounds. *)

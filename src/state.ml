@@ -85,7 +85,7 @@ let rec place_loop game p i dir =
   | Some tup -> (
       try
         let ship_coords, updated_player =
-          place_ship (get_player !game p) (init_ship i) (fst tup) (snd tup) dir
+          place_ship (get_player !game p) (init_ship i) tup dir
         in
         if p then (
           game := make_game updated_player (get_player !game (not p)) p;

@@ -115,7 +115,7 @@ let placer board ship ship_spots =
   in
   helper ship_spots board
 
-let place_ship player ship x y dir =
+let place_ship player ship (x, y) dir =
   let update_board board ship ship_spots =
     if is_valid_position board ship_spots then
       (ship_spots, placer board ship ship_spots)
@@ -202,3 +202,12 @@ let is_game_over player =
   && num_placed player destroyer = 0
   && num_placed player submarine = 0
   && num_placed player patrol = 0
+
+let custom_place is_valid player ship (x, y) dir =
+  let update_board board ship ship_spots =
+    if is_valid board ship_spots then (ship_spots, placer board ship ship_spots)
+    else raise (InvalidPosition "")
+  in
+  let ship_spots = pos_of_ship ship x y dir in
+  let lst, board = update_board player.board ship ship_spots in
+  (lst, { player with board })

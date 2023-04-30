@@ -31,6 +31,9 @@ val ( >>@ ) : int * int -> int * int -> bool
 val string_of_coord : int * int -> string
 (** [string_of_coord x] is the string representation of x. *)
 
+val empty : board
+(** [empty] is the empty board with no cells. *)
+
 val insert : int * int -> cell -> board -> board
 (** [insert k v d] adds the binding (k,v) to [d] and replaces any previous
     binding. *)
