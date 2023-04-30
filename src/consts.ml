@@ -21,5 +21,5 @@ let ocean_blue = 0x7BB5FF
 let piss_yellow = 0xFFBF00
 let depression_grey = 0xABB0B8
 let white = 0xFFFFFF
-let samples = 1000
+let samples = 5000
 let intersect_weight = 5
