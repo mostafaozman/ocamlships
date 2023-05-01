@@ -31,6 +31,7 @@ let game = make_game player ai true
 module AI = Make ((val gen_diff_module Hard)) ((val gen_player_module player))
 
 let placed_player = create_placements ship_num_arr player
+let coords, player_w_ship = place_ship player (init_ship 3) (3, 2) true
 
 let board_tests =
   [
@@ -148,6 +149,11 @@ let battleship_tests =
     ( "get_cell (-1,-1) raises failure" >:: fun _ ->
       assert_raises (InvalidPosition "(-1,-1)") (fun () ->
           get_cell board (-1, -1)) );
+    (* num_placed tests *)
+    ( "num_placed on empty board should be zero" >:: fun _ ->
+      assert_equal 0 (num_placed player 0) );
+    ( "num_placed on board with one submarine\n   should be 1" >:: fun _ ->
+      assert_equal 1 (num_placed player_w_ship 3) );
   ]
 
 let suite =
