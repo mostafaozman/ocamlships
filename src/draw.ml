@@ -17,9 +17,9 @@ let draw_rect color x y width height =
 
 let draw_cell color x y =
   draw_rect color
-    (background_llx + box_off + (box_size * x))
-    (background_tly - box_size - (box_size * y))
-    41 41
+    (background_llx + box_off + ((box_size + box_off) * x))
+    (background_tly - (box_size + box_off) - ((box_size + box_off) * y))
+    box_size box_size
 
 let draw_player_board self p =
   draw_rect black background_llx background_lly background_length
@@ -30,7 +30,8 @@ let draw_player_board self p =
     for x = 0 to board_size - 1 do
       match get_cell board (x, y) with
       | Empty -> draw_cell ocean_blue x y
-      | Hit -> draw_cell quit_red x y
+      | Hit _ -> draw_cell quit_red x y
+      | Sunk _ -> draw_cell piss_yellow x y
       | Miss -> draw_cell logo_wht x y
       | Ship _ ->
           if self = true then draw_cell green x y else draw_cell ocean_blue x y

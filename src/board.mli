@@ -1,14 +1,12 @@
-type ship = {
-  length : int;
-  adjacents : (int * int) list;
-}
+type ship = { length : int }
 (** The type representing a ship. *)
 
 (** The type representing a cell on the board. *)
 type cell =
   | Empty
   | Ship of { ship : ship ref }
-  | Hit
+  | Hit of { ship : ship ref }
+  | Sunk of { ship : ship ref }
   | Miss
 
 type board
@@ -32,6 +30,9 @@ val ( >>@ ) : int * int -> int * int -> bool
 
 val string_of_coord : int * int -> string
 (** [string_of_coord x] is the string representation of x. *)
+
+val empty : board
+(** [empty] is the empty board with no cells. *)
 
 val insert : int * int -> cell -> board -> board
 (** [insert k v d] adds the binding (k,v) to [d] and replaces any previous

@@ -12,10 +12,15 @@ type state =
   | PLAY
 
 let state = ref START
-let player_board = init_player "Player"
-let op_board = init_player "AI" |> create_placements
-let g = make_game player_board op_board true
+let player = init_player Player
+let opp = init_player AI |> create_placements ship_num_arr
+let g = make_game player opp true
 let game = ref g
+
+(* WHEN YOU WANT THE AI TO FIRE, CALL [AIFire.shoot (player)]. (player) is the
+   player to shoot at. *)
+module AIFire =
+  Make ((val gen_diff_module Easy)) ((val gen_player_module player))
 
 (** [convert x y] is the grid coordinate associated with pixel position
     ([x],[y]). None if coordinate is outside the grid. *)
@@ -26,9 +31,16 @@ let convert x y =
     || y < background_lly || y > background_tly
   then None
   else
-    let r = (background_tly - y - box_off) / box_size in
-    let c = (x - background_llx - box_off) / box_size in
+    let r = (background_tly - y - box_off) / (box_size + box_off) in
+    let c = (x - background_llx - box_off) / (box_size + box_off) in
     Some (c, r)
+
+(** [button_bound_check (low_x,high_x) (low_y,high_y) st] is whether the x
+    coordinate of [st] is within [low_x]...[high_x] and the y coordinate is
+    within [low_y]...[high_y]. Ranges are inclusive on both ends. *)
+let button_bound_check (low_x, high_x) (low_y, high_y) st =
+  st.mouse_x >= low_x && st.mouse_x <= high_x && st.mouse_y >= low_y
+  && st.mouse_y <= high_y
 
 (** [quit ()] exits the program with exit status 0. *)
 let quit () = exit 0
@@ -51,16 +63,12 @@ let start_loop game =
   synchronize ();
   if st.key == 'q' then quit ();
   (* If condition for start box *)
-  if
-    (st.mouse_x >= 200 && st.mouse_x <= 600)
-    && st.mouse_y >= 300 && st.mouse_y <= 425
-  then (
+  if button_bound_check (200, 600) (300, 425) st then (
     go_start !game;
     draw_placing_screen game true)
   else if
     (* If condition for quit box *)
-    (st.mouse_x >= 200 && st.mouse_x <= 600)
-    && st.mouse_y >= 100 && st.mouse_y <= 225
+    button_bound_check (200, 600) (100, 225) st
   then quit ()
 
 (** [place_loop g p i] draws the board of player 1 if [p] is true, player 2
@@ -77,7 +85,7 @@ let rec place_loop game p i dir =
   | Some tup -> (
       try
         let ship_coords, updated_player =
-          place_ship (get_player !game p) (init_ship i) (fst tup) (snd tup) dir
+          place_ship (get_player !game p) (init_ship i) tup dir
         in
         if p then (
           game := make_game updated_player (get_player !game (not p)) p;
@@ -87,13 +95,6 @@ let rec place_loop game p i dir =
       with e ->
         write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
-
-(** [button_bound_check (low_x,high_x) (low_y,high_y) st] is whether the x
-    coordinate of [st] is within [low_x]...[high_x] and the y coordinate is
-    within [low_y]...[high_y]. Ranges are inclusive on both ends. *)
-let button_bound_check (low_x, high_x) (low_y, high_y) st =
-  st.mouse_x >= low_x && st.mouse_x <= high_x && st.mouse_y >= low_y
-  && st.mouse_y <= high_y
 
 (** [placing_loop g p d] waits for player 1 if [p] is true, player 2 otherwise,
     to press the button for which ship they will place and then allows them to
@@ -135,7 +136,6 @@ and ready game p dir =
   let opp_player_ready = placed_ready (get_player !game (not p)) in
   match (curr_player_ready, opp_player_ready) with
   | true, true ->
-      print_endline (string_of_int carrier);
       write 295 760 black "Ready!" 30;
       go_play !game
   | true, false -> placing_loop game (not p) dir
