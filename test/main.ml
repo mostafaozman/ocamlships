@@ -1,27 +1,36 @@
 open OUnit2
+open Ships.Consts
 open Ships.Board
+open Ships.Ai
 open Ships.Battleship
 
 (********************************************************************
    Helper functions.
  ********************************************************************)
 
-let init_board_test (name : string) (input : char) (expected_output : int) :
-    test =
-  name >:: fun _ ->
-  assert_equal expected_output (int_of_char input) ~printer:string_of_int
+let in_bounds () = []
 
 (********************************************************************
    End helper functions.
  ********************************************************************)
 
-(* Initializations *)
+(********************************************************************
+  Initilizations
+  ********************************************************************)
+(* Board inits *)
 let board = init_board ()
 let ship = ref (init_ship 5)
 let ship2 = ref (init_ship 2)
+
+(* Battleships inits *)
 let ai = init_player AI
 let player = init_player Player
 let game = make_game player ai true
+
+(* Ai inits *)
+module AI = Make ((val gen_diff_module Hard)) ((val gen_player_module player))
+
+let placed_player = create_placements ship_num_arr player
 
 let board_tests =
   [
@@ -41,7 +50,8 @@ let board_tests =
     ( "find lower bound is Some Empty" >:: fun _ ->
       assert_equal (Some Empty) (board |> find (0, 0)) );
     ( "find upper bound is Some Empty" >:: fun _ ->
-      assert_equal (Some Empty) (board |> find (13, 13)) );
+      assert_equal (Some Empty) (board |> find (board_size - 1, board_size - 1))
+    );
     ( "find out of bounds is None" >:: fun _ ->
       assert_equal None (board |> find (22, 22)) );
     (*insert tests: 4 *)
@@ -69,7 +79,7 @@ let board_tests =
     (* fold tests: 1 *)
     ( "fold for ascending order" >:: fun _ ->
       assert_equal
-        ((13, 13), true)
+        ((9, 9), true)
         (board
         |> fold
              (fun (x, y) _ acc -> ((x, y), fst acc @<< (x, y)))
@@ -78,14 +88,40 @@ let board_tests =
     ( "to list initial board" >:: fun _ ->
       assert_equal
         (fold (fun (x, y) cell acc -> ((x, y), cell) :: acc) [] board)
-        (board |> to_list |> List.rev) )
-    (* ( "to list with ships inserted" >:: fun _ -> assert_equal (fold (fun (x,
-       y) cell acc -> ((x, y), cell) :: acc) [] board) (board |> insert (2, 2)
-       Miss |> to_list |> List.rev) ); *);
+        (board |> to_list |> List.rev) );
+    ( "to list with ships inserted" >:: fun _ ->
+      assert_equal
+        (fold
+           (fun (x, y) cell acc -> ((x, y), cell) :: acc)
+           []
+           (board |> insert (2, 2) Miss))
+        (board |> insert (2, 2) Miss |> to_list |> List.rev) );
   ]
 
 (* AI tests *)
-let ai_tests = []
+let ai_tests =
+  [
+    (* gen_diff_module tests: 3 *)
+    ( "gen_diff_module is module with difficulty easy" >:: fun _ ->
+      let module Diff_mod = (val gen_diff_module Easy) in
+      assert_equal Easy Diff_mod.difficulty );
+    ( "gen_diff_module is module with difficulty Medium" >:: fun _ ->
+      let module Diff_mod = (val gen_diff_module Medium) in
+      assert_equal Medium Diff_mod.difficulty );
+    ( "gen_diff_module is module with difficulty Hard" >:: fun _ ->
+      let module Diff_mod = (val gen_diff_module Hard) in
+      assert_equal Hard Diff_mod.difficulty );
+    (* gen_player_module tests: 1 *)
+    ( "gen_player_module is a module with player of type player" >:: fun _ ->
+      let module Player_mod = (val gen_player_module player) in
+      assert_equal player Player_mod.player );
+    (* create_placements tests : 1 *)
+    ( "create_placements has 7 ships placed" >:: fun _ ->
+      assert_equal true (placed_player |> placed_ready) )
+    (* Ai shoot : 1 *)
+    (* ( "ArtIntelligence.shoot returns a tuple " >:: fun _ -> let t, _, _ =
+       AI.shoot placed_player in assert_equal t ); *);
+  ]
 
 (* Battleship Tests *)
 let battleship_tests =
@@ -108,7 +144,7 @@ let battleship_tests =
     ( "get_cell lower bound is empty" >:: fun _ ->
       assert_equal Empty (get_cell board (0, 0)) );
     ( "get_cell upper bound is empty" >:: fun _ ->
-      assert_equal Empty (get_cell board (13, 13)) );
+      assert_equal Empty (get_cell board (board_size - 1, board_size - 1)) );
     ( "get_cell (-1,-1) raises failure" >:: fun _ ->
       assert_raises (InvalidPosition "(-1,-1)") (fun () ->
           get_cell board (-1, -1)) );
