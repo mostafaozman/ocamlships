@@ -41,8 +41,8 @@ let board_tests =
       assert_equal (Some Empty) (board |> find (2, 2)) );
     ( "find lower bound is Some Empty" >:: fun _ ->
       assert_equal (Some Empty) (board |> find (0, 0)) );
-    (* ( "find upper bound is Some Empty" >:: fun _ -> assert_equal (Some Empty)
-       (board |> find (13, 13)) ); *)
+    ( "find upper bound is Some Empty" >:: fun _ ->
+      assert_equal (Some Empty) (board |> find (13, 13)) );
     ( "find out of bounds is None" >:: fun _ ->
       assert_equal None (board |> find (22, 22)) );
     (*insert tests: 4 *)
@@ -68,9 +68,13 @@ let board_tests =
       assert_equal None (board |> insert (2, 2) (Ship { ship }) |> find (22, 22))
     );
     (* fold tests: 1 *)
-    (* ( "fold for ascending order" >:: fun _ -> assert_equal ((13, 13), true)
-       (board |> fold (fun (x, y) _ acc -> ((x, y), fst acc @<< (x, y))) ((-1,
-       -1), true)) ); *)
+    ( "fold for ascending order" >:: fun _ ->
+      assert_equal
+        ((13, 13), true)
+        (board
+        |> fold
+             (fun (x, y) _ acc -> ((x, y), fst acc @<< (x, y)))
+             ((-1, -1), true)) );
     (* to list tests: 1 *)
     ( "to list initial board" >:: fun _ ->
       assert_equal
