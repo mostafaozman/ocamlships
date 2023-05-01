@@ -97,7 +97,7 @@ let battleship_tests =
     (* empty_player_board test: 1 *)
     ( "players board is empty" >:: fun _ ->
       assert_equal board
-        (snd (place_ship (init_player Player) !ship 2 2 true)
+        (snd (place_ship (init_player Player) !ship (2, 2) true)
         |> empty_player_board |> get_player_board) );
     (* get_player_board: 1 *)
     ( "players board is empty" >:: fun _ ->
