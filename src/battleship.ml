@@ -30,7 +30,6 @@ let get_player g b =
 let get_player_board p = p.board
 let set_board p b = { p with board = b }
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
-
 let pp l = "[" ^ String.concat ";" (List.map string_of_coord l) ^ "]"
 
 (** [is_adjacent lst x a] is whether the element at position [x] in the matrix
