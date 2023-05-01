@@ -18,6 +18,8 @@ let init_board_test (name : string) (input : char) (expected_output : int) :
 (* Initializations *)
 let board = init_board ()
 let ship = ref (init_ship 4)
+let player_no_ship = init_player "aleph"
+let coords, player_w_ship = place_ship player_no_ship (init_ship 3) 3 2 true
 
 let board_tests =
   [
@@ -77,7 +79,12 @@ let battleship_tests =
       assert_equal Empty (get_cell board (13, 13)) );
     ( "get_cell (-1,-1) raises failure" >:: fun _ ->
       assert_raises (InvalidPosition "(-1,-1)") (fun () ->
-          get_cell board (-1, -1)) );
+          get_cell board (-1, -1)) )
+    (* num_placed tests *)
+    (* ( "num_placed on empty board should be zero" >:: fun _ -> assert_equal 0
+       (num_placed player_no_ship 0) ); ( "num_placed on board with one
+       submarine should be 1" >:: fun _ -> assert_equal 1 (num_placed
+       player_w_ship 3) ); *);
   ]
 
 let suite =
