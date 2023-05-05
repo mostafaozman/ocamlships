@@ -8,6 +8,7 @@ open Draw
 
 type state =
   | START
+  | INSTRUCTIONS
   | PLACING
   | PLAY
 
@@ -47,10 +48,17 @@ let quit () = exit 0
 
 (** [go_start g] changes state to PLACING and draws the board of player 1 in
     [g]. *)
+
 let go_start game =
   state := PLACING;
   clear_graph ();
   draw_player_board true (get_player game true)
+
+let go_instructions =
+  state := INSTRUCTIONS;
+  print_string "\nINSTRUCTIONS";
+  let _ = open_graph " 800x800" in
+  draw_instructions ()
 
 let go_play game =
   state := PLAY;
@@ -63,13 +71,21 @@ let start_loop game =
   synchronize ();
   if st.key == 'q' then quit ();
   (* If condition for start box *)
-  if button_bound_check (200, 600) (300, 425) st then (
-    go_start !game;
-    draw_placing_screen game true)
+  if button_bound_check (200, 600) (300, 425) st then go_instructions
   else if
     (* If condition for quit box *)
     button_bound_check (200, 600) (100, 225) st
   then quit ()
+
+let instructions_loop () =
+  let st = wait_next_event [ Button_down; Key_pressed ] in
+  synchronize ();
+  draw_instructions ();
+  if st.key == 'q' then quit ();
+  (* If condition for start box *)
+  if button_bound_check (290, 290 + 220) (50, 50+80) st then (
+    go_start !game;
+    draw_placing_screen game true)
 
 (** [place_loop g p i] draws the board of player 1 if [p] is true, player 2
     otherwise, after they have placed a ship of length [i] in game [g]. *)
@@ -185,6 +201,10 @@ let main () =
 
   while !state = START do
     start_loop game
+  done;
+
+  while !state = INSTRUCTIONS do
+    instructions_loop ()
   done;
 
   while !state = PLACING do

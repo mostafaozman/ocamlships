@@ -21,6 +21,12 @@ let draw_cell color x y =
     (background_tly - (box_size + box_off) - ((box_size + box_off) * y))
     box_size box_size
 
+let draw_instructions () =
+  draw_rect white 0 0 800 800;
+  draw_rect go_green 290 50 220 80;
+  write 325 70 white "Continue" 40;
+  write 230 730 black "Instructions" 60
+
 let draw_player_board self p =
   draw_rect black background_llx background_lly background_length
     background_length;
