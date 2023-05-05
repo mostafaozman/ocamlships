@@ -124,6 +124,11 @@ let place_ship player ship (x, y) dir =
   let lst, board = update_board player.board ship ship_spots in
   (lst, { player with board })
 
+let is_place_possible player ship (x, y) dir =
+  let ship_spots = pos_of_ship ship x y dir in
+  if is_valid_position player.board ship_spots then ship_spots
+  else raise (InvalidPosition "")
+
 let num_placed player i =
   let get_ship_cell i cell =
     match cell with
