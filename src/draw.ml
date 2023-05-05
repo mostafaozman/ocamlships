@@ -25,7 +25,20 @@ let draw_instructions () =
   draw_rect white 0 0 800 800;
   draw_rect go_green 290 50 220 80;
   write 325 70 white "Continue" 40;
-  write 230 730 black "Instructions" 60
+  write 230 730 black "Instructions" 60;
+  write 30 680 black
+    "- Place ships by clicking on a ship then clicking a square on" 25;
+  write 52 655 black
+    "the board where you would like the center of the ship to be" 25;
+  write 30 625 black "- Ships are placed horizontally by default" 25;
+  write 30 595 black "- Rotate a ship by clicking the rotate button then a ship"
+    25;
+  write 30 565 black "- You must place: 1 len 5, 1 len 4, 2 len 3, and 3 len 2"
+    25;
+  write 30 535 black
+    "- After placing ships, click the ready button to start the game" 25;
+  write 30 505 black
+    "- To continue, choose a difficulty then select the button below" 25
 
 let draw_player_board self p =
   draw_rect black background_llx background_lly background_length
