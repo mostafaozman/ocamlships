@@ -33,7 +33,7 @@ let gen_player_module player =
 type ai = {
   mutable low_priority_stack : (int * int) S.t;
   mutable high_priority_stack : (int * int) S.t;
-  mutable num_remaining : int array;
+  mutable num_remaining : (int * int) array;
 }
 
 module type ArtIntelligence = sig
@@ -41,7 +41,7 @@ module type ArtIntelligence = sig
 end
 
 (* ############################## Easy AI ################################### *)
-let rec create_placements arr player =
+let rec create_placements (arr : (int * int) array) (player : player) : player =
   let rec helper (sz : int) (p : player) =
     try
       place_ship p (init_ship sz)
@@ -49,17 +49,12 @@ let rec create_placements arr player =
         (R.bool ())
     with exn -> helper sz p
   in
-  let rec loop (index : int) (i : int) (acc : player) =
-    match i with
+  let rec loop (acc : player) ((len, num) : int * int) =
+    match num with
     | 0 -> acc
-    | _ ->
-        let ship_length = 5 - index in
-        loop index (i - 1) (helper ship_length acc |> snd)
+    | _ -> loop (helper len acc |> snd) (len, num - 1)
   in
-  A.fold_left
-    (fun (index, p) num -> (index + 1, loop index num p))
-    (0, player) arr
-  |> snd
+  A.fold_left (fun acc (len, num) -> loop acc (len, num)) player arr
 
 (** [gen_array p] generates a sorted array in ascending order out of player
     [p]'s board coordinates. *)
@@ -229,9 +224,31 @@ let shoot_hard ai p =
      | Sunk { ship } -> !ship.length
    in
    let index = -len_of_ship + carrier in
-   ai.num_remaining.(index) <- ai.num_remaining.(index) - 1);
+   ai.num_remaining.(index) <-
+     (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1));
 
   (coords, p, result)
+
+let monte_carlo_sim ai player =
+  let sim_helper length dir =
+    let acc = ref [] in
+    for y = 0 to board_size - 1 do
+      for x = 0 to board_size - 1 do
+        try
+          acc := is_place_possible player (init_ship length) (x, y) dir :: !acc
+        with exn -> ()
+      done
+    done;
+    !acc
+  in
+  sim_helper 2 true
+
+let shoot_hard2 ai p =
+  let board = get_player_board p in
+  let sanitized_player = sanitize p in
+  let map = Hashtbl.create (board_size * board_size) in
+  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
+  sanitized_player
 
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
