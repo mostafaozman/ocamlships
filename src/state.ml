@@ -54,10 +54,9 @@ let go_start game =
   clear_graph ();
   draw_player_board true (get_player game true)
 
-let go_instructions =
+let go_instructions game =
   state := INSTRUCTIONS;
   print_string "\nINSTRUCTIONS";
-  let _ = open_graph " 800x800" in
   draw_instructions ()
 
 let go_play game =
@@ -71,19 +70,19 @@ let start_loop game =
   synchronize ();
   if st.key == 'q' then quit ();
   (* If condition for start box *)
-  if button_bound_check (200, 600) (300, 425) st then go_instructions
+  if button_bound_check (200, 600) (300, 425) st then go_instructions game
   else if
     (* If condition for quit box *)
     button_bound_check (200, 600) (100, 225) st
   then quit ()
 
-let instructions_loop () =
+let instructions_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   draw_instructions ();
   if st.key == 'q' then quit ();
   (* If condition for start box *)
-  if button_bound_check (290, 290 + 220) (50, 50+80) st then (
+  if button_bound_check (290, 290 + 220) (50, 50 + 80) st then (
     go_start !game;
     draw_placing_screen game true)
 
@@ -204,7 +203,7 @@ let main () =
   done;
 
   while !state = INSTRUCTIONS do
-    instructions_loop ()
+    instructions_loop game
   done;
 
   while !state = PLACING do
