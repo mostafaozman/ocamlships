@@ -229,7 +229,7 @@ let shoot_hard ai p =
 
   (coords, p, result)
 
-let monte_carlo_sim ai player =
+let monte_carlo_sim2 ai player =
   let sim_helper length dir =
     let acc = ref [] in
     for y = 0 to board_size - 1 do
@@ -241,14 +241,50 @@ let monte_carlo_sim ai player =
     done;
     !acc
   in
-  sim_helper 2 true
+  A.fold_left
+    (fun acc (len, num) ->
+      if num <> 0 then (sim_helper len true @ sim_helper len false) @ acc
+      else acc)
+    [] ai.num_remaining
+  |> List.flatten
 
 let shoot_hard2 ai p =
   let board = get_player_board p in
   let sanitized_player = sanitize p in
   let map = Hashtbl.create (board_size * board_size) in
   fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
-  sanitized_player
+  List.fold_left
+    (fun () (x, y) ->
+      Hashtbl.replace map (x, y)
+        (if is_intersect (x, y) (get_player_board sanitized_player) then
+         Hashtbl.find map (x, y) + intersect_weight
+        else Hashtbl.find map (x, y) + 1))
+    ()
+    (monte_carlo_sim2 ai sanitized_player);
+  let weight, (x, y) =
+    Hashtbl.fold
+      (fun (x, y) num_occured (maxer, coord) ->
+        match get_cell board (x, y) with
+        | Hit _ | Miss | Sunk _ -> (maxer, coord)
+        | _ ->
+            if num_occured >= maxer then (num_occured, (x, y))
+            else (maxer, coord))
+      map
+      (0, (0, 0))
+  in
+  let coords, p, result = fire p x y in
+
+  (if result = ShipSunk then
+   let len_of_ship =
+     match get_cell (get_player_board p) (List.hd coords) with
+     | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
+     | Sunk { ship } -> !ship.length
+   in
+   let index = -len_of_ship + carrier in
+   ai.num_remaining.(index) <-
+     (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1));
+
+  (coords, p, result)
 
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
@@ -271,5 +307,5 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
     match D.difficulty with
     | Easy -> shoot_easy ai p
     | Medium -> shoot_mid ai p
-    | Hard -> shoot_hard ai p
+    | Hard -> shoot_hard2 ai p
 end
