@@ -229,11 +229,14 @@ let shoot_hard ai p =
 
   (coords, p, result)
 
+(* TODO: Improve this by checking for intersect with Hit while placing to give
+   coordinates more weight. *)
 let monte_carlo_sim2 ai player =
   let sim_helper length dir =
     let acc = ref [] in
     for y = 0 to board_size - 1 do
       for x = 0 to board_size - 1 do
+        print_endline (string_of_coord (x, y));
         try
           acc := is_place_possible player (init_ship length) (x, y) dir :: !acc
         with exn -> ()
