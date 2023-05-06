@@ -32,8 +32,9 @@ val gen_player_module : player -> (module Player)
 
 val create_placements : (int * int) array -> player -> player
 (** [create_placements arr p] is [p] with their board occupied by the number of
-    ships specified in. Requires: [arr] is of length 4 and index 0 is the number
-    of length 5 ships, index 1 is length 4, and so on. *)
+    ships specified in [arr]. Requires: The elements of [arr] are tuples whose
+    first element is the length of the ship and second element is the number of
+    that ship to place. *)
 
 (** [Make] is the functor that determines how the AI plays. *)
 module Make : functor (D : Diff) (P : Player) -> ArtIntelligence
