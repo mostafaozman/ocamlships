@@ -84,13 +84,13 @@ let instructions_loop () =
   if st.key == 'q' then quit ();
   (* Check easy button *)
   if button_bound_check (30, 250) (250, 330) st then
-    write 360 350 black "Easy!" 40;
+    write 360 350 black "Easy:)" 40;
   (* Check medium button *)
   if button_bound_check (290, 510) (250, 330) st then
     write 350 350 black "Medium!" 40;
   (* Check hard button *)
   if button_bound_check (550, 770) (250, 330) st then
-    write 360 350 black "Hard!" 40;
+    write 360 350 black "Hard>:(" 40;
   (* If condition for start box *)
   if button_bound_check (290, 510) (50, 130) st then (
     go_start !game;
