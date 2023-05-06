@@ -38,7 +38,13 @@ let draw_instructions () =
   write 30 535 black
     "- After placing ships, click the ready button to start the game" 25;
   write 30 505 black
-    "- To continue, choose a difficulty then select the button below" 25
+    "- To continue, choose a difficulty then select the button below" 25;
+  draw_rect go_green 30 250 220 80;
+  write 100 270 white "Easy" 40;
+  draw_rect piss_yellow 290 250 220 80;
+  write 355 270 white "Medium" 40;
+  draw_rect quit_red 550 250 220 80;
+  write 625 270 white "Hard" 40
 
 let draw_player_board self p =
   draw_rect black background_llx background_lly background_length
