@@ -173,11 +173,6 @@ let string_of_map fk fv m =
   Hashtbl.fold (fun k v acc -> ("(" ^ fk k ^ ":" ^ fv v ^ ")") :: acc) m []
   |> String.concat ","
 
-(** [is_hit_cell c] is whether [c] is a hit cell. *)
-let is_hit_cell = function
-  | Hit _ -> true
-  | _ -> false
-
 (** [sim_helper p pp len dir map] updates [map] with new weights after placing a
     ship of length [len] on every coordinate of [p]'s board facing horizontally
     if [dir] is true, false otherwise. Requires: [pp] is [p] with Hit cells set
@@ -188,34 +183,35 @@ let sim_helper player placing_p len dir map =
       try
         let coords = possible_place placing_p (init_ship len) (x, y) dir in
         if
-          List.exists
-            (fun c -> c |> get_cell (get_player_board player) |> is_hit_cell)
-            coords
-        then
+          List.exists (fun c -> is_intersect c (get_player_board player)) coords
+        then (
+          print_endline (string_of_coord (x, y));
           List.iter
             (fun coord ->
               Hashtbl.replace map coord
-                (Hashtbl.find map coord * intersect_weight))
-            coords
+                ((Hashtbl.find map coord + 2) * intersect_weight))
+            coords)
         else
           List.iter
             (fun coord ->
-              Hashtbl.replace map coord (Hashtbl.find map coord + 1))
+              Hashtbl.replace map coord (Hashtbl.find map coord + 2))
             coords
       with exn -> ()
-    done
+    done;
+    print_endline "\n"
   done
 
 (** [monte_carlo_sim ai p b] is the Hashtable that gives a weight to every
     coordinate on [b]. *)
 let monte_carlo_sim ai player board =
   let map = Hashtbl.create (board_size * board_size) in
-  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
-  let placing_p = sanitize_for_placing player in
+  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) (-1)) () board;
+  let sanitized_player = sanitize player in
+  let placing_p = sanitize_for_placing sanitized_player in
   A.iter
     (fun (len, num) ->
-      if num <> 0 then sim_helper player placing_p len true map;
-      sim_helper player placing_p len false map)
+      if num <> 0 then sim_helper sanitized_player placing_p len true map;
+      sim_helper sanitized_player placing_p len false map)
     ai.num_remaining;
   map
 
@@ -235,12 +231,13 @@ let index_in_list x lst =
   in
   finder x lst 0
 
+(* TODO: There's a bug that gives some proper cells 0 probability. *)
+
 (** [shoot_hard ai p] is the same as [shoot_easy] but utilizes a different
     algorithm to determine where to shoot. *)
 let shoot_hard ai p =
   let board = get_player_board p in
-  let sanitized_player = sanitize p in
-  let new_map = monte_carlo_sim ai sanitized_player board in
+  let new_map = monte_carlo_sim ai p board in
   let weight, (x, y) =
     Hashtbl.fold
       (fun (x, y) num_occured (maxer, coord) ->
@@ -250,7 +247,7 @@ let shoot_hard ai p =
             if random_greater_than num_occured maxer then (num_occured, (x, y))
             else (maxer, coord))
       new_map
-      (0, (0, 0))
+      (-1, (-1, -1))
   in
   print_endline (string_of_int weight);
   let coords, p, result = fire p x y in

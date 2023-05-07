@@ -86,9 +86,9 @@ let rec is_valid_position (board : board) (ship_spots : (int * int) list) =
     end
 
 let get_adjacents_of_point (x, y) =
-  let top = (x, y + 1) in
+  let top = (x, y - 1) in
   let left = (x - 1, y) in
-  let bottom = (x, y - 1) in
+  let bottom = (x, y + 1) in
   let right = (x + 1, y) in
   [ top; left; bottom; right ]
   |> List.filter (fun (x, y) ->
