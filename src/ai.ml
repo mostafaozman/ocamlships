@@ -225,6 +225,16 @@ let random_greater_than a b =
   let c = R.bool () in
   if c then a > b else a >= b
 
+(** [index_in_list x lst] is the index of the first element in [lst] in which
+    [fst elem = x]*)
+let index_in_list x lst =
+  let rec finder x lst acc =
+    match lst with
+    | [] -> raise (Failure "Not Found")
+    | (l, n) :: t -> if l = x then acc else finder x t (acc + 1)
+  in
+  finder x lst 0
+
 (** [shoot_hard ai p] is the same as [shoot_easy] but utilizes a different
     algorithm to determine where to shoot. *)
 let shoot_hard ai p =
@@ -242,21 +252,21 @@ let shoot_hard ai p =
       new_map
       (0, (0, 0))
   in
+  print_endline (string_of_int weight);
   let coords, p, result = fire p x y in
 
-  (if result = ShipSunk then
-   let len_of_ship =
-     match get_cell (get_player_board p) (List.hd coords) with
-     | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
-     | Sunk { ship } -> !ship.length
-   in
-   let index =
-     A.fold_left
-       (fun acc (len, num) -> if len = len_of_ship then acc else acc + 1)
-       0 ai.num_remaining
-   in
-   ai.num_remaining.(index) <-
-     (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1));
+  if result = ShipSunk then (
+    let len_of_ship =
+      match get_cell (get_player_board p) (List.hd coords) with
+      | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
+      | Sunk { ship } -> !ship.length
+    in
+    let index = index_in_list len_of_ship (A.to_list ai.num_remaining) in
+    ai.num_remaining.(index) <-
+      (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1);
+    print_endline
+      (ai.num_remaining |> A.to_list |> List.map string_of_coord
+     |> String.concat ";"));
 
   (coords, p, result)
 
