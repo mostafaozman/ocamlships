@@ -134,7 +134,7 @@ let shoot_mid ai p =
 (* ################################ Hard AI ################################# *)
 
 (** [sanitize_for_placing player] is [player] with Hit cells labeled as Empty.
-    This is so the monte carlo simulation knows it can place ships there. *)
+    This is so the simulation knows it can place ships there. *)
 let sanitize_for_placing player =
   let b =
     fold
@@ -167,14 +167,21 @@ let is_intersect (x, y) board =
   | Hit _ -> true
   | _ -> raise (invalid_arg "AI is cheating")
 
+(** [string_of_map fk fv m] is the string representation of [m]. Used for
+    debugging only. *)
 let string_of_map fk fv m =
   Hashtbl.fold (fun k v acc -> ("(" ^ fk k ^ ":" ^ fv v ^ ")") :: acc) m []
   |> String.concat ","
 
+(** [is_hit_cell c] is whether [c] is a hit cell. *)
 let is_hit_cell = function
   | Hit _ -> true
   | _ -> false
 
+(** [sim_helper p pp len dir map] updates [map] with new weights after placing a
+    ship of length [len] on every coordinate of [p]'s board facing horizontally
+    if [dir] is true, false otherwise. Requires: [pp] is [p] with Hit cells set
+    to Empty. *)
 let sim_helper player placing_p len dir map =
   for x = 0 to board_size - 1 do
     for y = 0 to board_size - 1 do
@@ -199,6 +206,8 @@ let sim_helper player placing_p len dir map =
     done
   done
 
+(** [monte_carlo_sim ai p b] is the Hashtable that gives a weight to every
+    coordinate on [b]. *)
 let monte_carlo_sim ai player board =
   let map = Hashtbl.create (board_size * board_size) in
   fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
@@ -210,6 +219,14 @@ let monte_carlo_sim ai player board =
     ai.num_remaining;
   map
 
+(** [random_greater_than a b] randomly determines whether to return a > b or a
+    >= b. *)
+let random_greater_than a b =
+  let c = R.bool () in
+  if c then a > b else a >= b
+
+(** [shoot_hard ai p] is the same as [shoot_easy] but utilizes a different
+    algorithm to determine where to shoot. *)
 let shoot_hard ai p =
   let board = get_player_board p in
   let sanitized_player = sanitize p in
@@ -220,7 +237,7 @@ let shoot_hard ai p =
         match get_cell board (x, y) with
         | Hit _ | Miss | Sunk _ -> (maxer, coord)
         | _ ->
-            if num_occured >= maxer then (num_occured, (x, y))
+            if random_greater_than num_occured maxer then (num_occured, (x, y))
             else (maxer, coord))
       new_map
       (0, (0, 0))
