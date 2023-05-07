@@ -175,8 +175,8 @@ let string_of_map fk fv m =
 
 (** [sim_helper p pp len dir map] updates [map] with new weights after placing a
     ship of length [len] on every coordinate of [p]'s board facing horizontally
-    if [dir] is true, false otherwise. Requires: [pp] is [p] with Hit cells set
-    to Empty. *)
+    if [dir] is true, vertically otherwise. Requires: [pp] is [p] with Hit cells
+    set to Empty. *)
 let sim_helper player placing_p len dir map =
   for x = 0 to board_size - 1 do
     for y = 0 to board_size - 1 do
@@ -184,21 +184,19 @@ let sim_helper player placing_p len dir map =
         let coords = possible_place placing_p (init_ship len) (x, y) dir in
         if
           List.exists (fun c -> is_intersect c (get_player_board player)) coords
-        then (
-          print_endline (string_of_coord (x, y));
+        then
           List.iter
             (fun coord ->
               Hashtbl.replace map coord
                 ((Hashtbl.find map coord + 2) * intersect_weight))
-            coords)
+            coords
         else
           List.iter
             (fun coord ->
               Hashtbl.replace map coord (Hashtbl.find map coord + 2))
             coords
       with exn -> ()
-    done;
-    print_endline "\n"
+    done
   done
 
 (** [monte_carlo_sim ai p b] is the Hashtable that gives a weight to every
@@ -230,8 +228,6 @@ let index_in_list x lst =
     | (l, n) :: t -> if l = x then acc else finder x t (acc + 1)
   in
   finder x lst 0
-
-(* TODO: There's a bug that gives some proper cells 0 probability. *)
 
 (** [shoot_hard ai p] is the same as [shoot_easy] but utilizes a different
     algorithm to determine where to shoot. *)
