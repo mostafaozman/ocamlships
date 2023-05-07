@@ -133,19 +133,6 @@ let shoot_mid ai p =
 
 (* ################################ Hard AI ################################# *)
 
-(** [new_ship_spots ai player] is all the coordinates on [player]'s board that
-    have a ship on them after randomly generating possible configurations for
-    it. *)
-let new_ship_spots ai player =
-  let new_player = create_placements ai.num_remaining player in
-  fold
-    (fun (x, y) cell acc ->
-      match cell with
-      | Ship _ -> (x, y) :: acc
-      | _ -> acc)
-    []
-    (get_player_board new_player)
-
 (** [sanitize_for_placing player] is [player] with Hit cells labeled as Empty.
     This is so the monte carlo simulation knows it can place ships there. *)
 let sanitize_for_placing player =
@@ -172,17 +159,6 @@ let sanitize player =
   in
   set_board player b
 
-(** [monte_carlo_sim ai player samples] is every coordinate with a ship after
-    [sample] random attempts at generating a board based on [player]'s board.
-    Requires: [player]'s board has no Ship cells. *)
-let monte_carlo_sim ai player samples =
-  let rec sim_helper ai player samples acc =
-    match samples with
-    | 0 -> acc
-    | _ -> sim_helper ai player (samples - 1) (new_ship_spots ai player :: acc)
-  in
-  List.flatten (sim_helper ai (sanitize_for_placing player) samples [])
-
 (** [is_intersect (x,y) b] is whether the cell at coordinate [(x,y)] on [b] is a
     Hit cell. *)
 let is_intersect (x, y) board =
@@ -191,19 +167,53 @@ let is_intersect (x, y) board =
   | Hit _ -> true
   | _ -> raise (invalid_arg "AI is cheating")
 
+let string_of_map fk fv m =
+  Hashtbl.fold (fun k v acc -> ("(" ^ fk k ^ ":" ^ fv v ^ ")") :: acc) m []
+  |> String.concat ","
+
+let is_hit_cell = function
+  | Hit _ -> true
+  | _ -> false
+
+let sim_helper player placing_p len dir map =
+  for x = 0 to board_size - 1 do
+    for y = 0 to board_size - 1 do
+      try
+        let coords = possible_place placing_p (init_ship len) (x, y) dir in
+        if
+          List.exists
+            (fun c -> c |> get_cell (get_player_board player) |> is_hit_cell)
+            coords
+        then
+          List.iter
+            (fun coord ->
+              Hashtbl.replace map coord
+                (Hashtbl.find map coord * intersect_weight))
+            coords
+        else
+          List.iter
+            (fun coord ->
+              Hashtbl.replace map coord (Hashtbl.find map coord + 1))
+            coords
+      with exn -> ()
+    done
+  done
+
+let monte_carlo_sim ai player board =
+  let map = Hashtbl.create (board_size * board_size) in
+  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
+  let placing_p = sanitize_for_placing player in
+  A.iter
+    (fun (len, num) ->
+      if num <> 0 then sim_helper player placing_p len true map;
+      sim_helper player placing_p len false map)
+    ai.num_remaining;
+  map
+
 let shoot_hard ai p =
   let board = get_player_board p in
   let sanitized_player = sanitize p in
-  let map = Hashtbl.create (board_size * board_size) in
-  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
-  List.fold_left
-    (fun () (x, y) ->
-      Hashtbl.replace map (x, y)
-        (if is_intersect (x, y) (get_player_board sanitized_player) then
-         Hashtbl.find map (x, y) + intersect_weight
-        else Hashtbl.find map (x, y) + 1))
-    ()
-    (monte_carlo_sim ai sanitized_player samples);
+  let new_map = monte_carlo_sim ai sanitized_player board in
   let weight, (x, y) =
     Hashtbl.fold
       (fun (x, y) num_occured (maxer, coord) ->
@@ -212,7 +222,7 @@ let shoot_hard ai p =
         | _ ->
             if num_occured >= maxer then (num_occured, (x, y))
             else (maxer, coord))
-      map
+      new_map
       (0, (0, 0))
   in
   let coords, p, result = fire p x y in
@@ -223,67 +233,11 @@ let shoot_hard ai p =
      | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
      | Sunk { ship } -> !ship.length
    in
-   let index = -len_of_ship + carrier in
-   ai.num_remaining.(index) <-
-     (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1));
-
-  (coords, p, result)
-
-(* TODO: Improve this by checking for intersect with Hit while placing to give
-   coordinates more weight. *)
-let monte_carlo_sim2 ai player =
-  let sim_helper length dir =
-    let acc = ref [] in
-    for y = 0 to board_size - 1 do
-      for x = 0 to board_size - 1 do
-        print_endline (string_of_coord (x, y));
-        try
-          acc := is_place_possible player (init_ship length) (x, y) dir :: !acc
-        with exn -> ()
-      done
-    done;
-    !acc
-  in
-  A.fold_left
-    (fun acc (len, num) ->
-      if num <> 0 then (sim_helper len true @ sim_helper len false) @ acc
-      else acc)
-    [] ai.num_remaining
-  |> List.flatten
-
-let shoot_hard2 ai p =
-  let board = get_player_board p in
-  let sanitized_player = sanitize p in
-  let map = Hashtbl.create (board_size * board_size) in
-  fold (fun (x, y) c acc -> Hashtbl.replace map (x, y) 0) () board;
-  List.fold_left
-    (fun () (x, y) ->
-      Hashtbl.replace map (x, y)
-        (if is_intersect (x, y) (get_player_board sanitized_player) then
-         Hashtbl.find map (x, y) + intersect_weight
-        else Hashtbl.find map (x, y) + 1))
-    ()
-    (monte_carlo_sim2 ai sanitized_player);
-  let weight, (x, y) =
-    Hashtbl.fold
-      (fun (x, y) num_occured (maxer, coord) ->
-        match get_cell board (x, y) with
-        | Hit _ | Miss | Sunk _ -> (maxer, coord)
-        | _ ->
-            if num_occured >= maxer then (num_occured, (x, y))
-            else (maxer, coord))
-      map
-      (0, (0, 0))
-  in
-  let coords, p, result = fire p x y in
-
-  (if result = ShipSunk then
-   let len_of_ship =
-     match get_cell (get_player_board p) (List.hd coords) with
-     | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
-     | Sunk { ship } -> !ship.length
+   let index =
+     A.fold_left
+       (fun acc (len, num) -> if len = len_of_ship then acc else acc + 1)
+       0 ai.num_remaining
    in
-   let index = -len_of_ship + carrier in
    ai.num_remaining.(index) <-
      (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1));
 
@@ -310,5 +264,5 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
     match D.difficulty with
     | Easy -> shoot_easy ai p
     | Medium -> shoot_mid ai p
-    | Hard -> shoot_hard2 ai p
+    | Hard -> shoot_hard ai p
 end

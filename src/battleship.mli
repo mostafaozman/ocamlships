@@ -57,9 +57,10 @@ val place_ship :
     horizontal, false if vertical. Raises Invalid Position if position is out of
     bounds, already has ship, or is adjacent to another ship. *)
 
-val is_place_possible : player -> ship -> int * int -> bool -> (int * int) list
-(** [is_place_possible p ship x y dir] is the coordinates that a ship will
-    occupy if it were to be placed on [p]'s board horizontally if [dir] is true,
+val possible_place :
+  player -> ship -> int * int -> bool -> (int * int) list
+(** [possible_place p ship x y dir] is the coordinates that a ship will occupy
+    if it were to be placed on [p]'s board horizontally if [dir] is true,
     vertically otherswise. Raises: InvalidPosition if any position is outside
     the board's bounds or is non-empty. *)
 
