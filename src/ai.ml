@@ -248,7 +248,6 @@ let shoot_hard ai p =
       new_map
       (-1, (-1, -1))
   in
-  print_endline (string_of_int weight);
   let coords, p, result = fire p x y in
 
   if result = ShipSunk then (
@@ -304,8 +303,7 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
 
   let rec shoot p =
     match D.difficulty with
-    | Easy -> shoot_easy ai p
+    | Easy | Impossible -> shoot_easy ai p
     | Medium -> shoot_mid ai p
     | Hard -> shoot_hard ai p
-    | Impossible -> shoot_easy ai p
 end

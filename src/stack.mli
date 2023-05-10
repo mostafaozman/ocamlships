@@ -35,6 +35,8 @@ val to_list : 'a t -> 'a list
     [t] is the first element of the list. *)
 
 val of_list : 'a list -> 'a t
+(** [of_list l] is the stack consiting of [l]'s elements. The first element of
+    [l] is the topmost element of the stack. *)
 
 val of_array : 'a array -> 'a t
 (** [of_array arr] is the stack consisting of [arr]'s elements. The first
