@@ -185,11 +185,16 @@ let sim_helper player placing_p len dir map =
         if
           List.exists (fun c -> is_intersect c (get_player_board player)) coords
         then
+          let no_hit_coords =
+            List.filter
+              (fun c -> not (is_intersect c (get_player_board player)))
+              coords
+          in
           List.iter
             (fun coord ->
               Hashtbl.replace map coord
                 ((Hashtbl.find map coord + 2) * intersect_weight))
-            coords
+            no_hit_coords
         else
           List.iter
             (fun coord ->
@@ -237,11 +242,8 @@ let shoot_hard ai p =
   let weight, (x, y) =
     Hashtbl.fold
       (fun (x, y) num_occured (maxer, coord) ->
-        match get_cell board (x, y) with
-        | Hit _ | Miss | Sunk _ -> (maxer, coord)
-        | _ ->
-            if random_greater_than num_occured maxer then (num_occured, (x, y))
-            else (maxer, coord))
+        if random_greater_than num_occured maxer then (num_occured, (x, y))
+        else (maxer, coord))
       new_map
       (-1, (-1, -1))
   in
