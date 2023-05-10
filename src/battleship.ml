@@ -32,18 +32,6 @@ let set_board p b = { p with board = b }
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
 let pp l = "[" ^ String.concat ";" (List.map string_of_coord l) ^ "]"
 
-(** [is_adjacent lst x a] is whether the element at position [x] in the matrix
-    is adjacent, including diagonals, to the element at position [a]. *)
-let rec is_adjacent (x : int * int) (a : int * int) : bool =
-  if fst x < 0 || fst x >= board_size || snd x < 0 || snd x >= board_size then
-    raise (InvalidPosition (string_of_coord x))
-  else if fst a < 0 || fst a >= board_size || snd a < 0 || snd a >= board_size
-  then raise (InvalidPosition (string_of_coord a))
-  else
-    let dx = abs (fst x - fst a) in
-    let dy = abs (snd x - snd a) in
-    dx <= 1 && dy <= 1
-
 let get_cell b x =
   match find x b with
   | None -> raise (InvalidPosition (string_of_coord x))
@@ -93,15 +81,6 @@ let get_adjacents_of_point (x, y) =
   [ top; left; bottom; right ]
   |> List.filter (fun (x, y) ->
          x >= 0 && x < board_size && y >= 0 && y < board_size)
-
-(** [get_adjacents s] is all coordinates that are adjacent to the coordinates in
-    [s] within the board's bounds. *)
-let get_adjacents spots =
-  List.map get_adjacents_of_point spots
-  |> List.flatten |> List.sort_uniq compare
-  |> List.filter (fun (x, y) ->
-         (not (List.mem (x, y) spots))
-         && x >= 0 && x < board_size && y >= 0 && y < board_size)
 
 (** [placer b s sp] is the board after the ship [s] which occupies the positions
     in [sp] is placed on board [b]. *)
