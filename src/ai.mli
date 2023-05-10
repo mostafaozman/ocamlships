@@ -8,6 +8,7 @@ type difficulty =
   | Easy
   | Medium
   | Hard
+  | Impossible
 
 (** Wrapper module type for difficulty. *)
 module type Diff = sig

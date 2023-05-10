@@ -11,6 +11,7 @@ type difficulty =
   | Easy
   | Medium
   | Hard
+  | Impossible
 
 module type Diff = sig
   val difficulty : difficulty
@@ -265,21 +266,40 @@ let shoot_hard ai p =
 
   (coords, p, result)
 
+(* ########################## Impossible AI ################################# *)
+
+let is_ship_cell = function
+  | Ship _ -> true
+  | _ -> false
+
+let ship_coord_stack p =
+  let board = get_player_board p in
+  fold
+    (fun (x, y) c acc -> if is_ship_cell c then S.push (x, y) acc else acc)
+    S.empty board
+
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
   let ai =
-    if D.difficulty <> Hard then
+    if D.difficulty = Impossible then
+      let ship_stack = ship_coord_stack P.player in
+      {
+        low_priority_stack = ship_stack;
+        high_priority_stack = S.empty;
+        num_remaining = [||];
+      }
+    else if D.difficulty = Hard then
+      {
+        low_priority_stack = S.empty;
+        high_priority_stack = S.empty;
+        num_remaining = ship_num_arr;
+      }
+    else
       let shuffled_stack = shuffle P.player |> S.of_array in
       {
         low_priority_stack = shuffled_stack;
         high_priority_stack = S.empty;
         num_remaining = [||];
-      }
-    else
-      {
-        low_priority_stack = S.empty;
-        high_priority_stack = S.empty;
-        num_remaining = ship_num_arr;
       }
 
   let rec shoot p =
@@ -287,4 +307,5 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
     | Easy -> shoot_easy ai p
     | Medium -> shoot_mid ai p
     | Hard -> shoot_hard ai p
+    | Impossible -> shoot_easy ai p
 end
