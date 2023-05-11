@@ -95,6 +95,11 @@ let draw_placing_screen game player =
   draw_rect quit_red 501 60 150 40;
   write 526 74 white "Length 2 ship" 15
 
+let draw_fire_screen game player =
+  draw_player_board false (get_player !game player);
+  draw_rect quit_red 270 30 200 70;
+  write 325 50 white "Fire!" 40
+
 let rec update_cells self lst =
   match lst with
   | [] -> ()

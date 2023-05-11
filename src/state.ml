@@ -17,11 +17,12 @@ let player = init_player Player
 let opp = init_player AI |> create_placements ship_num_arr
 let g = make_game player opp true
 let game = ref g
+let diff = ref Easy
 
 (* WHEN YOU WANT THE AI TO FIRE, CALL [AIFire.shoot (player)]. (player) is the
    player to shoot at. *)
 module AIFire =
-  Make ((val gen_diff_module Easy)) ((val gen_player_module player))
+  Make ((val gen_diff_module !diff)) ((val gen_player_module player))
 
 (** [convert x y] is the grid coordinate associated with pixel position
     ([x],[y]). None if coordinate is outside the grid. *)
@@ -62,7 +63,7 @@ let go_instructions game =
 let go_play game =
   state := PLAY;
   clear_graph ();
-  draw_player_board true (get_player game false)
+  draw_player_board false (get_player game false)
 
 (** [start_loop g] is the start screen of game [g]. *)
 let start_loop game =
@@ -84,12 +85,15 @@ let instructions_loop game =
   (* Check easy button *)
   if button_bound_check (30, 250) (250, 330) st then
     write 360 350 black "Easy:)" 40;
+  diff := Easy;
   (* Check medium button *)
   if button_bound_check (290, 510) (250, 330) st then
     write 350 350 black "Medium!" 40;
+  diff := Medium;
   (* Check hard button *)
   if button_bound_check (550, 770) (250, 330) st then
     write 360 350 black "Hard>:(" 40;
+  diff := Hard;
 
   (* If condition for start box *)
   if button_bound_check (290, 510) (50, 130) st then (
@@ -120,6 +124,13 @@ let rec place_loop game p i dir =
       with e ->
         write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
+
+(** [play_loop g p] allows the player to fire at the opponents board *)
+let rec play_loop game p =
+  let state = wait_next_event [ Button_down; Key_pressed ] in
+  synchronize ();
+  draw_fire_screen game p;
+  if state.key == 'q' then quit ()
 
 (** [placing_loop g p d] waits for player 1 if [p] is true, player 2 otherwise,
     to press the button for which ship they will place and then allows them to
@@ -199,11 +210,6 @@ and ship_placer game p dir ship_length =
       30;
     placing_loop game p dir)
 
-let rec play_loop game p =
-  let _ = wait_next_event [ Button_down; Key_pressed ] in
-  synchronize ();
-  draw_player_board true (get_player !game false)
-
 let main () =
   let _ = open_graph " 800x800" in
   home ();
@@ -221,5 +227,5 @@ let main () =
   done;
 
   while !state = PLAY do
-    play_loop game true
+    play_loop game false
   done
