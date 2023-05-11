@@ -307,3 +307,7 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
     | Medium -> shoot_mid ai p
     | Hard -> shoot_hard ai p
 end
+
+let gen_ai diff player =
+  (module Make ((val gen_diff_module diff)) ((val gen_player_module player))
+  : ArtIntelligence)

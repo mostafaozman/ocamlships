@@ -39,3 +39,7 @@ val create_placements : (int * int) array -> player -> player
 
 (** [Make] is the functor that determines how the AI plays. *)
 module Make : functor (D : Diff) (P : Player) -> ArtIntelligence
+
+val gen_ai : difficulty -> player -> (module ArtIntelligence)
+(** [gen_ai d p] is the first-class ArtIntelligence module targeting [p] at
+    difficulty [d]. *)

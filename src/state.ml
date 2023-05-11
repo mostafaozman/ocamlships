@@ -17,12 +17,7 @@ let player = init_player Player
 let opp = init_player AI |> create_placements ship_num_arr
 let g = make_game player opp true
 let game = ref g
-let diff = ref Easy
-
-(* WHEN YOU WANT THE AI TO FIRE, CALL [AIFire.shoot (player)]. (player) is the
-   player to shoot at. *)
-module AIFire =
-  Make ((val gen_diff_module !diff)) ((val gen_player_module player))
+let ai = ref None
 
 (** [convert x y] is the grid coordinate associated with pixel position
     ([x],[y]). None if coordinate is outside the grid. *)
@@ -49,7 +44,6 @@ let quit () = exit 0
 
 (** [go_start g] changes state to PLACING and draws the board of player 1 in
     [g]. *)
-
 let go_start game =
   state := PLACING;
   clear_graph ();
@@ -85,15 +79,15 @@ let instructions_loop game =
   (* Check easy button *)
   if button_bound_check (30, 250) (250, 330) st then
     write 360 350 black "Easy:)" 40;
-  diff := Easy;
+  ai := Some (gen_ai Easy player);
   (* Check medium button *)
   if button_bound_check (290, 510) (250, 330) st then
     write 350 350 black "Medium!" 40;
-  diff := Medium;
+  ai := Some (gen_ai Medium player);
   (* Check hard button *)
   if button_bound_check (550, 770) (250, 330) st then
     write 360 350 black "Hard>:(" 40;
-  diff := Hard;
+  ai := Some (gen_ai Hard player);
 
   (* If condition for start box *)
   if button_bound_check (290, 510) (50, 130) st then (
