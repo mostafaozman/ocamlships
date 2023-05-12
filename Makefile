@@ -12,7 +12,7 @@ build:
 	dune build
 
 test:
-	OCAMLRUNPARAM=b dune exec test/main.exe
+	OCAMLRUNPARAM=b dune exec test/test.exe
 
 utop:
 	OCAMLRUNPARAM=b dune utop src
