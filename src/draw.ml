@@ -45,7 +45,9 @@ let draw_instructions () =
   draw_rect piss_yellow 290 250 220 80;
   write 355 270 white "Medium" 40;
   draw_rect quit_red 550 250 220 80;
-  write 625 270 white "Hard" 40
+  write 625 270 white "Hard" 40;
+  draw_rect purple 290 150 220 80;
+  write 300 170 white "Impossible" 40
 
 let draw_player_board self p =
   draw_rect black background_llx background_lly background_length

@@ -90,6 +90,11 @@ let instructions_loop game =
     write 360 350 black "Hard>:(" 40;
     diff := Hard);
 
+  (* Check Impossible button *)
+  if button_bound_check (290, 510) (150, 230) st then (
+    write 300 350 black "Impossible!!!" 40;
+    diff := Impossible);
+
   (* If condition for start box *)
   if button_bound_check (290, 510) (50, 130) st then (
     go_start !game;
