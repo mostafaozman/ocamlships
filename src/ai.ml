@@ -230,7 +230,7 @@ let random_greater_than a b =
 let index_in_list x lst =
   let rec finder x lst acc =
     match lst with
-    | [] -> raise (Failure "Not Found")
+    | [] -> raise Not_found
     | (l, n) :: t -> if l = x then acc else finder x t (acc + 1)
   in
   finder x lst 0

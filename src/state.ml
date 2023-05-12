@@ -125,12 +125,18 @@ let rec place_loop game p i dir =
         write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
 
-let create_num_remaining_arr p = 
+let create_num_remaining_arr p =
   let car_num = carrier_num - num_placed p carrier
   and des_num = destroyer_num - num_placed p destroyer
   and sub_num = submarine_num - num_placed p submarine
-  and pat_num = patrol_num - num_placed p patrol in 
-  [|(carrier,car_num);(destroyer,des_num);(submarine,sub_num);(patrol,pat_num)|]
+  and pat_num = patrol_num - num_placed p patrol in
+  [|
+    (carrier, car_num);
+    (destroyer, des_num);
+    (submarine, sub_num);
+    (patrol, pat_num);
+  |]
+
 (** [placing_loop g p d] waits for player 1 if [p] is true, player 2 otherwise,
     to press the button for which ship they will place and then allows them to
     place it in game [g] facing direction [d]. [d] being true will place a
@@ -161,10 +167,14 @@ let rec placing_loop game p dir =
   else if (* Length 2 ship *)
           button_bound_check (501, 651) (60, 100) st then
     ship_placer game p dir patrol
-else if  (*Auto fill players board*)
-  button_bound_check (680,780) (260,310) st then 
+  else if (*Auto fill players board*)
+          button_bound_check (680, 780) (260, 310) st
+  then
     let curr_p = get_player !game p in
-    game := make_game (create_placements (create_num_remaining_arr curr_p)  curr_p ) (get_player !game (not p)) p
+    game :=
+      make_game
+        (create_placements (create_num_remaining_arr curr_p) curr_p)
+        (get_player !game (not p)) p
 
 and rotate game p dir =
   write 295 760 black "Rotate!" 30;
@@ -195,7 +205,8 @@ and reset game p dir =
         (empty_player_board (get_player !game p))
         p;
 
-  write 200 760 black "Click again to reset!" 30;
+  let curr_p = get_player !game p in
+  draw_player_board true curr_p;
   placing_loop game p dir
 
 and ship_placer game p dir ship_length =
@@ -220,16 +231,13 @@ let rec play_loop game p =
   synchronize ();
   draw_fire_screen game p;
   if st.key == 'q' then quit ()
-  else if button_bound_check (680,780) (400,460) st then quit()
+  else if button_bound_check (680, 780) (400, 460) st then quit ()
   else if
     button_bound_check
       (background_llx, background_llx + background_length)
       (background_lly, background_lly + background_length)
       st
-  then 
-    try gui_fire game p st.mouse_x st.mouse_y with
-    | e -> play_loop game p
-  
+  then try gui_fire game p st.mouse_x st.mouse_y with e -> play_loop game p
   else play_loop game p
 
 and gui_fire game p x y =
