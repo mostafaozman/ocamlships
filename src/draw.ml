@@ -66,6 +66,15 @@ let draw_player_board self p =
     done
   done
 
+let draw_peek self p = 
+  clear_graph();
+  write 230 755 black "Your Board" 35;
+  draw_player_board ( self) p;
+
+  draw_rect quit_red 600 20 175 60;
+  write 610 25 white "< Back" 40
+
+
 let home () =
   draw_rect go_green 200 300 400 125;
   write 300 340 white "Start Game" 50;
@@ -111,7 +120,9 @@ let draw_fire_screen game player =
   write 325 50 black "Fire!" 40;
 
   draw_rect go_green 600 20 175 60;
-  write 610 25 white "Continue" 40
+  write 610 25 white "Continue" 40;
+
+  write 230 755 black "AI's Board" 35
 
 let rec update_cells color lst =
   match lst with
