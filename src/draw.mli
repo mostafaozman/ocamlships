@@ -30,10 +30,9 @@ val draw_placing_screen : game ref -> bool -> unit
     placing if [p] is true, player 2 otherwise. *)
 
 val draw_fire_screen : game ref -> bool -> unit
-(** [draw_fire_screen g p] draws the screen of game [g] while player 1 is
-    firing if [p] is true, player 2 otherwise. *)
+(** [draw_fire_screen g p] draws the screen of game [g] while player 1 is firing
+    if [p] is true, player 2 otherwise. *)
 
-val update_cells : bool -> (int * int) list -> unit
-(** [update_cells self lst] draws the cells at the positions in [lst]. Ship
-    cells will be drawn like empty cells if [self] if true, will be green
-    otherwise. *)
+val update_cells : color -> (int * int) list -> unit
+(** [update_cells color lst] draws the cells at the positions in [lst] in color
+    [color]. *)

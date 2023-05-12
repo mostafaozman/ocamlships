@@ -39,6 +39,7 @@ let draw_instructions () =
     "- After placing ships, click the ready button to start the game" 25;
   write 30 505 black
     "- To continue, choose a difficulty then select the button below" 25;
+  write 30 475 black "- Difficulty is MEDIUM by default if you don't choose" 25;
   draw_rect go_green 30 250 220 80;
   write 100 270 white "Easy" 40;
   draw_rect piss_yellow 290 250 220 80;
@@ -97,12 +98,17 @@ let draw_placing_screen game player =
 
 let draw_fire_screen game player =
   draw_player_board false (get_player !game player);
-  draw_rect quit_red 270 30 200 70;
-  write 325 50 white "Fire!" 40
+  draw_rect quit_red 680 400 100 60;
+  write 695 410 white "Quit" 40;
 
-let rec update_cells self lst =
+  write 325 50 black "Fire!" 40;
+
+  draw_rect go_green 600 20 175 60;
+  write 610 25 white "Continue" 40
+
+let rec update_cells color lst =
   match lst with
   | [] -> ()
   | (x, y) :: t ->
-      if self = true then draw_cell green x y else draw_cell ocean_blue x y;
-      update_cells self t
+      draw_cell color x y;
+      update_cells color t

@@ -11,13 +11,15 @@ type state =
   | INSTRUCTIONS
   | PLACING
   | PLAY
+  | GAMEOVER
 
 let state = ref START
 let player = init_player Player
 let opp = init_player AI |> create_placements ship_num_arr
 let g = make_game player opp true
 let game = ref g
-let ai = ref None
+let diff = ref Medium
+let ai = ref (gen_ai Medium player)
 
 (** [convert x y] is the grid coordinate associated with pixel position
     ([x],[y]). None if coordinate is outside the grid. *)
@@ -51,13 +53,12 @@ let go_start game =
 
 let go_instructions game =
   state := INSTRUCTIONS;
-  print_string "\nINSTRUCTIONS";
   draw_instructions ()
 
 let go_play game =
   state := PLAY;
   clear_graph ();
-  draw_player_board false (get_player game false)
+  draw_fire_screen game false
 
 (** [start_loop g] is the start screen of game [g]. *)
 let start_loop game =
@@ -77,17 +78,17 @@ let instructions_loop game =
   draw_instructions ();
   if st.key == 'q' then quit ();
   (* Check easy button *)
-  if button_bound_check (30, 250) (250, 330) st then
+  if button_bound_check (30, 250) (250, 330) st then (
     write 360 350 black "Easy:)" 40;
-  ai := Some (gen_ai Easy player);
+    diff := Easy);
   (* Check medium button *)
-  if button_bound_check (290, 510) (250, 330) st then
+  if button_bound_check (290, 510) (250, 330) st then (
     write 350 350 black "Medium!" 40;
-  ai := Some (gen_ai Medium player);
+    diff := Medium);
   (* Check hard button *)
-  if button_bound_check (550, 770) (250, 330) st then
+  if button_bound_check (550, 770) (250, 330) st then (
     write 360 350 black "Hard>:(" 40;
-  ai := Some (gen_ai Hard player);
+    diff := Hard);
 
   (* If condition for start box *)
   if button_bound_check (290, 510) (50, 130) st then (
@@ -112,19 +113,12 @@ let rec place_loop game p i dir =
         in
         if p then (
           game := make_game updated_player (get_player !game (not p)) p;
-          update_cells true ship_coords)
+          update_cells green ship_coords)
         else game := make_game (get_player !game (not p)) updated_player p;
-        update_cells true ship_coords
+        update_cells green ship_coords
       with e ->
         write 200 760 black "Can't place ship there" 30;
         place_loop game p i dir)
-
-(** [play_loop g p] allows the player to fire at the opponents board *)
-let rec play_loop game p =
-  let state = wait_next_event [ Button_down; Key_pressed ] in
-  synchronize ();
-  draw_fire_screen game p;
-  if state.key == 'q' then quit ()
 
 (** [placing_loop g p d] waits for player 1 if [p] is true, player 2 otherwise,
     to press the button for which ship they will place and then allows them to
@@ -167,7 +161,8 @@ and ready game p dir =
   match (curr_player_ready, opp_player_ready) with
   | true, true ->
       write 295 760 black "Ready!" 30;
-      go_play !game
+      ai := gen_ai !diff (get_player !game p);
+      go_play game
   | true, false -> placing_loop game (not p) dir
   | _ ->
       write 200 760 black "Place all ships to start!" 30;
@@ -203,6 +198,40 @@ and ship_placer game p dir ship_length =
       ("Max length " ^ string_of_int ship_length ^ " ships on board")
       30;
     placing_loop game p dir)
+
+(** [play_loop g p] allows the player to fire at the opponents board *)
+let rec play_loop game p =
+  let st = wait_next_event [ Button_down; Key_pressed ] in
+  synchronize ();
+  draw_fire_screen game p;
+  if st.key == 'q' then quit ()
+  else if
+    button_bound_check
+      (background_llx, background_llx + background_length)
+      (background_lly, background_lly + background_length)
+      st
+  then gui_fire game p st.mouse_x st.mouse_y
+  else play_loop game p
+
+and gui_fire game p x y =
+  let tup = convert x y in
+  let enemy = get_player !game p in
+  let shooter = get_player !game (not p) in
+  match tup with
+  | None -> play_loop game p
+  | Some (x, y) ->
+      let coords, new_opp, res = fire enemy x y in
+      (match res with
+      | ShipHit -> update_cells quit_red coords
+      | ShipMissed -> update_cells logo_wht coords
+      | ShipSunk -> update_cells piss_yellow coords);
+      if is_game_over new_opp then state := GAMEOVER
+      else game := make_game shooter new_opp true;
+      (* AI's turn to shoot *)
+      let open (val !ai) in
+      let _, new_self, _ = shoot shooter in
+      if is_game_over new_self then state := GAMEOVER
+      else game := make_game new_self new_opp true
 
 let main () =
   let _ = open_graph " 800x800" in
