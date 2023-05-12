@@ -172,6 +172,15 @@ let fire p x y =
   let coords, new_board, result = fire_helper p.board x y in
   (coords, { p with board = new_board }, result)
 
+let get_all_ship_coords p =
+  let board = p.board in
+  fold
+    (fun (x, y) c acc ->
+      match c with
+      | Ship _ -> (x, y) :: acc
+      | _ -> acc)
+    [] board
+
 let empty_player_board p = { p with board = init_board () }
 
 let placed_ready player =

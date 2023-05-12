@@ -79,3 +79,7 @@ val is_game_over : player -> bool
 
 val set_board : player -> board -> player
 (** [set_board b p] is player [p] with their board set to [b]. *)
+
+val get_all_ship_coords : player -> (int * int) list
+(** [get_all_ship_coords p] is all the coordinates on [p]'s board that have a
+    ship on them. *)

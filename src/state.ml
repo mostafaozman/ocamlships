@@ -169,12 +169,7 @@ let rec placing_loop game p dir =
     ship_placer game p dir patrol
   else if (*Auto fill players board*)
           button_bound_check (680, 780) (260, 310) st
-  then
-    let curr_p = get_player !game p in
-    game :=
-      make_game
-        (create_placements (create_num_remaining_arr curr_p) curr_p)
-        (get_player !game (not p)) p
+  then auto_place game p dir
 
 and rotate game p dir =
   write 295 760 black "Rotate!" 30;
@@ -207,6 +202,14 @@ and reset game p dir =
 
   let curr_p = get_player !game p in
   draw_player_board true curr_p;
+  placing_loop game p dir
+
+and auto_place game p dir =
+  let curr_p = get_player !game p in
+  let new_p = create_placements (create_num_remaining_arr curr_p) curr_p in
+  game := make_game new_p (get_player !game (not p)) p;
+  let to_update = get_all_ship_coords new_p in
+  update_cells green to_update;
   placing_loop game p dir
 
 and ship_placer game p dir ship_length =
