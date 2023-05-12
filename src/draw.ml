@@ -87,6 +87,9 @@ let draw_placing_screen game player =
   (* Rotate button *)
   draw_rect piss_yellow 680 360 100 50;
   write 700 378 white "Rotate" 20;
+  (* Auto place button *)
+  draw_rect purple 680 260 100 50;
+  write 685 270 white "Auto-place" 19;
 
   draw_rect quit_red 21 60 150 40;
   write 46 74 white "Length 5 ship" 15;
@@ -97,6 +100,8 @@ let draw_placing_screen game player =
 
   draw_rect quit_red 501 60 150 40;
   write 526 74 white "Length 2 ship" 15
+
+
 
 let draw_fire_screen game player =
   draw_player_board false (get_player !game player);
