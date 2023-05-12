@@ -215,7 +215,10 @@ let rec play_loop game p =
       (background_llx, background_llx + background_length)
       (background_lly, background_lly + background_length)
       st
-  then gui_fire game p st.mouse_x st.mouse_y
+  then 
+    try gui_fire game p st.mouse_x st.mouse_y with
+    | e -> play_loop game p
+  
   else play_loop game p
 
 and gui_fire game p x y =
