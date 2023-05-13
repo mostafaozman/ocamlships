@@ -45,9 +45,9 @@ let button_bound_check (low_x, high_x) (low_y, high_y) st =
 (** [quit ()] exits the program with exit status 0. *)
 let quit () = exit 0
 
-(** [go_start g] changes state to PLACING and draws the board of player 1 in
+(** [go_place g] changes state to PLACING and draws the board of player 1 in
     [g]. *)
-let go_start game =
+let go_place game =
   state := PLACING;
   clear_graph ();
   draw_player_board true (get_player game true)
@@ -76,7 +76,7 @@ let start_loop game =
 let instructions_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
-  draw_instructions ();
+  draw_rect white 0 350 800 100;
   if st.key == 'q' then quit ();
   (* Check easy button *)
   if button_bound_check (30, 250) (250, 330) st then (
@@ -94,12 +94,11 @@ let instructions_loop game =
   (* Check Impossible button *)
   if button_bound_check (290, 510) (150, 230) st then (
     write 300 350 black "Impossible!!!" 40;
-    print_endline "Impossible";
     diff := Impossible);
 
   (* If condition for start box *)
   if button_bound_check (290, 510) (50, 130) st then (
-    go_start !game;
+    go_place !game;
     draw_placing_screen (get_curr_player !game))
 
 (** [place_loop g p i] draws the board of player 1 if [p] is true, player 2
@@ -249,7 +248,11 @@ let rec play_loop game =
   synchronize ();
   draw_fire_screen game;
   if st.key == 'q' then quit ()
-  else if button_bound_check (680, 780) (400, 460) st then quit ()
+  else if button_bound_check (680, 780) (400, 460) st then (
+    game := make_game player opp true;
+    clear_graph ();
+    home ();
+    state := START)
   else if
     button_bound_check
       (background_llx, background_llx + background_length)
@@ -285,22 +288,15 @@ and gui_fire game x y =
         print_endline "Game Over, AI wins")
       else game := make_game new_self new_opp true
 
-let main () =
+let rec main () =
+  if !state = START then start_loop game
+  else if !state = INSTRUCTIONS then instructions_loop game
+  else if !state = PLACING then placing_loop game true
+  else if !state = PLAY then play_loop game;
+
+  main ()
+
+let start () =
   let _ = open_graph " 800x800" in
   home ();
-
-  while !state = START do
-    start_loop game
-  done;
-
-  while !state = INSTRUCTIONS do
-    instructions_loop game
-  done;
-
-  while !state = PLACING do
-    placing_loop game true
-  done;
-
-  while !state = PLAY do
-    play_loop game
-  done
+  main ()
