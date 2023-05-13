@@ -31,4 +31,4 @@ let piss_yellow = 0xFFBF00
 let depression_grey = 0xABB0B8
 let white = 0xFFFFFF
 let purple = 0x3432a8
-let intersect_weight = 4
+let intersect_weight = 10
