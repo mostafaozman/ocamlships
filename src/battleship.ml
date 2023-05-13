@@ -167,7 +167,12 @@ let fire p x y =
     | Ship { ship } ->
         let same_ship_tups = get_same_refs board ship in
         if List.length (List.filter is_ship same_ship_tups) = 1 then
-          let coords = List.map (fun (tup, c) -> tup) same_ship_tups in
+          let coords =
+            List.fold_left
+              (fun acc (tup, c) -> if tup = (x, y) then acc else tup :: acc)
+              [] same_ship_tups
+          in
+          let coords = (x, y) :: coords in
           (coords, sunk_transform board ship coords, ShipSunk)
         else ([ (x, y) ], insert (x, y) (Hit { ship }) board, ShipHit)
     | _ -> raise (InvalidPosition (string_of_coord (x, y)))

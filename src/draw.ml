@@ -66,10 +66,24 @@ let draw_player_board self p =
     done
   done
 
-let draw_peek self p =
+let draw_peek self p last =
   clear_graph ();
   write 230 755 black "Your Board" 35;
   draw_player_board self p;
+
+  begin
+    match last with
+    | None -> ()
+    | Some (x, y) ->
+        write
+          (background_llx + box_off
+          + ((box_size + box_off) * x)
+          + (box_size / 3) - 5)
+          (background_tly - (box_size + box_off)
+          - ((box_size + box_off) * y)
+          - (box_size / 3) + 5)
+          purple "X" 85
+  end;
 
   draw_rect quit_red 600 20 175 60;
   write 610 25 white "< Back" 40

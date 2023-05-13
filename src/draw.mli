@@ -19,9 +19,10 @@ val draw_player_board : bool -> player -> unit
     will be drawn the same as empty cells. if [self] is false, then ship cells
     will be drawn differently than empty cells. *)
 
-val draw_peek : bool -> player -> unit
-(**[draw_peek self p] draws the board of the player whilst playing the game.
-   works similarly to draw_player_board as it draws the players board*)
+val draw_peek : bool -> player -> (int * int) option -> unit
+(**[draw_peek self p last] draws the board of the player whilst playing the
+   game. works similarly to draw_player_board as it draws the players board.
+   [last] is the cell that was last hit on [p]'s board. *)
 
 val home : unit -> unit
 (** [home ()] draws the start screen of the game. *)

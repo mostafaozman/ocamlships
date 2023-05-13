@@ -21,6 +21,7 @@ let g = make_game player opp true
 let game = ref g
 let diff = ref Medium
 let ai = ref (gen_ai Medium player)
+let last_hit = ref None
 
 (** [convert x y] is the grid coordinate associated with pixel position
     ([x],[y]). None if coordinate is outside the grid. *)
@@ -64,7 +65,7 @@ let go_play game =
 let go_peek g =
   state := PEEK;
   let curr_player = get_curr_player !g in
-  draw_peek true curr_player
+  draw_peek true curr_player !last_hit
 
 (** [start_loop g] is the start screen of game [g]. *)
 let start_loop game =
@@ -287,13 +288,14 @@ and gui_fire game x y =
         print_endline "Game Over, You win")
       else game := make_game shooter new_opp true;
       (* AI's turn to shoot *)
-      if not (!state = GAMEOVER) then
+      if not (!state = GAMEOVER) then (
         let open (val !ai) in
-        let _, new_self, _ = shoot shooter in
+        let c, new_self, _ = shoot shooter in
         if is_game_over new_self then (
           state := GAMEOVER;
           print_endline "Game Over, AI wins")
-        else game := make_game new_self new_opp true
+        else game := make_game new_self new_opp true;
+        last_hit := Some (List.hd c))
 
 let peek_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
