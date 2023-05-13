@@ -29,11 +29,20 @@ let get_player g b =
   if b then player1 else player2
 
 let get_curr_player g = g.current_player |> get_player g
-let curr_bool g = g.current_player
 let get_player_board p = p.board
 let set_board p b = { p with board = b }
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
 let pp l = "[" ^ String.concat ";" (List.map string_of_coord l) ^ "]"
+
+let string_of_game g =
+  let p_string p =
+    match p.of_type with
+    | Player -> "Player"
+    | AI -> "AI"
+  in
+  let p1, p2 = g.players in
+  p_string p1 ^ " vs " ^ p_string p2 ^ " with current player being: "
+  ^ string_of_bool g.current_player
 
 let get_cell b x =
   match find x b with

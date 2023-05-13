@@ -186,10 +186,10 @@ and rotate game dir =
 and ready game dir =
   let curr_player = get_curr_player !game in
   let curr_is_player_1 = is_player_1 !game curr_player in
-  let opp =
+  let enemy =
     if curr_is_player_1 then get_player !game false else get_player !game true
   in
-  let curr_ready, opp_ready = (placed_ready curr_player, placed_ready opp) in
+  let curr_ready, opp_ready = (placed_ready curr_player, placed_ready enemy) in
   match (curr_ready, opp_ready) with
   | true, true ->
       write 295 760 black "Ready!" 30;
@@ -197,8 +197,8 @@ and ready game dir =
       else ai := gen_ai !diff (get_player !game false);
       go_play game
   | true, false ->
-      if curr_is_player_1 then game := make_game curr_player opp false
-      else game := make_game opp curr_player true;
+      if curr_is_player_1 then game := make_game curr_player enemy false
+      else game := make_game enemy curr_player true;
       placing_loop game dir
   | _ ->
       write 200 760 black "Place all ships to start!" 30;
@@ -256,7 +256,8 @@ let rec play_loop game =
   draw_fire_screen game;
   if st.key == 'q' then quit ()
   else if button_bound_check (680, 780) (400, 460) st then (
-    game := make_game player opp true;
+    game :=
+      make_game player (init_player AI |> create_placements ship_num_arr) true;
     clear_graph ();
     home ();
     state := START)

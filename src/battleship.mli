@@ -27,13 +27,15 @@ val make_game : player -> player -> bool -> game
 val get_player : game -> bool -> player
 (** [get_player g b] is player 1, in game [g], if [b] is true and player 2
     otherwise. *)
+
 val is_player_1 : game -> player -> bool
 (** [is_player_1 g p] is whether [p] is player 1 in game [g]. *)
 
 val get_curr_player : game -> player
 (** [get_curr_player g] is the current player of game [g]. *)
 
-val curr_bool : game -> bool
+val string_of_game : game -> string
+(** [string_of_game g] is the string representation of game [g]. *)
 
 val empty_player_board : player -> player
 (** [empty_player_board p] is player [p] with an empty board. *)

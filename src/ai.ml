@@ -291,7 +291,7 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
       {
         low_priority_stack = S.empty;
         high_priority_stack = S.empty;
-        num_remaining = ship_num_arr;
+        num_remaining = A.copy ship_num_arr;
       }
     else
       let shuffled_stack = shuffle P.player |> S.of_array in
