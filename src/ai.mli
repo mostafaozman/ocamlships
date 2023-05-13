@@ -1,3 +1,6 @@
+(** Ai is the module that handles all of the computer's actions in a Battleship
+    game. *)
+
 open Battleship
 
 type ai

@@ -1,3 +1,5 @@
+(** Stack is the module that provides a functional stack data structure. *)
+
 type 'a t
 (** the type representing a stack. *)
 
