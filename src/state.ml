@@ -61,6 +61,11 @@ let go_play game =
   clear_graph ();
   draw_fire_screen game
 
+let go_peek g =
+  state := PEEK;
+  let curr_player = get_curr_player !g in
+  draw_peek true curr_player
+
 (** [start_loop g] is the start screen of game [g]. *)
 let start_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
@@ -101,8 +106,8 @@ let instructions_loop game =
     go_place !game;
     draw_placing_screen (get_curr_player !game))
 
-(** [place_loop g p i] draws the board of player 1 if [p] is true, player 2
-    otherwise, after they have placed a ship of length [i] in game [g]. *)
+(** [place_loop g i dir] draws the board of the current player in [g] as they
+    attempt to place a ship of length [i] facing direction [dir]. *)
 let rec place_loop game i dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
@@ -242,7 +247,8 @@ and ship_placer game dir ship_length =
       30;
     placing_loop game dir)
 
-(** [play_loop g p] allows the player to fire at the opponents board *)
+(** [play_loop g] allows the current player in game [g] to fire at the opponents
+    board *)
 let rec play_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
@@ -259,7 +265,7 @@ let rec play_loop game =
       (background_lly, background_lly + background_length)
       st
   then try gui_fire game st.mouse_x st.mouse_y with e -> play_loop game
-  else play_loop game
+  else if button_bound_check (600, 775) (20, 80) st then go_peek game
 
 and gui_fire game x y =
   let tup = convert x y in
@@ -288,11 +294,18 @@ and gui_fire game x y =
         print_endline "Game Over, AI wins")
       else game := make_game new_self new_opp true
 
+let peek_loop game =
+  let st = wait_next_event [ Button_down; Key_pressed ] in
+  synchronize ();
+  if st.key == 'q' then quit ()
+  else if button_bound_check (600, 775) (20, 80) st then go_play game
+
 let rec main () =
   if !state = START then start_loop game
   else if !state = INSTRUCTIONS then instructions_loop game
   else if !state = PLACING then placing_loop game true
-  else if !state = PLAY then play_loop game;
+  else if !state = PLAY then play_loop game
+  else if !state = PEEK then peek_loop game;
 
   main ()
 
