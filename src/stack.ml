@@ -33,4 +33,13 @@ let of_array arr =
 
 let string_of_stack f s =
   let s = List.map f s in
-  "[" ^ String.concat ";" s ^ "]"
+  let ( +^+ ) a b = Buffer.add_string a b in
+  let buff = Buffer.create 100 in
+  Buffer.add_char buff '[';
+  List.iter
+    (fun e ->
+      buff +^+ e;
+      Buffer.add_char buff ';')
+    s;
+  Buffer.add_char buff ']';
+  Buffer.contents buff

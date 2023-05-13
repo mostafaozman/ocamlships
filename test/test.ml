@@ -178,8 +178,8 @@ let battleship_tests =
         (get_adjacents_of_point (5, 5)) );
     (* pp tests: 2*)
     ("pp empty list is []" >:: fun _ -> assert_equal "[]" (pp []));
-    ( "pp [(10,10);(0,0);(5,3)] list is \"[(10,10);(0,0);(5,3)]\"" >:: fun _ ->
-      assert_equal "[(10,10);(0,0);(5,3)]" (pp [ (10, 10); (0, 0); (5, 3) ]) );
+    ( "pp [(10,10);(0,0);(5,3)] list is \"[(10,10);(0,0);(5,3);]\"" >:: fun _ ->
+      assert_equal "[(10,10);(0,0);(5,3);]" (pp [ (10, 10); (0, 0); (5, 3) ]) );
     (* num_placed tests: 3 *)
     ( "num_placed on empty board is zero" >:: fun _ ->
       assert_equal 0 (num_placed player 3) );

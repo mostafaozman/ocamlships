@@ -105,4 +105,12 @@ let init_board () =
   helper_y (board_size - 1) empty
 
 let init_ship length = { length }
-let string_of_coord (x, y) = "(" ^ string_of_int x ^ "," ^ string_of_int y ^ ")"
+
+let string_of_coord (x, y) =
+  let buff = Buffer.create 10 in
+  Buffer.add_char buff '(';
+  buff +^+ string_of_int x;
+  Buffer.add_char buff ',';
+  buff +^+ string_of_int y;
+  Buffer.add_char buff ')';
+  Buffer.contents buff

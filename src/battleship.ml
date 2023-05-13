@@ -32,7 +32,18 @@ let get_curr_player g = g.current_player |> get_player g
 let get_player_board p = p.board
 let set_board p b = { p with board = b }
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }
-let pp l = "[" ^ String.concat ";" (List.map string_of_coord l) ^ "]"
+
+let pp l =
+  let buff = Buffer.create (List.length l * 4) in
+  let str_lst = List.map string_of_coord l in
+  Buffer.add_char buff '[';
+  List.iter
+    (fun s ->
+      buff +^+ s;
+      Buffer.add_char buff ';')
+    str_lst;
+  Buffer.add_char buff ']';
+  Buffer.contents buff
 
 let string_of_game g =
   let p_string p =
@@ -41,8 +52,18 @@ let string_of_game g =
     | AI -> "AI"
   in
   let p1, p2 = g.players in
-  p_string p1 ^ " vs " ^ p_string p2 ^ " with current player being: "
-  ^ string_of_bool g.current_player
+  let buff = Buffer.create 45 in
+  let to_concat =
+    [
+      p_string p1;
+      " vs ";
+      p_string p2;
+      " with current player being: ";
+      string_of_bool g.current_player;
+    ]
+  in
+  List.iter (fun s -> buff +^+ s) to_concat;
+  Buffer.contents buff
 
 let get_cell b x =
   match find x b with
