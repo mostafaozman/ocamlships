@@ -11,6 +11,7 @@ type state =
   | INSTRUCTIONS
   | PLACING
   | PLAY
+  | PEEK
   | GAMEOVER
 
 let state = ref START
@@ -58,7 +59,7 @@ let go_instructions game =
 let go_play game =
   state := PLAY;
   clear_graph ();
-  draw_fire_screen game false
+  draw_fire_screen game
 
 (** [start_loop g] is the start screen of game [g]. *)
 let start_loop game =
@@ -93,37 +94,39 @@ let instructions_loop game =
   (* Check Impossible button *)
   if button_bound_check (290, 510) (150, 230) st then (
     write 300 350 black "Impossible!!!" 40;
+    print_endline "Impossible";
     diff := Impossible);
 
   (* If condition for start box *)
   if button_bound_check (290, 510) (50, 130) st then (
     go_start !game;
-    draw_placing_screen game true)
+    draw_placing_screen (get_curr_player !game))
 
 (** [place_loop g p i] draws the board of player 1 if [p] is true, player 2
     otherwise, after they have placed a ship of length [i] in game [g]. *)
-let rec place_loop game p i dir =
+let rec place_loop game i dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
-  draw_placing_screen game p;
+  draw_placing_screen (get_curr_player !game);
   let tup = convert st.mouse_x st.mouse_y in
   match tup with
   | None ->
       write 200 760 black "Select position on board" 25;
-      place_loop game p i dir
+      place_loop game i dir
   | Some tup -> (
       try
+        let curr = get_curr_player !game in
         let ship_coords, updated_player =
-          place_ship (get_player !game p) (init_ship i) tup dir
+          place_ship curr (init_ship i) tup dir
         in
-        if p then (
-          game := make_game updated_player (get_player !game (not p)) p;
+        if is_player_1 !game curr then (
+          game := make_game updated_player (get_player !game false) true;
           update_cells green ship_coords)
-        else game := make_game (get_player !game (not p)) updated_player p;
+        else game := make_game (get_player !game true) updated_player false;
         update_cells green ship_coords
       with e ->
         write 200 760 black "Can't place ship there" 30;
-        place_loop game p i dir)
+        place_loop game i dir)
 
 let create_num_remaining_arr p =
   let car_num = carrier_num - num_placed p carrier
@@ -141,78 +144,90 @@ let create_num_remaining_arr p =
     to press the button for which ship they will place and then allows them to
     place it in game [g] facing direction [d]. [d] being true will place a
     horizontal ship, vertical otherwise. *)
-let rec placing_loop game p dir =
+let rec placing_loop game dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
-  draw_placing_screen game p;
+  draw_placing_screen (get_curr_player !game);
   if st.key == 'q' then quit ()
   else if (* Check for rotation *)
           button_bound_check (680, 780) (360, 410) st
-  then rotate game p dir
+  then rotate game dir
   else if (* Check ready button *)
           button_bound_check (680, 780) (430, 480) st
-  then ready game p dir
+  then ready game dir
   else if (* Check reset button *)
           button_bound_check (680, 780) (700, 800) st
-  then reset game p dir
-  else if (* Length 5 ship *)
-          button_bound_check (21, 171) (60, 100) st then
-    ship_placer game p dir carrier
-  else if (* Length 4 ship *)
-          button_bound_check (181, 331) (60, 100) st then
-    ship_placer game p dir destroyer
-  else if (* Length 3 ship *)
-          button_bound_check (341, 491) (60, 100) st then
-    ship_placer game p dir submarine
-  else if (* Length 2 ship *)
-          button_bound_check (501, 651) (60, 100) st then
-    ship_placer game p dir patrol
+  then reset game dir
   else if (*Auto fill players board*)
           button_bound_check (680, 780) (260, 310) st
-  then auto_place game p dir
+  then auto_place game dir
+  else if (* Length 5 ship *)
+          button_bound_check (21, 171) (60, 100) st then
+    ship_placer game dir carrier
+  else if (* Length 4 ship *)
+          button_bound_check (181, 331) (60, 100) st then
+    ship_placer game dir destroyer
+  else if (* Length 3 ship *)
+          button_bound_check (341, 491) (60, 100) st then
+    ship_placer game dir submarine
+  else if (* Length 2 ship *)
+          button_bound_check (501, 651) (60, 100) st then
+    ship_placer game dir patrol
 
-and rotate game p dir =
+and rotate game dir =
   write 295 760 black "Rotate!" 30;
-  placing_loop game p (not dir)
+  placing_loop game (not dir)
 
-and ready game p dir =
-  let curr_player_ready = placed_ready (get_player !game p) in
-  let opp_player_ready = placed_ready (get_player !game (not p)) in
-  match (curr_player_ready, opp_player_ready) with
+and ready game dir =
+  let curr_player = get_curr_player !game in
+  let curr_is_player_1 = is_player_1 !game curr_player in
+  let opp =
+    if curr_is_player_1 then get_player !game false else get_player !game true
+  in
+  let curr_ready, opp_ready = (placed_ready curr_player, placed_ready opp) in
+  match (curr_ready, opp_ready) with
   | true, true ->
       write 295 760 black "Ready!" 30;
-      ai := gen_ai !diff (get_player !game p);
+      if curr_is_player_1 then ai := gen_ai !diff (get_player !game true)
+      else ai := gen_ai !diff (get_player !game false);
       go_play game
-  | true, false -> placing_loop game (not p) dir
+  | true, false ->
+      if curr_is_player_1 then game := make_game curr_player opp false
+      else game := make_game opp curr_player true;
+      placing_loop game dir
   | _ ->
       write 200 760 black "Place all ships to start!" 30;
-      placing_loop game p dir
+      placing_loop game dir
 
-and reset game p dir =
-  if p then
-    game :=
-      make_game
-        (empty_player_board (get_player !game p))
-        (get_player !game (not p)) p
-  else
-    game :=
-      make_game (get_player !game (not p))
-        (empty_player_board (get_player !game p))
-        p;
-
-  let curr_p = get_player !game p in
+and reset game dir =
+  let curr_p = get_curr_player !game in
+  begin
+    match is_player_1 !game curr_p with
+    | true ->
+        game :=
+          make_game (empty_player_board curr_p) (get_player !game false) true
+    | false ->
+        game :=
+          make_game (get_player !game true) (empty_player_board curr_p) false
+  end;
+  let curr_p = get_curr_player !game in
   draw_player_board true curr_p;
-  placing_loop game p dir
+  placing_loop game dir
 
-and auto_place game p dir =
-  let curr_p = get_player !game p in
+and auto_place game dir =
+  let curr_p = get_curr_player !game in
   let new_p = create_placements (create_num_remaining_arr curr_p) curr_p in
-  game := make_game new_p (get_player !game (not p)) p;
+  begin
+    match is_player_1 !game curr_p with
+    | true -> game := make_game new_p (get_player !game false) true
+    | false -> game := make_game (get_player !game true) new_p false
+  end;
   let to_update = get_all_ship_coords new_p in
   update_cells green to_update;
-  placing_loop game p dir
+  placing_loop game dir
 
-and ship_placer game p dir ship_length =
+and ship_placer game dir ship_length =
+  let curr_p = get_curr_player !game in
   let ship_num =
     match ship_length with
     | n when n = carrier -> carrier_num
@@ -220,19 +235,19 @@ and ship_placer game p dir ship_length =
     | n when n = submarine -> submarine_num
     | _ -> patrol_num
   in
-  if num_placed (get_player !game p) ship_length < ship_num then
-    place_loop game p ship_length dir
+  if num_placed curr_p ship_length < ship_num then
+    place_loop game ship_length dir
   else (
     write 170 760 black
       ("Max length " ^ string_of_int ship_length ^ " ships on board")
       30;
-    placing_loop game p dir)
+    placing_loop game dir)
 
 (** [play_loop g p] allows the player to fire at the opponents board *)
-let rec play_loop game p =
+let rec play_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
-  draw_fire_screen game p;
+  draw_fire_screen game;
   if st.key == 'q' then quit ()
   else if button_bound_check (680, 780) (400, 460) st then quit ()
   else if
@@ -240,15 +255,18 @@ let rec play_loop game p =
       (background_llx, background_llx + background_length)
       (background_lly, background_lly + background_length)
       st
-  then try gui_fire game p st.mouse_x st.mouse_y with e -> play_loop game p
-  else play_loop game p
+  then try gui_fire game st.mouse_x st.mouse_y with e -> play_loop game
+  else play_loop game
 
-and gui_fire game p x y =
+and gui_fire game x y =
   let tup = convert x y in
-  let enemy = get_player !game p in
-  let shooter = get_player !game (not p) in
+  let shooter = get_curr_player !game in
+  let enemy =
+    if is_player_1 !game shooter then get_player !game false
+    else get_player !game true
+  in
   match tup with
-  | None -> play_loop game p
+  | None -> play_loop game
   | Some (x, y) ->
       let coords, new_opp, res = fire enemy x y in
       (match res with
@@ -280,9 +298,9 @@ let main () =
   done;
 
   while !state = PLACING do
-    placing_loop game true true
+    placing_loop game true
   done;
 
   while !state = PLAY do
-    play_loop game false
+    play_loop game
   done

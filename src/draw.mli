@@ -29,11 +29,11 @@ val home : unit -> unit
 val draw_instructions : unit -> unit
 (** [draw_instructions ()] draws the instructions screen of the game. *)
 
-val draw_placing_screen : game ref -> bool -> unit
+val draw_placing_screen : player -> unit
 (** [draw_placing_screen g p] draws the screen of game [g] while player 1 is
     placing if [p] is true, player 2 otherwise. *)
 
-val draw_fire_screen : game ref -> bool -> unit
+val draw_fire_screen : game ref -> unit
 (** [draw_fire_screen g p] draws the screen of game [g] while player 1 is firing
     if [p] is true, player 2 otherwise. *)
 

@@ -22,11 +22,14 @@ type game = {
 }
 
 let init_player of_type = { of_type; board = init_board () }
+let is_player_1 g p = p = fst g.players
 
 let get_player g b =
   let player1, player2 = g.players in
   if b then player1 else player2
 
+let get_curr_player g = g.current_player |> get_player g
+let curr_bool g = g.current_player
 let get_player_board p = p.board
 let set_board p b = { p with board = b }
 let make_game p1 p2 curr = { players = (p1, p2); current_player = curr }

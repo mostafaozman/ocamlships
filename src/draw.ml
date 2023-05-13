@@ -66,14 +66,13 @@ let draw_player_board self p =
     done
   done
 
-let draw_peek self p = 
-  clear_graph();
+let draw_peek self p =
+  clear_graph ();
   write 230 755 black "Your Board" 35;
-  draw_player_board ( self) p;
+  draw_player_board self p;
 
   draw_rect quit_red 600 20 175 60;
   write 610 25 white "< Back" 40
-
 
 let home () =
   draw_rect go_green 200 300 400 125;
@@ -84,8 +83,8 @@ let home () =
   draw_rect black 0 620 800 280;
   write 280 680 white "Battle Ships" 50
 
-let draw_placing_screen game player =
-  draw_player_board true (get_player !game player);
+let draw_placing_screen player =
+  draw_player_board true player;
   (* Ready button *)
   draw_rect white 0 755 800 45;
   draw_rect go_green 680 430 100 50;
@@ -110,10 +109,14 @@ let draw_placing_screen game player =
   draw_rect quit_red 501 60 150 40;
   write 526 74 white "Length 2 ship" 15
 
+let draw_fire_screen game =
+  let curr_player = get_curr_player !game in
+  begin
+    match is_player_1 !game curr_player with
+    | true -> draw_player_board false (get_player !game false)
+    | false -> draw_player_board false (get_player !game true)
+  end;
 
-
-let draw_fire_screen game player =
-  draw_player_board false (get_player !game player);
   draw_rect quit_red 680 400 100 60;
   write 695 410 white "Quit" 40;
 
