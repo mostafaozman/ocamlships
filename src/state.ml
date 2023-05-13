@@ -287,12 +287,13 @@ and gui_fire game x y =
         print_endline "Game Over, You win")
       else game := make_game shooter new_opp true;
       (* AI's turn to shoot *)
-      let open (val !ai) in
-      let _, new_self, _ = shoot shooter in
-      if is_game_over new_self then (
-        state := GAMEOVER;
-        print_endline "Game Over, AI wins")
-      else game := make_game new_self new_opp true
+      if not (!state = GAMEOVER) then
+        let open (val !ai) in
+        let _, new_self, _ = shoot shooter in
+        if is_game_over new_self then (
+          state := GAMEOVER;
+          print_endline "Game Over, AI wins")
+        else game := make_game new_self new_opp true
 
 let peek_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
