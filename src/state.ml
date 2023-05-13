@@ -16,7 +16,7 @@ type state =
 
 let state = ref START
 let player = init_player Player
-let opp = init_player AI |> create_placements ship_num_arr
+let opp = init_player AI |> create_placements ship_num_lst
 let g = make_game player opp true
 let game = ref g
 let diff = ref Medium
@@ -133,17 +133,17 @@ let rec place_loop game i dir =
         write 200 760 black "Can't place ship there" 30;
         place_loop game i dir)
 
-let create_num_remaining_arr p =
+let create_num_remaining_lst p =
   let car_num = carrier_num - num_placed p carrier
   and des_num = destroyer_num - num_placed p destroyer
   and sub_num = submarine_num - num_placed p submarine
   and pat_num = patrol_num - num_placed p patrol in
-  [|
+  [
     (carrier, car_num);
     (destroyer, des_num);
     (submarine, sub_num);
     (patrol, pat_num);
-  |]
+  ]
 
 (** [placing_loop g p d] waits for player 1 if [p] is true, player 2 otherwise,
     to press the button for which ship they will place and then allows them to
@@ -221,7 +221,7 @@ and reset game dir =
 
 and auto_place game dir =
   let curr_p = get_curr_player !game in
-  let new_p = create_placements (create_num_remaining_arr curr_p) curr_p in
+  let new_p = create_placements (create_num_remaining_lst curr_p) curr_p in
   begin
     match is_player_1 !game curr_p with
     | true -> game := make_game new_p (get_player !game false) true
@@ -257,7 +257,7 @@ let rec play_loop game =
   if st.key == 'q' then quit ()
   else if button_bound_check (680, 780) (400, 460) st then (
     game :=
-      make_game player (init_player AI |> create_placements ship_num_arr) true;
+      make_game player (init_player AI |> create_placements ship_num_lst) true;
     clear_graph ();
     home ();
     state := START)

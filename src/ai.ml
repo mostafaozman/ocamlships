@@ -42,7 +42,7 @@ module type ArtIntelligence = sig
 end
 
 (* ############################## Easy AI ################################### *)
-let rec create_placements (arr : (int * int) array) (player : player) : player =
+let rec create_placements (lst : (int * int) list) (player : player) : player =
   let rec helper (sz : int) (p : player) =
     try
       place_ship p (init_ship sz)
@@ -55,7 +55,7 @@ let rec create_placements (arr : (int * int) array) (player : player) : player =
     | 0 -> acc
     | _ -> loop (helper len acc |> snd) (len, num - 1)
   in
-  A.fold_left (fun acc (len, num) -> loop acc (len, num)) player arr
+  List.fold_left (fun acc (len, num) -> loop acc (len, num)) player lst
 
 (** [gen_array p] generates a sorted array in ascending order out of player
     [p]'s board coordinates. *)
@@ -291,7 +291,7 @@ module Make (D : Diff) (P : Player) : ArtIntelligence = struct
       {
         low_priority_stack = S.empty;
         high_priority_stack = S.empty;
-        num_remaining = A.copy ship_num_arr;
+        num_remaining = A.of_list ship_num_lst;
       }
     else
       let shuffled_stack = shuffle P.player |> S.of_array in

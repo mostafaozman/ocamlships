@@ -9,13 +9,13 @@ let submarine_num = 2
 let patrol_num = 3
 let total_ships = carrier_num + destroyer_num + submarine_num + patrol_num
 
-let ship_num_arr =
-  [|
+let ship_num_lst =
+  [
     (carrier, carrier_num);
     (destroyer, destroyer_num);
     (submarine, submarine_num);
     (patrol, patrol_num);
-  |]
+  ]
 
 let box_size = 58
 let box_off = 5

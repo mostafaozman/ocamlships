@@ -20,7 +20,7 @@ let game = make_game player ai true
 (* Ai inits *)
 module AI = Make ((val gen_diff_module Hard)) ((val gen_player_module player))
 
-let placed_player = create_placements ship_num_arr player
+let placed_player = create_placements ship_num_lst player
 let coords, player_w_ship_horz = place_ship player !ship2 (3, 2) true
 let coords2, player_w_ship_vert = place_ship player !ship2 (3, 2) false
 

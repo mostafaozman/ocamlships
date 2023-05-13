@@ -31,9 +31,9 @@ val gen_diff_module : difficulty -> (module Diff)
 val gen_player_module : player -> (module Player)
 (** [gen_player_module p] is a first-class Player module with player set to [p]. *)
 
-val create_placements : (int * int) array -> player -> player
-(** [create_placements arr p] is [p] with their board occupied by the number of
-    ships specified in [arr]. Requires: The elements of [arr] are tuples whose
+val create_placements : (int * int) list -> player -> player
+(** [create_placements lst p] is [p] with their board occupied by the number of
+    ships specified in [lst]. Requires: The elements of [lst] are tuples whose
     first element is the length of the ship and second element is the number of
     that ship to place. *)
 
