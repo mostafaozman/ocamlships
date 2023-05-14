@@ -264,10 +264,6 @@ let shoot_hard ai p =
 
 (* ########################## Impossible AI ################################# *)
 
-let is_ship_cell = function
-  | Ship _ -> true
-  | _ -> false
-
 let ship_coord_stack p =
   let board = get_player_board p in
   fold

@@ -93,6 +93,17 @@ val is_game_over : player -> bool
 val set_board : player -> board -> player
 (** [set_board b p] is player [p] with their board set to [b]. *)
 
+val is_ship_cell : cell -> bool
+(** [is_ship c] is whether [c] is a ship cell or not. *)
+
 val get_all_ship_coords : player -> (int * int) list
 (** [get_all_ship_coords p] is all the coordinates on [p]'s board that have a
     ship on them. *)
+
+val get_same_refs : board -> ship ref -> ((int * int) * cell) list
+(** [get_same_refs b s] is all the coordinates and their corresponding cells on
+    board [b] that have a ship which shares a memory location with [s]. *)
+
+val set_empty : (int * int) list -> player -> player
+(** [set_empty p lst] is [p] with all the coordinates of their board in [lst]
+    set to Empty. *)

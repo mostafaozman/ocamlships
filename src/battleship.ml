@@ -221,6 +221,10 @@ let get_all_ship_coords p =
 
 let empty_player_board p = { p with board = init_board () }
 
+let is_ship_cell = function
+  | Ship _ -> true
+  | _ -> false
+
 let placed_ready player =
   carrier_num = num_placed player carrier
   && destroyer_num = num_placed player destroyer
@@ -232,3 +236,10 @@ let is_game_over player =
   && num_placed player destroyer = 0
   && num_placed player submarine = 0
   && num_placed player patrol = 0
+
+let set_empty lst p =
+  let board = p.board in
+  let new_b =
+    List.fold_left (fun acc (x, y) -> insert (x, y) Empty acc) board lst
+  in
+  { p with board = new_b }

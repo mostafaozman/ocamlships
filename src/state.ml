@@ -194,6 +194,41 @@ let rec placing_loop game dir =
   else if (* Length 2 ship *)
           button_bound_check (501, 651) (60, 100) st then
     ship_placer game dir patrol
+  else if
+    (* Clicking board to remove ship. *)
+    button_bound_check
+      (background_llx, background_llx + background_length)
+      (background_lly, background_lly + background_length)
+      st
+  then remove_ship game st
+
+and remove_ship game st =
+  let tup = convert st.mouse_x st.mouse_y in
+  let extracted_coord =
+    match tup with
+    | None -> raise (failwith "Not possible")
+    | Some (x, y) -> (x, y)
+  in
+  let curr_p = get_curr_player !game in
+  let p_board = get_player_board curr_p in
+  let cell = get_cell p_board extracted_coord in
+  match cell with
+  | Ship { ship } ->
+      let same_ship_coords, same_ship_cells =
+        get_same_refs p_board ship |> List.split
+      in
+      update_cells ocean_blue same_ship_coords;
+      if is_player_1 !game curr_p then
+        game :=
+          make_game
+            (curr_p |> set_empty same_ship_coords)
+            (get_player !game false) true
+      else
+        game :=
+          make_game (get_player !game true)
+            (curr_p |> set_empty same_ship_coords)
+            false
+  | _ -> ()
 
 and rotate game dir =
   write 295 760 black "Rotate!" 30;
@@ -298,15 +333,13 @@ and gui_fire game x y =
       | ShipHit -> update_cells quit_red coords
       | ShipMissed -> update_cells logo_wht coords
       | ShipSunk -> update_cells piss_yellow coords);
-      if is_game_over new_opp then (
-        gg_go_next game true)
+      if is_game_over new_opp then gg_go_next game true
       else game := make_game shooter new_opp true;
       (* AI's turn to shoot *)
       if not (!state = GAMEOVER) then (
         let open (val !ai) in
         let c, new_self, _ = shoot shooter in
-        if is_game_over new_self then (
-          gg_go_next game false)
+        if is_game_over new_self then gg_go_next game false
         else game := make_game new_self new_opp true;
         last_hit := Some (List.hd c))
 
