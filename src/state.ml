@@ -369,14 +369,16 @@ let game_over_loop game =
   else if button_bound_check (290, 510) (150, 230) st then quit ()
 
 let rec main () =
-  if !state = START then start_loop game
-  else if !state = INSTRUCTIONS then instructions_loop game
-  else if !state = PLACING then placing_loop game true
-  else if !state = PLAY then play_loop game
-  else if !state = PEEK then peek_loop game
-  else if !state = GAMEOVER then game_over_loop game;
+  try
+    if !state = START then start_loop game
+    else if !state = INSTRUCTIONS then instructions_loop game
+    else if !state = PLACING then placing_loop game true
+    else if !state = PLAY then play_loop game
+    else if !state = PEEK then peek_loop game
+    else if !state = GAMEOVER then game_over_loop game;
 
-  main ()
+    main ()
+  with Graphic_failure _ -> exit 0
 
 let start () =
   let _ = open_graph " 800x800" in
