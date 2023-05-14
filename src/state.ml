@@ -228,7 +228,10 @@ and remove_ship game st =
           make_game (get_player !game true)
             (curr_p |> set_empty same_ship_coords)
             false
-  | _ -> ()
+  | Empty -> ()
+  | Sunk _ -> raise (failwith "Sunk impossible")
+  | Hit _ -> raise (failwith "Hit impossible")
+  | Miss -> raise (failwith "Miss impossible")
 
 and rotate game dir =
   write 295 760 black "Rotate!" 30;
@@ -249,11 +252,8 @@ and ready game dir =
       go_play game
   | true, false ->
       if curr_is_player_1 then game := make_game curr_player enemy false
-      else game := make_game enemy curr_player true;
-      placing_loop game dir
-  | _ ->
-      write 200 760 black "Place all ships to start!" 30;
-      placing_loop game dir
+      else game := make_game enemy curr_player true
+  | _ -> write 200 760 black "Place all ships to start!" 30
 
 and reset game dir =
   let curr_p = get_curr_player !game in
@@ -267,8 +267,7 @@ and reset game dir =
           make_game (get_player !game true) (empty_player_board curr_p) false
   end;
   let curr_p = get_curr_player !game in
-  draw_player_board true curr_p;
-  placing_loop game dir
+  draw_player_board true curr_p
 
 and auto_place game dir =
   let curr_p = get_curr_player !game in
@@ -279,8 +278,7 @@ and auto_place game dir =
     | false -> game := make_game (get_player !game true) new_p false
   end;
   let to_update = get_all_ship_coords new_p in
-  update_cells green to_update;
-  placing_loop game dir
+  update_cells green to_update
 
 and ship_placer game dir ship_length =
   let curr_p = get_curr_player !game in
