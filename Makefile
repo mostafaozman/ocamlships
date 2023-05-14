@@ -32,3 +32,7 @@ bisect: bisect-clean
 
 bisect-clean:
 	rm -rf _coverage bisect*.coverage
+
+loc:
+	make clean
+	cloc --by-file --include-lang=OCaml .
