@@ -1,3 +1,5 @@
+(** Draw is the module that handles drawing onto a Graphics window. *)
+
 open Graphics
 open Battleship
 
