@@ -52,6 +52,7 @@ let quit () = exit 0
 let go_start () =
   clear_graph ();
   home ();
+  last_hit := None;
   game :=
     make_game (init_player Player)
       (init_player AI |> create_placements ship_num_lst)
@@ -268,7 +269,6 @@ and ship_placer game dir ship_length =
 let rec play_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
-  draw_fire_screen game;
   if st.key == 'q' then go_start ()
   else if button_bound_check (680, 780) (694, 744) st then (
     game :=
@@ -299,16 +299,14 @@ and gui_fire game x y =
       | ShipMissed -> update_cells logo_wht coords
       | ShipSunk -> update_cells piss_yellow coords);
       if is_game_over new_opp then (
-        gg_go_next game true;
-        print_endline "Game Over, You win")
+        gg_go_next game true)
       else game := make_game shooter new_opp true;
       (* AI's turn to shoot *)
       if not (!state = GAMEOVER) then (
         let open (val !ai) in
         let c, new_self, _ = shoot shooter in
         if is_game_over new_self then (
-          gg_go_next game false;
-          print_endline "Game Over, AI wins")
+          gg_go_next game false)
         else game := make_game new_self new_opp true;
         last_hit := Some (List.hd c))
 

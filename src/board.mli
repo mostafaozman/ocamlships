@@ -64,6 +64,8 @@ val to_list : board -> ((int * int) * cell) list
 (** [to_list d] is [d] as a sorted a association list. *)
 
 val of_map : ('a * 'b, 'c) Hashtbl.t -> ('a * 'b, 'c) rbtree
+(** [of_map m] makes a red-black tree with nodes containing the bindings of [m].*)
 
 val string_of_tree :
   ('a -> string) -> ('b -> string) -> ('a, 'b) rbtree -> string
+(** [string_of_tree] is the string representation of a tree. *)

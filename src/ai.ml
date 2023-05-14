@@ -248,22 +248,17 @@ let shoot_hard ai p =
       new_map
       (-1, (-1, -1))
   in
-  print_newline ();
-  print_endline (of_map new_map |> string_of_tree string_of_coord string_of_int);
   let coords, p, result = fire p x y in
 
-  if result = ShipSunk then (
-    let len_of_ship =
-      match get_cell (get_player_board p) (List.hd coords) with
-      | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
-      | Sunk { ship } -> !ship.length
-    in
-    let index = index_in_list len_of_ship (A.to_list ai.num_remaining) in
-    ai.num_remaining.(index) <-
-      (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1);
-    print_endline
-      (ai.num_remaining |> A.to_list |> List.map string_of_coord
-     |> String.concat ";"));
+  (if result = ShipSunk then
+   let len_of_ship =
+     match get_cell (get_player_board p) (List.hd coords) with
+     | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
+     | Sunk { ship } -> !ship.length
+   in
+   let index = index_in_list len_of_ship (A.to_list ai.num_remaining) in
+   ai.num_remaining.(index) <-
+     (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1));
 
   (coords, p, result)
 
