@@ -7,7 +7,6 @@ let carrier_num = 1
 let destroyer_num = 1
 let submarine_num = 2
 let patrol_num = 1
-let total_ships = carrier_num + destroyer_num + submarine_num + patrol_num
 
 let ship_num_lst =
   [

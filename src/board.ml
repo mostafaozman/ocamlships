@@ -90,31 +90,6 @@ let rec fold f acc d =
   | Node (_, (k, v), l, r) -> fold f (f k v (fold f acc l)) r
 
 let to_list d = fold (fun k v acc -> (k, v) :: acc) [] d |> List.rev
-
-let init_board () =
-  let rec helper_y y acc =
-    let rec helper_x x acc =
-      match x with
-      | -1 -> acc
-      | _ -> helper_x (x - 1) (insert (x, y) Empty acc)
-    in
-    match y with
-    | -1 -> acc
-    | _ -> helper_y (y - 1) (fold insert acc (helper_x (board_size - 1) empty))
-  in
-  helper_y (board_size - 1) empty
-
-let init_ship length = { length }
-
-let string_of_coord (x, y) =
-  let buff = Buffer.create 10 in
-  Buffer.add_char buff '(';
-  buff +^+ string_of_int x;
-  Buffer.add_char buff ',';
-  buff +^+ string_of_int y;
-  Buffer.add_char buff ')';
-  Buffer.contents buff
-
 let of_map m = Hashtbl.fold insert m empty
 
 let string_of_tree fk fv b =
@@ -131,3 +106,34 @@ let string_of_tree fk fv b =
       () b
   in
   Buffer.contents buff
+
+let init_ship length = { length }
+
+let init_board () =
+  let rec helper_y y acc =
+    let rec helper_x x acc =
+      match x with
+      | -1 -> acc
+      | _ -> helper_x (x - 1) (insert (x, y) Empty acc)
+    in
+    match y with
+    | -1 -> acc
+    | _ -> helper_y (y - 1) (fold insert acc (helper_x (board_size - 1) empty))
+  in
+  helper_y (board_size - 1) empty
+
+let string_of_coord (x, y) =
+  let buff = Buffer.create 10 in
+  Buffer.add_char buff '(';
+  buff +^+ string_of_int x;
+  Buffer.add_char buff ',';
+  buff +^+ string_of_int y;
+  Buffer.add_char buff ')';
+  Buffer.contents buff
+
+let string_of_cell = function
+  | Ship { ship } -> "Ship of length" ^ string_of_int !ship.length
+  | Sunk { ship } -> "Sunken ship of length" ^ string_of_int !ship.length
+  | Hit { ship } -> "Hit ship of length" ^ string_of_int !ship.length
+  | Empty -> "Empty"
+  | Miss -> "Miss"
