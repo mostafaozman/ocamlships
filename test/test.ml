@@ -16,6 +16,7 @@ let board2 = init_board () |> insert (2, 2) (Ship { ship })
 (* Battleships inits *)
 let ai = init_player AI
 let player = init_player Player
+let player2 = set_board (init_player Player) board2
 let game = make_game player ai true
 
 (* Ai inits *)
@@ -157,6 +158,15 @@ let battleship_tests =
     (* get_player_board tests: 1 *)
     ( "players board is empty" >:: fun _ ->
       assert_equal board (get_player_board player) );
+    ( "player2 board is board2" >:: fun _ ->
+      assert_equal board2 (get_player_board player2) );
+    (* is_player_1 tests: 2*)
+    ( "is_player1 for player on game is true" >:: fun _ ->
+      assert_equal true (is_player_1 game player) );
+    ( "is_player1 for ai on game is false" >:: fun _ ->
+      assert_equal false (is_player_1 game ai) );
+    (* get_curr_player test: 2 *)
+
     (* get_cells tests: 4 *)
     ( "get_cell on empty board is empty" >:: fun _ ->
       assert_equal Empty (get_cell board (2, 2)) );
