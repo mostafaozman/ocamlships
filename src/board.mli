@@ -12,6 +12,17 @@ type cell =
   | Sunk of { ship : ship ref }
   | Miss
 
+(** The type representing the color of a node in a rbtree. *)
+type color =
+  | Red
+  | Black
+
+(** The type representing a red-black tree. It satisfies all Red-Black tree
+    invariants. *)
+type ('k, 'v) rbtree =
+  | Node of color * ('k * 'v) * ('k, 'v) rbtree * ('k, 'v) rbtree
+  | Leaf
+
 type board
 (** The type representing the board of a game of Battleship. *)
 
@@ -51,3 +62,8 @@ val fold : (int * int -> cell -> 'a -> 'a) -> 'a -> board -> 'a
 
 val to_list : board -> ((int * int) * cell) list
 (** [to_list d] is [d] as a sorted a association list. *)
+
+val of_map : ('a * 'b, 'c) Hashtbl.t -> ('a * 'b, 'c) rbtree
+
+val string_of_tree :
+  ('a -> string) -> ('b -> string) -> ('a, 'b) rbtree -> string

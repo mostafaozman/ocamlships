@@ -248,6 +248,8 @@ let shoot_hard ai p =
       new_map
       (-1, (-1, -1))
   in
+  print_newline ();
+  print_endline (of_map new_map |> string_of_tree string_of_coord string_of_int);
   let coords, p, result = fire p x y in
 
   if result = ShipSunk then (
