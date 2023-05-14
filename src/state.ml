@@ -123,6 +123,10 @@ let instructions_loop game =
     go_place !game;
     draw_placing_screen (get_curr_player !game))
 
+let reset_direction_drawing () =
+  draw_rect white 320 20 200 30;
+  write 340 20 black horiz 30
+
 (** [place_loop g i dir] draws the board of the current player in [g] as they
     attempt to place a ship of length [i] facing direction [dir]. *)
 let rec place_loop game i dir =
@@ -144,7 +148,8 @@ let rec place_loop game i dir =
           game := make_game updated_player (get_player !game false) true;
           update_cells green ship_coords)
         else game := make_game (get_player !game true) updated_player false;
-        update_cells green ship_coords
+        update_cells green ship_coords;
+        reset_direction_drawing ()
       with e ->
         write 200 760 black "Can't place ship there" 30;
         place_loop game i dir)
@@ -168,7 +173,7 @@ let create_num_remaining_lst p =
 let rec placing_loop game dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
-  draw_placing_screen (get_curr_player !game);
+  draw_rect white 0 755 800 45;
   if st.key == 'q' then quit ()
   else if (* Check for rotation *)
           button_bound_check (680, 780) (360, 410) st
@@ -235,6 +240,12 @@ and remove_ship game st =
 
 and rotate game dir =
   write 295 760 black "Rotate!" 30;
+  draw_rect white 320 20 200 30;
+  begin
+    match dir with
+    | true -> write 340 20 black vert 30
+    | false -> write 340 20 black horiz 30
+  end;
   placing_loop game (not dir)
 
 and ready game dir =
@@ -267,7 +278,8 @@ and reset game dir =
           make_game (get_player !game true) (empty_player_board curr_p) false
   end;
   let curr_p = get_curr_player !game in
-  draw_player_board true curr_p
+  draw_player_board true curr_p;
+  reset_direction_drawing ()
 
 and auto_place game dir =
   let curr_p = get_curr_player !game in
@@ -278,7 +290,8 @@ and auto_place game dir =
     | false -> game := make_game (get_player !game true) new_p false
   end;
   let to_update = get_all_ship_coords new_p in
-  update_cells green to_update
+  update_cells green to_update;
+  reset_direction_drawing ()
 
 and ship_placer game dir ship_length =
   let curr_p = get_curr_player !game in
@@ -291,11 +304,10 @@ and ship_placer game dir ship_length =
   in
   if num_placed curr_p ship_length < ship_num then
     place_loop game ship_length dir
-  else (
+  else
     write 170 760 black
       ("Max length " ^ string_of_int ship_length ^ " ships on board")
-      30;
-    placing_loop game dir)
+      30
 
 (** [play_loop g] allows the current player in game [g] to fire at the opponents
     board *)
