@@ -214,8 +214,10 @@ let monte_carlo_sim ai player board =
   let placing_p = sanitize_for_placing sanitized_player in
   A.iter
     (fun (len, num) ->
-      if num <> 0 then sim_helper sanitized_player placing_p len true map;
-      sim_helper sanitized_player placing_p len false map)
+      if num <> 0 then (
+        sim_helper sanitized_player placing_p len true map;
+        sim_helper sanitized_player placing_p len false map)
+      else ())
     ai.num_remaining;
   map
 
