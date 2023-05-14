@@ -1,3 +1,6 @@
+(** Board is the module handling all aspects of a battleship game's board. It
+    enables client to create board's that respond to player interaction. *)
+
 type ship = { length : int }
 (** The type representing a ship. *)
 

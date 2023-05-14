@@ -1,3 +1,7 @@
+(** Battleship is the module responsible for the logic of the battleship game.
+    It implements placing, firing, and all interaction a player could have with
+    the game. *)
+
 open Board
 
 (** type representing whether a player is an AI or not. *)
