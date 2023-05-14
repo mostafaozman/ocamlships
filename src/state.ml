@@ -270,7 +270,7 @@ let rec play_loop game =
   synchronize ();
   draw_fire_screen game;
   if st.key == 'q' then go_start ()
-  else if button_bound_check (680, 780) (400, 460) st then (
+  else if button_bound_check (680, 780) (694, 744) st then (
     game :=
       make_game player (init_player AI |> create_placements ship_num_lst) true;
     clear_graph ();

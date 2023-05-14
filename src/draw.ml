@@ -80,6 +80,21 @@ let draw_peek self p last =
   write 230 755 black "Your Board" 35;
   draw_player_board self p;
 
+  write 695 554 black "Key:" 40;
+
+  draw_rect piss_yellow 680 (614 - 150) 100 60;
+  write 695 474 black "Sunk" 40;
+
+  draw_rect quit_red 680 (534 - 150) 100 60;
+  write 695 394 black "Hit" 40;
+
+  draw_rect black 680 (454 - 150) 100 60;
+  draw_rect white 683 (454 - 147) 94 54;
+  write 695 314 black "Miss" 40;
+
+  draw_rect purple 680 (374 - 150) 100 60;
+  write 685 238 white "Last Hit" 25;
+
   begin
     match last with
     | None -> ()
@@ -140,8 +155,20 @@ let draw_fire_screen game =
     | false -> draw_player_board false (get_player !game true)
   end;
 
-  draw_rect quit_red 680 400 100 60;
-  write 695 410 white "Quit" 40;
+  draw_rect quit_red 680 694 100 60;
+  write 695 704 white "Quit" 40;
+
+  write 695 554 black "Key:" 40;
+
+  draw_rect piss_yellow 680 (614 - 150) 100 60;
+  write 695 474 black "Sunk" 40;
+
+  draw_rect quit_red 680 (534 - 150) 100 60;
+  write 695 394 black "Hit" 40;
+
+  draw_rect black 680 (454 - 150) 100 60;
+  draw_rect white 683 (454 - 147) 94 54;
+  write 695 314 black "Miss" 40;
 
   write 325 50 black "Fire!" 40;
 
