@@ -22,13 +22,14 @@ let draw_cell color x y =
     (background_tly - (box_size + box_off) - ((box_size + box_off) * y))
     box_size box_size
 
-(** [parameterize_string s p] is [s] with all substring that match the first
-    element of a tuple in [p] replaced by the second element of that tuple. *)
-let parameterize_string s pair_list =
+(** [parameterize_string s f p] is [s] with all substring that match the first
+    element of a tuple in [p] replaced by the second element of that tuple after
+    it has been converted to a string by [f]. *)
+let parameterize_string s f pair_list =
   List.fold_left
-    (fun acc (to_match, str) ->
+    (fun acc (to_match, elem) ->
       let regex = Str.regexp_string to_match in
-      Str.global_replace regex str acc)
+      Str.global_replace regex (f elem) acc)
     s pair_list
 
 let draw_instructions () =
@@ -36,16 +37,16 @@ let draw_instructions () =
     "- You must place: %nc len %c, %nd len %d, %ns len %s, and %np len %p"
   in
   let paramerized_string =
-    parameterize_string you_must
+    parameterize_string you_must string_of_int
       [
-        ("%nc", string_of_int carrier_num);
-        ("%c", string_of_int carrier);
-        ("%nd", string_of_int destroyer_num);
-        ("%d", string_of_int destroyer);
-        ("%ns", string_of_int submarine_num);
-        ("%s", string_of_int submarine);
-        ("%np", string_of_int patrol_num);
-        ("%p", string_of_int patrol);
+        ("%nc", carrier_num);
+        ("%c", carrier);
+        ("%nd", destroyer_num);
+        ("%d", destroyer);
+        ("%ns", submarine_num);
+        ("%s", submarine);
+        ("%np", patrol_num);
+        ("%p", patrol);
       ]
   in
   draw_rect white 0 0 800 800;
