@@ -49,6 +49,15 @@ let draw_instructions () =
   draw_rect purple 290 150 220 80;
   write 300 170 white "Impossible" 40
 
+let draw_game_over game b =
+  draw_rect black 0 0 800 800;
+  draw_rect go_green 290 50 220 80;
+  write 310 70 white "Play Again" 40;
+  draw_rect quit_red 290 150 220 80;
+  write 370 170 white "Quit" 40;
+  if b then write 110 450 red "PLAYER ONE WINS!" 80
+  else write 110 450 red "PLAYER TWO WINS!" 80
+
 let draw_player_board self p =
   draw_rect black background_llx background_lly background_length
     background_length;
@@ -137,7 +146,7 @@ let draw_fire_screen game =
   write 325 50 black "Fire!" 40;
 
   draw_rect go_green 600 20 175 60;
-  write 610 25 white "Continue" 40;
+  write 650 25 white "Peek" 40;
 
   write 230 755 black "AI's Board" 35
 

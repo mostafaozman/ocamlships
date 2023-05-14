@@ -48,6 +48,16 @@ let quit () = exit 0
 
 (** [go_place g] changes state to PLACING and draws the board of player 1 in
     [g]. *)
+
+let go_start () =
+  clear_graph ();
+  home ();
+  game :=
+    make_game (init_player Player)
+      (init_player AI |> create_placements ship_num_lst)
+      true;
+  state := START
+
 let go_place game =
   state := PLACING;
   clear_graph ();
@@ -57,15 +67,20 @@ let go_instructions game =
   state := INSTRUCTIONS;
   draw_instructions ()
 
-let go_play game =
+let go_play g =
   state := PLAY;
   clear_graph ();
-  draw_fire_screen game
+  draw_fire_screen g
 
 let go_peek g =
   state := PEEK;
   let curr_player = get_curr_player !g in
   draw_peek true curr_player !last_hit
+
+let gg_go_next g b =
+  state := GAMEOVER;
+  clear_graph ();
+  draw_game_over g b
 
 (** [start_loop g] is the start screen of game [g]. *)
 let start_loop game =
@@ -254,13 +269,12 @@ let rec play_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   draw_fire_screen game;
-  if st.key == 'q' then quit ()
+  if st.key == 'q' then go_start ()
   else if button_bound_check (680, 780) (400, 460) st then (
     game :=
       make_game player (init_player AI |> create_placements ship_num_lst) true;
     clear_graph ();
-    home ();
-    state := START)
+    go_start ())
   else if
     button_bound_check
       (background_llx, background_llx + background_length)
@@ -285,7 +299,7 @@ and gui_fire game x y =
       | ShipMissed -> update_cells logo_wht coords
       | ShipSunk -> update_cells piss_yellow coords);
       if is_game_over new_opp then (
-        state := GAMEOVER;
+        gg_go_next game true;
         print_endline "Game Over, You win")
       else game := make_game shooter new_opp true;
       (* AI's turn to shoot *)
@@ -293,7 +307,7 @@ and gui_fire game x y =
         let open (val !ai) in
         let c, new_self, _ = shoot shooter in
         if is_game_over new_self then (
-          state := GAMEOVER;
+          gg_go_next game false;
           print_endline "Game Over, AI wins")
         else game := make_game new_self new_opp true;
         last_hit := Some (List.hd c))
@@ -304,12 +318,22 @@ let peek_loop game =
   if st.key == 'q' then quit ()
   else if button_bound_check (600, 775) (20, 80) st then go_play game
 
+let game_over_loop game =
+  let st = wait_next_event [ Button_down; Key_pressed ] in
+  synchronize ();
+  if st.key == 'q' then quit ()
+  else if (* Check for new game *)
+          button_bound_check (290, 510) (50, 130) st
+  then go_start ()
+  else if button_bound_check (290, 510) (150, 230) st then quit ()
+
 let rec main () =
   if !state = START then start_loop game
   else if !state = INSTRUCTIONS then instructions_loop game
   else if !state = PLACING then placing_loop game true
   else if !state = PLAY then play_loop game
-  else if !state = PEEK then peek_loop game;
+  else if !state = PEEK then peek_loop game
+  else if !state = GAMEOVER then game_over_loop game;
 
   main ()
 
