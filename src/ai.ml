@@ -250,26 +250,19 @@ let shoot_hard ai p =
   in
   let coords, p, result = fire p x y in
 
-  if result = ShipSunk then (
-    let len_of_ship =
-      match get_cell (get_player_board p) (List.hd coords) with
-      | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
-      | Sunk { ship } -> !ship.length
-    in
-    let index = index_in_list len_of_ship (A.to_list ai.num_remaining) in
-    ai.num_remaining.(index) <-
-      (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1);
-    print_endline
-      (ai.num_remaining |> A.to_list |> List.map string_of_coord
-     |> String.concat ";"));
+  (if result = ShipSunk then
+   let len_of_ship =
+     match get_cell (get_player_board p) (List.hd coords) with
+     | Empty | Hit _ | Miss | Ship _ -> raise (invalid_arg "Not sunk")
+     | Sunk { ship } -> !ship.length
+   in
+   let index = index_in_list len_of_ship (A.to_list ai.num_remaining) in
+   ai.num_remaining.(index) <-
+     (fst ai.num_remaining.(index), snd ai.num_remaining.(index) - 1));
 
   (coords, p, result)
 
 (* ########################## Impossible AI ################################# *)
-
-let is_ship_cell = function
-  | Ship _ -> true
-  | _ -> false
 
 let ship_coord_stack p =
   let board = get_player_board p in

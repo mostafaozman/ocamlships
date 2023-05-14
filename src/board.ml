@@ -114,3 +114,20 @@ let string_of_coord (x, y) =
   buff +^+ string_of_int y;
   Buffer.add_char buff ')';
   Buffer.contents buff
+
+let of_map m = Hashtbl.fold insert m empty
+
+let string_of_tree fk fv b =
+  let buff = Buffer.create (size b) in
+  let _ =
+    fold
+      (fun k v () ->
+        buff +^+ "(";
+        buff +^+ fk k;
+        buff +^+ ":";
+        buff +^+ fv v;
+        buff +^+ " )";
+        buff +^+ ",")
+      () b
+  in
+  Buffer.contents buff
