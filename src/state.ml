@@ -133,6 +133,8 @@ let rec place_loop game i dir =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
   draw_placing_screen (get_curr_player !game);
+  draw_rect white 320 20 200 30;
+  write 340 20 black (if dir then horiz else vert) 30;
   let tup = convert st.mouse_x st.mouse_y in
   match tup with
   | None ->
@@ -232,8 +234,9 @@ and remove_ship game st =
         game :=
           make_game (get_player !game true)
             (curr_p |> set_empty same_ship_coords)
-            false
-  | Empty -> ()
+            false;
+      reset_direction_drawing ()
+  | Empty -> reset_direction_drawing ()
   | Sunk _ -> raise (failwith "Sunk impossible")
   | Hit _ -> raise (failwith "Hit impossible")
   | Miss -> raise (failwith "Miss impossible")
