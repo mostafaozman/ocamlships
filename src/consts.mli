@@ -84,3 +84,9 @@ val intersect_weight : int
 
 val ( +^+ ) : Buffer.t -> string -> unit
 (**[a +^+ b] adds [b] to buffer [a]*)
+
+val horiz : string
+(**[horiz] string of th unicode → *)
+
+val vert : string
+(**[vert] string of th unicode ↑ *)

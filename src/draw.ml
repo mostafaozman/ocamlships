@@ -150,7 +150,9 @@ let draw_placing_screen player =
   write 366 74 white "Length 3 ship" 15;
 
   draw_rect quit_red 501 60 150 40;
-  write 526 74 white "Length 2 ship" 15
+  write 526 74 white "Length 2 ship" 15;
+
+  write 180 20 black ("Direction: " ^ horiz) 30
 
 let draw_fire_screen game =
   let curr_player = get_curr_player !game in
