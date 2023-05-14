@@ -148,7 +148,7 @@ let sanitize_for_placing player =
   set_board player b
 
 (** [sanitize player] is [player] with Ship cells labeled as Empty. This is to
-    prevent the AI from cheating. *)
+    prevent the AI from cheating . *)
 let sanitize player =
   let b =
     fold
