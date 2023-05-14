@@ -2,6 +2,7 @@ open Graphics
 open Consts
 open Battleship
 open Board
+module Str = Str
 
 let write mv_x mv_y color string size =
   set_font
@@ -21,7 +22,32 @@ let draw_cell color x y =
     (background_tly - (box_size + box_off) - ((box_size + box_off) * y))
     box_size box_size
 
+(** [parameterize_string s p] is [s] with all substring that match the first
+    element of a tuple in [p] replaced by the second element of that tuple. *)
+let parameterize_string s pair_list =
+  List.fold_left
+    (fun acc (to_match, str) ->
+      let regex = Str.regexp_string to_match in
+      Str.global_replace regex str acc)
+    s pair_list
+
 let draw_instructions () =
+  let you_must =
+    "- You must place: %nc len %c, %nd len %d, %ns len %s, and %np len %p"
+  in
+  let paramerized_string =
+    parameterize_string you_must
+      [
+        ("%nc", string_of_int carrier_num);
+        ("%c", string_of_int carrier);
+        ("%nd", string_of_int destroyer_num);
+        ("%d", string_of_int destroyer);
+        ("%ns", string_of_int submarine_num);
+        ("%s", string_of_int submarine);
+        ("%np", string_of_int patrol_num);
+        ("%p", string_of_int patrol);
+      ]
+  in
   draw_rect white 0 0 800 800;
   draw_rect go_green 290 50 220 80;
   write 325 70 white "Continue" 40;
@@ -33,8 +59,7 @@ let draw_instructions () =
   write 30 625 black "- Ships are placed horizontally by default" 25;
   write 30 595 black "- Rotate a ship by clicking the rotate button then a ship"
     25;
-  write 30 565 black "- You must place: 1 len 5, 1 len 4, 2 len 3, and 3 len 2"
-    25;
+  write 30 565 black paramerized_string 25;
   write 30 535 black
     "- After placing ships, click the ready button to start the game" 25;
   write 30 505 black
