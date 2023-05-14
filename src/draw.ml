@@ -82,18 +82,23 @@ let draw_peek self p last =
 
   write 695 554 black "Key:" 40;
 
-  draw_rect piss_yellow 680 (614 - 150) 100 60;
-  write 695 474 black "Sunk" 40;
+  draw_rect black 680 464 50 50;
+  draw_rect piss_yellow 685 469 40 40;
+  write 735 474 black "Sunk" 30;
 
-  draw_rect quit_red 680 (534 - 150) 100 60;
-  write 695 394 black "Hit" 40;
+  draw_rect black 680 384 50 50;
+  draw_rect quit_red 685 389 40 40;
+  write 735 394 black "Hit" 30;
 
-  draw_rect black 680 (454 - 150) 100 60;
-  draw_rect white 683 (454 - 147) 94 54;
-  write 695 314 black "Miss" 40;
+  draw_rect black 680 304 50 50;
+  draw_rect white 685 309 40 40;
+  write 735 314 black "Miss" 30;
 
-  draw_rect purple 680 (374 - 150) 100 60;
-  write 685 238 white "Last Hit" 25;
+  draw_rect black 680 224 50 50;
+  draw_rect white 685 229 40 40;
+  write 695 225 purple "X" 50;
+  write 735 248 black "Last" 20;
+  write 735 228 black "Hit" 20;
 
   begin
     match last with
@@ -110,7 +115,7 @@ let draw_peek self p last =
   end;
 
   draw_rect quit_red 600 20 175 60;
-  write 610 25 white "< Back" 40
+  write 610 30 white "< Back" 40
 
 let home () =
   draw_rect go_green 200 300 400 125;
@@ -160,15 +165,17 @@ let draw_fire_screen game =
 
   write 695 554 black "Key:" 40;
 
-  draw_rect piss_yellow 680 (614 - 150) 100 60;
-  write 695 474 black "Sunk" 40;
+  draw_rect black 680 464 50 50;
+  draw_rect piss_yellow 685 469 40 40;
+  write 735 474 black "Sunk" 30;
 
-  draw_rect quit_red 680 (534 - 150) 100 60;
-  write 695 394 black "Hit" 40;
+  draw_rect black 680 384 50 50;
+  draw_rect quit_red 685 389 40 40;
+  write 735 394 black "Hit" 30;
 
-  draw_rect black 680 (454 - 150) 100 60;
-  draw_rect white 683 (454 - 147) 94 54;
-  write 695 314 black "Miss" 40;
+  draw_rect black 680 304 50 50;
+  draw_rect white 685 309 40 40;
+  write 735 314 black "Miss" 30;
 
   write 325 50 black "Fire!" 40;
 

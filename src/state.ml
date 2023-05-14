@@ -268,7 +268,6 @@ and ship_placer game dir ship_length =
 let rec play_loop game =
   let st = wait_next_event [ Button_down; Key_pressed ] in
   synchronize ();
-  draw_fire_screen game;
   if st.key == 'q' then go_start ()
   else if button_bound_check (680, 780) (694, 744) st then (
     game :=
