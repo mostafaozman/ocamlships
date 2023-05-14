@@ -45,3 +45,5 @@ val of_array : 'a array -> 'a t
     element of [arr] is the topmost element of the stack. *)
 
 val string_of_stack : ('a -> string) -> 'a t -> string
+(** [string_of_stack f t] is a string representation of t. Requires f is a
+    to_string function for the type of elements in t *)

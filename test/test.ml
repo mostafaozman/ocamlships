@@ -6,7 +6,7 @@ open Ships.Battleship
 
 (********* Test Plan: *********)
 
-(*********** Initilizations ********)
+(******************************* Initilizations *******************************)
 (* Board inits *)
 let board = init_board ()
 let ship = ref (init_ship 5)
@@ -27,7 +27,7 @@ let placed_player = create_placements ship_num_lst player
 let coords, player_w_ship_horz = place_ship player !ship2 (3, 2) true
 let coords2, player_w_ship_vert = place_ship player !ship2 (3, 2) false
 
-(* Board tests: 26 *)
+(*************************** Board tests: 26 **********************************)
 let board_tests =
   [
     (*@<< tests: 5*)
@@ -117,9 +117,12 @@ let board_tests =
            []
            (board |> insert (2, 2) Miss))
         (board |> insert (2, 2) Miss |> to_list |> List.rev) );
+    (* of_map tests: 2 *)
+    ( "of_map [] is empty" >:: fun _ ->
+      assert_equal Leaf (of_map (Hashtbl.create 0)) );
   ]
 
-(* AI tests: 6 *)
+(***************************** Ai tests: 6 ************************************)
 let ai_tests =
   [
     (* gen_diff_module tests: 4 *)
@@ -144,7 +147,7 @@ let ai_tests =
       assert_equal true (placed_player |> placed_ready) );
   ]
 
-(* Battleship Tests: 42 *)
+(************************* Battleships tests: 44 ******************************)
 let battleship_tests =
   [
     (* get_player tests: 2 *)
@@ -171,17 +174,17 @@ let battleship_tests =
       assert_equal player (get_curr_player game) );
     ( "get_curr_player on game2 is ai" >:: fun _ ->
       assert_equal ai (get_curr_player game2) );
-    (* string_of_game tests: *)
+    (* string_of_game tests: 2*)
     ( "string_of_game on game is \"Player vs AI with current player being: \
        true\" "
     >:: fun _ ->
       assert_equal "Player vs AI with current player being: true"
-        (string_of_game game) ~printer:Fun.id );
+        (string_of_game game) );
     ( "string_of_game on game2 is \"Player vs AI with current player being: \
        false\" "
     >:: fun _ ->
       assert_equal "Player vs AI with current player being: false"
-        (string_of_game game2) ~printer:Fun.id );
+        (string_of_game game2) );
     (* get_cells tests: 4 *)
     ( "get_cell on empty board is empty" >:: fun _ ->
       assert_equal Empty (get_cell board (2, 2)) );
@@ -210,7 +213,7 @@ let battleship_tests =
       assert_equal 1 (num_placed player_w_ship_horz 3) );
     ( "num_placed with invalid ship length is 0" >:: fun _ ->
       assert_equal 0 (num_placed player_w_ship_horz 7) );
-    (* place_ship tests: 3 *)
+    (* place_ship tests: 4 *)
     ( "place_ship horizontal submarine in (3,2)" >:: fun _ ->
       assert_equal
         ([ (4, 2); (3, 2); (2, 2) ], Ship { ship = ship2 })
@@ -283,7 +286,7 @@ let battleship_tests =
       assert_equal board (set_board placed_player board |> get_player_board) );
     ( "set_board to board2 is player with board2" >:: fun _ ->
       assert_equal board2 (set_board player board2 |> get_player_board) );
-    (* get_all_ship_coords tests: 2 *)
+    (* get_all_ship_coords tests: 3 *)
     ( "get_all_ship_coords on empty board is empty" >:: fun _ ->
       assert_equal [] (get_all_ship_coords player) );
     ( "get_all_ship_coords on horz ship at (3,2)" >:: fun _ ->
@@ -296,8 +299,104 @@ let battleship_tests =
         (get_all_ship_coords player_w_ship_vert) );
   ]
 
+(*************************** Stack tests: 31 **********************************)
+open Ships.Stack
+
+let stack_tests =
+  [
+    (* is_empty tests: 2 *)
+    ("is_empty on empty is true" >:: fun _ -> assert_equal true (is_empty empty));
+    ( "is_empty after push is false" >:: fun _ ->
+      assert_equal false (is_empty (empty |> push 3)) );
+    (* to_list tests: 3*)
+    ( "to_list of [push 3 empty] is [3] " >:: fun _ ->
+      assert_equal [ 3 ] (push 3 empty |> to_list) );
+    ( "to_list of [2,3] is [2;3] " >:: fun _ ->
+      assert_equal [ 2; 3 ] (push 3 empty |> push 2 |> to_list) );
+    ("to_list of empty is [] " >:: fun _ -> assert_equal [] (empty |> to_list));
+    (* peek tests: 3*)
+    ( "peek of empty raises Empty " >:: fun _ ->
+      assert_raises EMPTY (fun () -> empty |> peek) );
+    ("peek of [3] is 3 " >:: fun _ -> assert_equal 3 (push 3 empty |> peek));
+    ( "peek of [2,3] is 2 " >:: fun _ ->
+      assert_equal 2 (push 3 empty |> push 2 |> peek) );
+    (* pop tests: 3*)
+    ( "pop of empty raises Empty " >:: fun _ ->
+      assert_raises EMPTY (fun () -> empty |> pop) );
+    ( "pop of [3] is empty " >:: fun _ ->
+      assert_equal empty (push 3 empty |> pop) );
+    ( "pop of [2,3] is [3] " >:: fun _ ->
+      assert_equal [ 3 ] (push 3 empty |> push 2 |> pop |> to_list) );
+    (* size tests: 4 *)
+    ("size of empty is 0  " >:: fun _ -> assert_equal 0 (empty |> size));
+    ( "size of push on empty is 1 " >:: fun _ ->
+      assert_equal 1 (push 3 empty |> size) );
+    ( "size of push |> push is 2 " >:: fun _ ->
+      assert_equal 2 (push 3 empty |> push 2 |> size) );
+    ( "size of pop on [2,3] is 1 " >:: fun _ ->
+      assert_equal 1 (push 3 empty |> push 2 |> pop |> size) );
+    (* append tests: 3*)
+    ( "append empty empty is empty  " >:: fun _ ->
+      assert_equal empty (append empty empty) );
+    ( "append [1] [2] is [1,2]" >:: fun _ ->
+      assert_equal [ 1; 2 ]
+        (let s1 = push 1 empty in
+         let s2 = push 2 empty in
+         append s1 s2 |> to_list) );
+    ( "append [2,3] [1,2] is [2,3,1,2]" >:: fun _ ->
+      assert_equal [ 2; 3; 1; 2 ]
+        (let s1 = push 3 empty |> push 2 in
+         let s2 = push 2 empty |> push 1 in
+         append s1 s2 |> to_list) );
+    (* rem_elements tests: 4*)
+    ( "rem_elements [] from empty is empty  " >:: fun _ ->
+      assert_equal empty (rem_elements [] empty) );
+    ( "rem_elements [] from [1,2] is [1,2]" >:: fun _ ->
+      assert_equal [ 1; 2 ]
+        (let s1 = push 2 empty |> push 1 in
+         rem_elements [] s1 |> to_list) );
+    ( "rem_elements [1,2] from [1,2] is empty" >:: fun _ ->
+      assert_equal empty
+        (let s1 = push 1 empty |> push 2 in
+         rem_elements [ 1; 2 ] s1) );
+    ( "rem_elements [0] from [1,2,1] is [1,2,3]" >:: fun _ ->
+      assert_equal [ 1; 2; 3 ]
+        (let s1 = push 3 empty |> push 2 |> push 1 in
+         rem_elements [ 0 ] s1 |> to_list) );
+    (* of_list tests: 3*)
+    ("of_list []  is empty  " >:: fun _ -> assert_equal empty (of_list []));
+    ( "of_list [1;2] is [1,2]" >:: fun _ ->
+      assert_equal [ 1; 2 ] (of_list [ 1; 2 ] |> to_list) );
+    ( "of_list works with other stack functions" >:: fun _ ->
+      assert_equal empty
+        (of_list [ 1; 2; 3 ] |> push 4 |> rem_elements [ 2; 3 ] |> pop |> pop)
+    );
+    (* of_array tests: 3*)
+    ( "of_array []  is empty  " >:: fun _ ->
+      assert_equal empty (of_array (Array.make 0 "")) );
+    ( "of_array [1;2] is [1,2]" >:: fun _ ->
+      assert_equal [ 1; 2 ]
+        (let arr = Array.make 2 1 in
+         arr.(1) <- 2;
+         of_array arr |> to_list) );
+    ( "of_array works with other stack functions" >:: fun _ ->
+      assert_equal empty
+        (let arr = Array.make 3 1 in
+         arr.(1) <- 2;
+         arr.(2) <- 3;
+         of_array arr |> push 4 |> rem_elements [ 2; 3 ] |> pop |> pop) );
+    (* string_of_stack tests: 3*)
+    ( "string_of_stack empty is \"[]\" " >:: fun _ ->
+      assert_equal "[]" (string_of_stack string_of_int empty) );
+    ( "string_of_stack on [1] is \"[1;]\" " >:: fun _ ->
+      assert_equal "[1;]" (push 1 empty |> string_of_stack string_of_int) );
+    ( "string_of_stack on [1,2,3] is \"[1;2;3;]\"" >:: fun _ ->
+      assert_equal "[1;2;3;]"
+        (push 3 empty |> push 2 |> push 1 |> string_of_stack string_of_int) );
+  ]
+
 let suite =
   "test suite for final project"
-  >::: List.flatten [ board_tests; ai_tests; battleship_tests ]
+  >::: List.flatten [ board_tests; ai_tests; battleship_tests; stack_tests ]
 
 let _ = run_test_tt_main suite
