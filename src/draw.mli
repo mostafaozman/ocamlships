@@ -41,7 +41,7 @@ val draw_fire_screen : game ref -> unit
     if [p] is true, player 2 otherwise. *)
 
 val draw_game_over : game ref -> bool -> unit
-(** [draw_game_over g p] draws the screen of a screen saying game over and
+(** [draw_game_over game bool] draws the screen of a screen saying game over and
     allows the player to start a new game. *)
 
 val update_cells : color -> (int * int) list -> unit
