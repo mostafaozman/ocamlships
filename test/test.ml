@@ -11,10 +11,12 @@ open Ships.Battleship
 let board = init_board ()
 let ship = ref (init_ship 5)
 let ship2 = ref (init_ship 3)
+let board2 = init_board () |> insert (2, 2) (Ship { ship })
 
 (* Battleships inits *)
 let ai = init_player AI
 let player = init_player Player
+let player2 = set_board (init_player Player) board2
 let game = make_game player ai true
 
 (* Ai inits *)
@@ -138,13 +140,10 @@ let ai_tests =
       assert_equal player Player_mod.player );
     (* create_placements tests : 1 *)
     ( "create_placements has 7 ships placed" >:: fun _ ->
-      assert_equal true (placed_player |> placed_ready) )
-    (* Ai shoot : 1 *)
-    (* ( "ArtIntelligence.shoot returns a tuple " >:: fun _ -> let t, _, _ =
-       AI.shoot placed_player in assert_equal t ); *);
+      assert_equal true (placed_player |> placed_ready) );
   ]
 
-(* Battleship Tests: 27 *)
+(* Battleship Tests: 29 *)
 let battleship_tests =
   [
     (* get_player tests: 2 *)
@@ -159,6 +158,15 @@ let battleship_tests =
     (* get_player_board tests: 1 *)
     ( "players board is empty" >:: fun _ ->
       assert_equal board (get_player_board player) );
+    ( "player2 board is board2" >:: fun _ ->
+      assert_equal board2 (get_player_board player2) );
+    (* is_player_1 tests: 2*)
+    ( "is_player1 for player on game is true" >:: fun _ ->
+      assert_equal true (is_player_1 game player) );
+    ( "is_player1 for ai on game is false" >:: fun _ ->
+      assert_equal false (is_player_1 game ai) );
+    (* get_curr_player test: 2 *)
+
     (* get_cells tests: 4 *)
     ( "get_cell on empty board is empty" >:: fun _ ->
       assert_equal Empty (get_cell board (2, 2)) );
@@ -205,7 +213,31 @@ let battleship_tests =
       assert_raises (InvalidPosition "(10,11)") (fun () ->
           place_ship player_w_ship_horz (init_ship 3) (11, 11) true) );
     (* fire tests: *)
-
+    ( "fire on initial board is coords and shipMissed" >:: fun _ ->
+      assert_equal
+        ([ (4, 5) ], ShipMissed)
+        (let coords, _, result = fire player 4 5 in
+         (coords, result)) );
+    ( "fire on Ship cell is coords and ShipHit" >:: fun _ ->
+      assert_equal
+        ([ (3, 2) ], ShipHit)
+        (let coords, _, result = fire player_w_ship_horz 3 2 in
+         (coords, result)) );
+    ( "fire on all Ship cells is coords and ShipSunk" >:: fun _ ->
+      assert_equal
+        ([ (2, 2); (3, 2); (4, 2) ], ShipSunk)
+        (let _, p1, _ = fire player_w_ship_horz 3 2 in
+         let _, p2, _ = fire p1 4 2 in
+         let coords, _, result = fire p2 2 2 in
+         (coords, result)) );
+    ( "fire on hit cell raises Invalid Position" >:: fun _ ->
+      assert_raises (InvalidPosition "(3,2)") (fun () ->
+          let _, new_player, _ = fire player_w_ship_horz 3 2 in
+          fire new_player 3 2) );
+    ( "fire on miss cell raises Invalid Position" >:: fun _ ->
+      assert_raises (InvalidPosition "(7,2)") (fun () ->
+          let _, new_player, _ = fire player_w_ship_horz 7 2 in
+          fire new_player 7 2) );
     (* possible_place tests: 4 *)
     ( "possible_place horizontal carrier in (3,2)" >:: fun _ ->
       assert_equal
@@ -231,6 +263,22 @@ let battleship_tests =
       assert_equal true (player |> is_game_over) );
     ( "is_game_over with some placed is true" >:: fun _ ->
       assert_equal false (placed_player |> is_game_over) );
+    (* set_board tests: 2 *)
+    ( "set_board to board is player with board" >:: fun _ ->
+      assert_equal board (set_board placed_player board |> get_player_board) );
+    ( "set_board to board2 is player with board2" >:: fun _ ->
+      assert_equal board2 (set_board player board2 |> get_player_board) );
+    (* get_all_ship_coords tests: 2 *)
+    ( "get_all_ship_coords on empty board is empty" >:: fun _ ->
+      assert_equal [] (get_all_ship_coords player) );
+    ( "get_all_ship_coords on horz ship at (3,2)" >:: fun _ ->
+      assert_equal
+        [ (4, 2); (3, 2); (2, 2) ]
+        (get_all_ship_coords player_w_ship_horz) );
+    ( "get_all_ship_coords on vert ship at (3,2)" >:: fun _ ->
+      assert_equal
+        [ (3, 3); (3, 2); (3, 1) ]
+        (get_all_ship_coords player_w_ship_vert) );
   ]
 
 let suite =
