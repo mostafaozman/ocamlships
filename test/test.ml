@@ -18,6 +18,7 @@ let ai = init_player AI
 let player = init_player Player
 let player2 = set_board (init_player Player) board2
 let game = make_game player ai true
+let game2 = make_game player ai false
 
 (* Ai inits *)
 module AI = Make ((val gen_diff_module Hard)) ((val gen_player_module player))
@@ -143,7 +144,7 @@ let ai_tests =
       assert_equal true (placed_player |> placed_ready) );
   ]
 
-(* Battleship Tests: 29 *)
+(* Battleship Tests: 42 *)
 let battleship_tests =
   [
     (* get_player tests: 2 *)
@@ -155,7 +156,7 @@ let battleship_tests =
       assert_equal board
         (snd (place_ship (init_player Player) !ship (2, 2) true)
         |> empty_player_board |> get_player_board) );
-    (* get_player_board tests: 1 *)
+    (* get_player_board tests: 2 *)
     ( "players board is empty" >:: fun _ ->
       assert_equal board (get_player_board player) );
     ( "player2 board is board2" >:: fun _ ->
@@ -166,7 +167,21 @@ let battleship_tests =
     ( "is_player1 for ai on game is false" >:: fun _ ->
       assert_equal false (is_player_1 game ai) );
     (* get_curr_player test: 2 *)
-
+    ( "get_curr_player on game is player" >:: fun _ ->
+      assert_equal player (get_curr_player game) );
+    ( "get_curr_player on game2 is ai" >:: fun _ ->
+      assert_equal ai (get_curr_player game2) );
+    (* string_of_game tests: *)
+    ( "string_of_game on game is \"Player vs AI with current player being: \
+       true\" "
+    >:: fun _ ->
+      assert_equal "Player vs AI with current player being: true"
+        (string_of_game game) ~printer:Fun.id );
+    ( "string_of_game on game2 is \"Player vs AI with current player being: \
+       false\" "
+    >:: fun _ ->
+      assert_equal "Player vs AI with current player being: false"
+        (string_of_game game2) ~printer:Fun.id );
     (* get_cells tests: 4 *)
     ( "get_cell on empty board is empty" >:: fun _ ->
       assert_equal Empty (get_cell board (2, 2)) );
@@ -212,7 +227,7 @@ let battleship_tests =
     ( "place_ship on out of bounds is InvalidPosition" >:: fun _ ->
       assert_raises (InvalidPosition "(10,11)") (fun () ->
           place_ship player_w_ship_horz (init_ship 3) (11, 11) true) );
-    (* fire tests: *)
+    (* fire tests: 5*)
     ( "fire on initial board is coords and shipMissed" >:: fun _ ->
       assert_equal
         ([ (4, 5) ], ShipMissed)
