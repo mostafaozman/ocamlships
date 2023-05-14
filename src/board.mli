@@ -33,7 +33,7 @@ val ( >>@ ) : int * int -> int * int -> bool
     to the second element. *)
 
 val string_of_coord : int * int -> string
-(** [string_of_coord x] is the string representation of x. *)
+(** [string_of_coord x] is the string representation of [x]. *)
 
 val empty : board
 (** [empty] is the empty board with no cells. *)

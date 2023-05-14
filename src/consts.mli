@@ -29,9 +29,6 @@ val submarine_num : int
 val patrol_num : int
 (** [patrol_num] is the number of the patrol ships present on the board. *)
 
-val total_ships : int
-(** [total_ships] is the number of the total ships present on the board. *)
-
 val ship_num_lst : (int * int) list
 (** [ship_num_lst] represents a tuple of a ship length and ship number for each
     ship. *)
