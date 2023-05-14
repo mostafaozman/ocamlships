@@ -31,6 +31,7 @@ let depression_grey = 0xABB0B8
 let white = 0xFFFFFF
 let purple = 0x3432a8
 let intersect_weight = 10
+let adjacent_weight = 5
 let ( +^+ ) a b = Buffer.add_string a b
 let horiz = "Horizontal"
 let vert = "Vertical"

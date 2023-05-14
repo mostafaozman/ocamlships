@@ -79,6 +79,10 @@ val intersect_weight : int
 (** [intersect_weight] is how much the Hard AI prioritizes intersecting Hit
     cells in its calculations. *)
 
+val adjacent_weight : int
+(** [adjacent_weight] is how much the Hard AI prioritizes two adjacent Hit cells
+    in its calculations. *)
+
 val ( +^+ ) : Buffer.t -> string -> unit
 (** [a +^+ b] adds [b] to buffer [a]*)
 

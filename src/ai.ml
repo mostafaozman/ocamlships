@@ -205,6 +205,56 @@ let sim_helper player placing_p len dir map =
     done
   done
 
+(** [weight_adjacents p m] adds weight to horizontal coordinates if two
+    horizontal hits are next to each other. Same for verticals. Requires: [p]'s
+    board has no Ship cells. *)
+let weight_adjacents p m =
+  let get_hits b =
+    fold
+      (fun (x, y) c acc -> if is_intersect (x, y) b then (x, y) :: acc else acc)
+      [] b
+  in
+
+  let hori_vert_split (ox, oy) adj_list =
+    List.partition
+      (fun (x, y) ->
+        if ox + 1 = x || ox - 1 = x then true
+        else if oy + 1 = y || oy - 1 = y then false
+        else raise (invalid_arg "Points not adjacent"))
+      adj_list
+  in
+
+  let get_empty_adj board dir (x, y) =
+    let adjs = get_adjacents_of_point (x, y) in
+    let directional_adjs =
+      if dir then fst (hori_vert_split (x, y) adjs)
+      else snd (hori_vert_split (x, y) adjs)
+    in
+    List.find_opt (fun e -> get_cell board e = Empty) directional_adjs
+  in
+
+  let board = get_player_board p in
+  let hit_list = get_hits board in
+  let change_weights dir lst (x', y') =
+    if List.mem (x', y') hit_list then (
+      List.iter
+        (fun coord ->
+          if get_cell board coord = Empty then
+            Hashtbl.replace m coord (Hashtbl.find m coord * adjacent_weight))
+        lst;
+      match get_empty_adj board dir (x', y') with
+      | None -> ()
+      | Some coord ->
+          Hashtbl.replace m coord (Hashtbl.find m coord * adjacent_weight))
+  in
+  List.iter
+    (fun (x, y) ->
+      let adjacents = get_adjacents_of_point (x, y) in
+      let horizontals, verticals = hori_vert_split (x, y) adjacents in
+      List.iter (change_weights true horizontals) horizontals;
+      List.iter (change_weights false verticals) verticals)
+    hit_list
+
 (** [monte_carlo_sim ai p b] is the Hashtable that gives a weight to every
     coordinate on [b]. *)
 let monte_carlo_sim ai player board =
@@ -219,6 +269,7 @@ let monte_carlo_sim ai player board =
         sim_helper sanitized_player placing_p len false map)
       else ())
     ai.num_remaining;
+  weight_adjacents sanitized_player map;
   map
 
 (** [random_greater_than a b] randomly determines whether to return a > b or a
@@ -267,10 +318,8 @@ let shoot_hard ai p =
 (* ########################## Impossible AI ################################# *)
 
 let ship_coord_stack p =
-  let board = get_player_board p in
-  fold
-    (fun (x, y) c acc -> if is_ship_cell c then S.push (x, y) acc else acc)
-    S.empty board
+  let ship_cells = get_all_ship_coords p in
+  List.fold_left (fun acc e -> S.push e acc) S.empty ship_cells
 
 (* ########################################################################## *)
 module Make (D : Diff) (P : Player) : ArtIntelligence = struct
