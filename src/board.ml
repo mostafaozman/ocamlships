@@ -132,8 +132,8 @@ let string_of_coord (x, y) =
   Buffer.contents buff
 
 let string_of_cell = function
-  | Ship { ship } -> "Ship of length" ^ string_of_int !ship.length
-  | Sunk { ship } -> "Sunken ship of length" ^ string_of_int !ship.length
-  | Hit { ship } -> "Hit ship of length" ^ string_of_int !ship.length
+  | Ship { ship } -> "Ship of length " ^ string_of_int !ship.length
+  | Sunk { ship } -> "Sunken ship of length " ^ string_of_int !ship.length
+  | Hit { ship } -> "Hit ship of length " ^ string_of_int !ship.length
   | Empty -> "Empty"
   | Miss -> "Miss"

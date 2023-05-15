@@ -5,7 +5,22 @@ open Ships.Ai
 open Ships.Battleship
 
 (********* Test Plan: *********)
-
+(* This project was tested using both OUnit and manual testing. OUnit test cases
+   were used to test board.ml, battleships.ml, stack.ml and part of ai.ml. The
+   rest of the modules (draw.ml, state.ml, and the rest of ai.ml) were tested
+   manually. For the modules with OUnit testing, the test cases were developed
+   using glass box testing. The test cases were chosen such that the test suite
+   reached 90+% of bisect code coverage for each of the modules. For ai.ml, only
+   the first-class module functions and create_placements were tested using
+   OUnit. The rest of the functions were tested manually due to their
+   randomness. The OUnit tests demonstrate the correctness of the program
+   because the test suite reaches 90+% coverage for each applicable module and
+   runs to completion with no errors. The manual testing for gui related moduled
+   (draw.ml and state.ml) were done by having multiple people play the game
+   multiple times while actively trying to create edge cases/bugs. The manual
+   testing for ai.ml functions were done by playing the game while printing out
+   information such as the probabilties the ai calculated. Manual testing was
+   conducted until no more bugs could be found. *)
 (******************************* Initilizations *******************************)
 (* Board inits *)
 let board = init_board ()
@@ -27,7 +42,7 @@ let placed_player = create_placements ship_num_lst player
 let coords, player_w_ship_horz = place_ship player !ship2 (3, 2) true
 let coords2, player_w_ship_vert = place_ship player !ship2 (3, 2) false
 
-(*************************** Board tests: 26 **********************************)
+(*************************** Board tests: 35 **********************************)
 let board_tests =
   [
     (*@<< tests: 5*)
@@ -117,9 +132,35 @@ let board_tests =
            []
            (board |> insert (2, 2) Miss))
         (board |> insert (2, 2) Miss |> to_list |> List.rev) );
+    (* string_of_cell tests: 5 *)
+    ( "string of Ship{ship} is \"Ship of length 5\"" >:: fun _ ->
+      assert_equal "Ship of length 5" (string_of_cell (Ship { ship })) );
+    ( "string of Sunk{ship} is \"Sunken ship of length 5\"" >:: fun _ ->
+      assert_equal "Sunken ship of length 5" (string_of_cell (Sunk { ship })) );
+    ( "string of Hit{ship} is \"Hit ship of length 5\"" >:: fun _ ->
+      assert_equal "Hit ship of length 5" (string_of_cell (Hit { ship })) );
+    ( "string of Empty is \"Empty\"" >:: fun _ ->
+      assert_equal "Empty" (string_of_cell Empty) );
+    ( "string of Miss is \"Miss\"" >:: fun _ ->
+      assert_equal "Miss" (string_of_cell Miss) );
     (* of_map tests: 2 *)
     ( "of_map [] is empty" >:: fun _ ->
       assert_equal Leaf (of_map (Hashtbl.create 0)) );
+    ( "of_map [(0,0), Empty]" >:: fun _ ->
+      assert_equal
+        (Node (Black, ((0, 0), Empty), Leaf, Leaf))
+        (of_map
+           (let tbl = Hashtbl.create 1 in
+            Hashtbl.add tbl (0, 0) Empty;
+            tbl)) );
+    (* string_of_tree tests: 2*)
+    ( "string_of_tree [Leaf] is \"\"" >:: fun _ ->
+      assert_equal "" (string_of_tree string_of_coord string_of_int Leaf) );
+    ( "string_of_tree [(0,0), Empty] is \"\"" >:: fun _ ->
+      assert_equal "((0,0):Empty ),"
+        (let tree = Node (Black, ((0, 0), Empty), Leaf, Leaf) in
+         string_of_tree string_of_coord string_of_cell tree)
+        ~printer:Fun.id );
   ]
 
 (***************************** Ai tests: 6 ************************************)
@@ -147,7 +188,7 @@ let ai_tests =
       assert_equal true (placed_player |> placed_ready) );
   ]
 
-(************************* Battleships tests: 44 ******************************)
+(************************* Battleships tests: 46 ******************************)
 let battleship_tests =
   [
     (* get_player tests: 2 *)
@@ -185,7 +226,7 @@ let battleship_tests =
     >:: fun _ ->
       assert_equal "Player vs AI with current player being: false"
         (string_of_game game2) );
-    (* get_cells tests: 4 *)
+    (* get_cell tests: 4 *)
     ( "get_cell on empty board is empty" >:: fun _ ->
       assert_equal Empty (get_cell board (2, 2)) );
     ( "get_cell lower bound is empty" >:: fun _ ->
@@ -286,6 +327,11 @@ let battleship_tests =
       assert_equal board (set_board placed_player board |> get_player_board) );
     ( "set_board to board2 is player with board2" >:: fun _ ->
       assert_equal board2 (set_board player board2 |> get_player_board) );
+    (* is_ship_cell tests: 2 *)
+    ( "is_ship_cell on Ship is true" >:: fun _ ->
+      assert_equal true (is_ship_cell (Ship { ship })) );
+    ( "is_ship_cell on Empty is false" >:: fun _ ->
+      assert_equal false (is_ship_cell Empty) );
     (* get_all_ship_coords tests: 3 *)
     ( "get_all_ship_coords on empty board is empty" >:: fun _ ->
       assert_equal [] (get_all_ship_coords player) );
@@ -297,6 +343,21 @@ let battleship_tests =
       assert_equal
         [ (3, 3); (3, 2); (3, 1) ]
         (get_all_ship_coords player_w_ship_vert) );
+    (* set_empty tests: *)
+    ( "set_empty to remove one ship" >:: fun _ ->
+      assert_equal board
+        (set_empty [ (3, 2); (2, 2); (4, 2) ] player_w_ship_horz
+        |> get_player_board) );
+    ( "set_empty to remove all ships" >:: fun _ ->
+      assert_equal board
+        (let range n = List.init n (fun x -> x) in
+         let lst =
+           List.concat
+             (List.map
+                (fun i -> List.map (fun j -> (i, j)) (range 10))
+                (range 10))
+         in
+         set_empty lst player_w_ship_horz |> get_player_board) );
   ]
 
 (*************************** Stack tests: 31 **********************************)
