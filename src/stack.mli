@@ -4,6 +4,7 @@ type 'a t
 (** the type representing a stack. *)
 
 exception EMPTY
+(** Exception raised when stack is empty and an element is requested. *)
 
 val empty : 'a t
 (** The empty stack *)

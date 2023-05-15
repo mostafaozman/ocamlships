@@ -17,6 +17,8 @@ type board
 (** The type representing the board of a game of Battleship. *)
 
 exception InvalidPosition of string
+(** Exception to raise when an illegal change is requested on board coordinate
+    or a coordinate is out of bounds. *)
 
 val init_board : unit -> board
 (** [init_board ()] initializes a new, empty game board. *)
