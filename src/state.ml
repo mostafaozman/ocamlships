@@ -329,7 +329,7 @@ let rec play_loop game =
       (background_lly, background_lly + background_length)
       st
   then try gui_fire game st.mouse_x st.mouse_y with e -> play_loop game
-  else if button_bound_check (600, 775) (20, 80) st || st.key == 'p' then
+  else if button_bound_check (600, 775) (20, 80) st then
     go_peek game
 
 and gui_fire game x y =
