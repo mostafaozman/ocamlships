@@ -1,4 +1,3 @@
-(* Implement functions from battleship.mli *)
 open Consts
 open Board
 

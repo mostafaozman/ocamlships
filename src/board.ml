@@ -1,5 +1,5 @@
 (** Code for [empty], [is_empty], [size], [insert], [find], [fold], and
-    [to_list] largely copied from Joel Valerio (jev66)'s Assignment 3. Balance
+    [to_list] largely adapted from Joel Valerio (jev66)'s Assignment 3. Balance
     is from textbook. *)
 
 open Consts
